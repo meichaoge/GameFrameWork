@@ -7,7 +7,7 @@ namespace GameFrameWork
     /// <summary>
     /// 包含常用的路径定义
     /// </summary>
-    public class ConstDefine
+    public partial class ConstDefine : Singleton_Static<ConstDefine>
     {
         /// <summary>
         /// 外部资源存储的主目录

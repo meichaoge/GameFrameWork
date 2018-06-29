@@ -35,13 +35,27 @@ namespace GameFrameWork
         public bool IsCompleted { get; protected set; }
         public bool IsError { get; protected set; }
         public float Process { get; protected set; }
-        public string Description { get; protected set; }
+
+        protected string m_Description = "";
+        public string Description
+        {
+            get
+            {
+                return m_Description;
+            }
+            protected set
+            {
+                m_Description = value;
+                if (OnUpdateDescriptionAct != null)
+                    OnUpdateDescriptionAct(m_Description);
+            }
+        }//描述更新 触发事件
         public object ResultObj { get; protected set; }
 
         /// <summary>
         /// GC回收时间间隔
         /// </summary>
-        protected virtual float m_GCInterval
+        public virtual float m_GCInterval
         {
             get
             {
@@ -58,6 +72,9 @@ namespace GameFrameWork
         public readonly List<System.Action> OnCompleteLoadAct = new List<Action>(); //加载完成事件
         protected float m_DisposeDelayTime = 0f; //(加载完成后引用计数为0时候)延迟销毁的时间
         public float UnUseTime { get; protected set; } //加载器失效时候的时间
+
+        public System.Action<string> OnUpdateDescriptionAct = null; //更新描述信息
+
         /// <summary>
         /// 引用计数
         /// </summary>
@@ -69,93 +86,7 @@ namespace GameFrameWork
         }
 
 
-        //protected virtual void LoadAsset<T>(string url, LoadAssetModel loadModel = LoadAssetModel.Async, LoadAssetPathEnum loadAssetPath = LoadAssetPathEnum.ResourcesPath)
-        //{
-        //    switch (loadModel)
-        //    {
-        //        case LoadAssetModel.Sync:
-        //            SyncLoadAsset(url);
-        //            break;
-        //        case LoadAssetModel.Async:
-        //            ASyncLoadAsset(url);
-        //            break;
-        //        default:
-        //            Debug.LogError("LoadAsset Fail,未定义的加载类型 " + loadModel);
-        //            break;
-        //    }
-
-        //}
-        ///// <summary>
-        ///// 同步加载资源
-        ///// </summary>
-        ///// <param name="url"></param>
-        //protected virtual void SyncLoadAsset(string url, LoadAssetPathEnum loadAssetPath = LoadAssetPathEnum.ResourcesPath)
-        //{
-        //    switch (loadAssetPath)
-        //    {
-        //        case LoadAssetPathEnum.PersistentDataPath:
-        //            SyncLoadAssetOfPersistentData(url);
-        //            break;
-        //        case LoadAssetPathEnum.ResourcesPath:
-        //            SyncLoadAssetOfResources(url);
-        //            break;
-        //        case LoadAssetPathEnum.StreamingAssetsPath:
-        //            break;
-        //        case LoadAssetPathEnum.EditorAssetDataPath:
-        //            break;
-        //        default:
-        //            break;
-        //    }
-        //}
-
-        ///// <summary>
-        ///// 异步加载资源
-        ///// </summary>
-        ///// <param name="url"></param>
-        //protected virtual void ASyncLoadAsset(string url, LoadAssetPathEnum loadAssetPath = LoadAssetPathEnum.ResourcesPath)
-        //{
-
-        //}
-
-        //#region 同步加载资源
-        ///// <summary>
-        ///// 同步加载Resources 资源
-        ///// </summary>
-        ///// <param name="url"></param>
-        ///// <param name=""></param>
-        //protected virtual void SyncLoadAssetOfResources(string url )
-        //{
-        //    ResultObj= Resources.Load(url);
-        //    Process = 1;
-        //    IsCompleted = true;
-        //    IsError = false;
-        //    OnCompleteLoad();
-        //}
-        ///// <summary>
-        ///// 同步加载 PersistentDataPath 资源
-        ///// </summary>
-        ///// <param name="url"></param>
-        //protected virtual void SyncLoadAssetOfPersistentData(string url)
-        //{
-        //    using (FileStream stream = new FileStream(ConstDefine.S_PersistentDataPath+url, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-        //    {
-
-
-        //    }
-        //}
-        //#endregion
-
-
-
-        protected virtual void OnCompleteLoad()
-        {
-            for (int index = 0; index < OnCompleteLoadAct.Count; index++)
-            {
-                if (OnCompleteLoadAct[index] != null)
-                    OnCompleteLoadAct[index]();
-            }
-        }
-
+        protected abstract void OnCompleteLoad();
 
 
         /// <summary>
@@ -180,9 +111,20 @@ namespace GameFrameWork
             UnUseTime = Time.realtimeSinceStartup;
         }
 
+        /// <summary>
+        /// 增加引用计数
+        /// </summary>
         public virtual void AddReference()
         {
             ++ReferCount;
+        }
+
+        /// <summary>
+        /// 减少引用计数
+        /// </summary>
+        public virtual void ReduceReference()
+        {
+            --ReferCount;
         }
 
         public abstract void Dispose();
