@@ -55,50 +55,39 @@ namespace GameFrameWork
         #endregion
 
 
-        #region 创建加载器
-
-        /// <summary>
-        /// 创建生成一个加载器并开始加载资源
-        /// </summary>
-        /// <typeparam name="T">加载器类型</typeparam>
-        /// <param name="url">资源唯一标识</param>
-        ///// <param name="completeCallback">加载完成回调</param>
-        ///// <param name="forceCreateNew">是否强制重新创建</param>
-        ///// <param name="loadModel">资源加载模式 默认异步加载</param>
-        public static void CreateLoader<T>(System.Action completeCallback) where T : BaseAbstracResourceLoader, new()
-        {
-            Dictionary<string, BaseAbstracResourceLoader> typeOfLoaders = null;
-            if (ResourcesLoaderMgr.S_AllTypeLoader.TryGetValue(typeof(T), out typeOfLoaders)==false)
-            {
-                typeOfLoaders = new Dictionary<string, BaseAbstracResourceLoader>();
-                ResourcesLoaderMgr.S_AllTypeLoader.Add(typeof(T), typeOfLoaders);
-            }//不存在这个类型
-
-
-            if (completeCallback != null)
-                completeCallback();
-        
-        }
-        #endregion
-
+ 
         #region 删除加载器  添加到待删除队列中
 
         /// <summary>
         ///  将Loader 删除放到不使用的字典中等待删除(需要判断引用计数是否小于1)
         /// </summary>
         /// <param name="loader">Loader.</param>
-        public static void DeleteLoader<T>(bool isForceDelete, BaseAbstracResourceLoader loader, string url)
+        public static void DeleteLoader<T>(  string url, bool isForceDelete)
         {
-            Queue<BaseAbstracResourceLoader> typeOfLoaders = null;
-            if (S_UnUseLoader.TryGetValue(typeof(T), out typeOfLoaders) == false)
+            BaseAbstracResourceLoader loader = null;
+            Dictionary<string, BaseAbstracResourceLoader> allUseingLoadersOfType = null;
+            if (S_AllTypeLoader.TryGetValue(typeof(T),out allUseingLoadersOfType) ==false)
             {
-                typeOfLoaders = new Queue<BaseAbstracResourceLoader>();
-                S_UnUseLoader.Add(typeof(T), typeOfLoaders);
+                Debug.LogError("DeleteLoader Fail,Not Exit Type "+ typeof(T));
+                return;
+            }
+            if(allUseingLoadersOfType.TryGetValue(url,out loader)==false)
+            {
+                Debug.LogError("DeleteLoader Fail,Not Exit Loader  " + typeof(T)+"  loaderName="+ url);
+                return;
+            }
+            allUseingLoadersOfType.Remove(url);
+
+            Queue<BaseAbstracResourceLoader> allUnUseLoadersOfType = null;
+            if (S_UnUseLoader.TryGetValue(typeof(T), out allUnUseLoadersOfType) == false)
+            {
+                allUnUseLoadersOfType = new Queue<BaseAbstracResourceLoader>();
+                S_UnUseLoader.Add(typeof(T), allUnUseLoadersOfType);
             }
             if (isForceDelete)
             {
                 loader.ReleaseLoader();
-                typeOfLoaders.Enqueue(loader);  //释放资源加载器资源并加入队列中
+                allUnUseLoadersOfType.Enqueue(loader);  //释放资源加载器资源并加入队列中
                 return;
             }
 
@@ -108,8 +97,9 @@ namespace GameFrameWork
                 return;
             }
             loader.ReleaseLoader();
-            typeOfLoaders.Enqueue(loader);  //释放资源加载器资源并加入队列中
-            Debug.Log("回收加载器  " + typeof(T) + "::" + url);
+            allUnUseLoadersOfType.Enqueue(loader);  //释放资源加载器资源并加入队列中
+            Debug.Log(S_UnUseLoader[typeof(T)].Count);
+            Debug.Log("回收加载器  " + typeof(T) + "::" + url+"  count="+ allUnUseLoadersOfType.Count);
         }
         #endregion
 
@@ -175,6 +165,8 @@ namespace GameFrameWork
                     if (Time.realtimeSinceStartup - checkLoader.UnUseTime < checkLoader.m_GCInterval)
                         break;  //由于加载器是一个队列 因此最前面的加载肯定先到达最长生命周期
 
+                    Debug.LogInfor("[GC Loaders ] Type=" + checkLoader .GetType()+ "  Url" + checkLoader.m_ResourcesUrl);
+
                     //当前加载器回收后超过了最大生命周期时间需要被删除回收资源
                     checkLoader.Dispose();  //加载器释放最后的资源
                     loaders.Dequeue();  //删除对象
@@ -194,22 +186,6 @@ namespace GameFrameWork
 
         #region 加载器检测/获取接口
 
-
-        /// <summary>
-        /// 检测并获取指定类型的加载器是否存在
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="isRecorded"></param>
-        /// <returns></returns>
-        public static bool CheckIfContainLoaderOfType<T>()  where T: BaseAbstracResourceLoader, new()
-        {
-            Dictionary<string, BaseAbstracResourceLoader> typeOfLoaders = null;
-            if (ResourcesLoaderMgr.S_AllTypeLoader.TryGetValue(typeof(T), out typeOfLoaders))
-            {
-                return true;
-            }
-            return false;
-        }
 
         /// <summary>
         /// 检获取指定类型的加载器 如果不存在则创建一个

@@ -4,31 +4,53 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 
-public class Test : MonoBehaviour {
+public class Test : MonoBehaviour
+{
     public string url;
-	// Use this for initialization
-	void Start () {
-        ResourcesLoaderMgr.CreateLoader<ByteLoader>( OnCompleteLoad);
-       
-    }
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
-
-    private void OnCompleteLoad()
+    // Use this for initialization
+    void Start()
     {
-        Debug.Log("OnCompleteLoad ..");
-        ByteLoader.LoadAsset<ByteLoader>(url, CompleteLoadHandler, LoadAssetModel.Async, LoadAssetPathEnum.ResourcesPath);
+
+
     }
 
-    private void  CompleteLoadHandler(bool isError, byte[] data)
+    // Update is called once per frame
+    void Update()
     {
-        if(isError==false)
+        if (Input.GetKeyDown(KeyCode.A))
+        {
+            ByteLoader.LoadAsset(url, CompleteLoadHandler, LoadAssetModel.Async, LoadAssetPathEnum.ResourcesPath);
+        }
+
+        if (Input.GetKeyDown(KeyCode.D))
+        {
+            OnApplicationQuit();
+        }
+    }
+
+
+    private void CompleteLoadHandler(bool isError, byte[] data)
+    {
+        if (isError == false)
         {
             Debug.Log(Encoding.UTF8.GetString(data));
         }
     }
+
+
+
+#if UNITY_EDITOR
+    private void OnApplicationQuit()
+    {
+        Debug.Log("OnApplicationQuit");
+        ByteLoader.UnLoadAsset(url);
+    }
+# else
+    private void OnDestroy()
+    {
+        Debug.Log("OnDestroy");
+            ByteLoader.UnLoadAsset(url);
+    }
+#endif
 
 }

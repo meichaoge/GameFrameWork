@@ -16,7 +16,7 @@ namespace GameFrameWork
             Debug.Log(" Application.persistentDataPath=" + Application.persistentDataPath);
             Debug.Log(" Application.temporaryCachePath=" + Application.temporaryCachePath);
             Debug.Log(" Application.streamingAssetsPath=" + Application.streamingAssetsPath);
-
+          
 #endif
 
             base.Awake();
@@ -34,7 +34,7 @@ namespace GameFrameWork
 
         private void FixedUpdate()
         {
-            ResourcesLoaderMgr.Tick();  
+            ResourcesLoaderMgr.Tick();
         }
 
 

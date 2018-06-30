@@ -60,7 +60,7 @@ namespace GameFrameWork
             get
             {
                 if (Application.platform == RuntimePlatform.WindowsEditor || Application.platform == RuntimePlatform.OSXEditor)
-                    return 1f;//编辑器下1秒
+                    return 3f;//编辑器下1秒
 
                 if (UnityEngine.Debug.isDebugBuild)
                     return 5f;  //打包时候开启 Develop Builder 
@@ -68,8 +68,11 @@ namespace GameFrameWork
             }
         }
 
-        protected string m_ResourcesUrl; //资源的唯一标识
-        public readonly List<System.Action> OnCompleteLoadAct = new List<Action>(); //加载完成事件
+        /// <summary>
+        /// 资源的唯一标识
+        /// </summary>
+        public string m_ResourcesUrl { get; protected set; } 
+
         protected float m_DisposeDelayTime = 0f; //(加载完成后引用计数为0时候)延迟销毁的时间
         public float UnUseTime { get; protected set; } //加载器失效时候的时间
 
@@ -99,7 +102,6 @@ namespace GameFrameWork
             Process = 0;
             Description = null;
             ResultObj = null;
-            OnCompleteLoadAct.Clear();
         }
         /// <summary>
         /// 将资源加载器放入待删除队列时候 释放必要的资源
@@ -107,7 +109,6 @@ namespace GameFrameWork
         public virtual void ReleaseLoader()
         {
             ReferCount = 0;
-            OnCompleteLoadAct.Clear();
             UnUseTime = Time.realtimeSinceStartup;
         }
 

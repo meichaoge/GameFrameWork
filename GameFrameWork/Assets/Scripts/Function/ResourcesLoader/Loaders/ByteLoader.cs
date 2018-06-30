@@ -24,9 +24,10 @@ namespace GameFrameWork
         }
 
         protected byte[] m_Data;
-        protected FileStream fileStream = null;
-        protected object m_AsyncStateObj=new object();
-
+        protected FileStream fileStream = null;  //读取文件的流对象
+        /// <summary>
+        /// 加载完成的回调
+        /// </summary>
         public readonly List<CompleteByteLoaderHandler> m_AllCompleteLoader = new List<CompleteByteLoaderHandler>();
 
         /// <summary>
@@ -37,10 +38,10 @@ namespace GameFrameWork
         /// <param name="completeHandler">加载完成回调</param>
         /// <param name="loadModel">加载模式(同步/异步) default=异步</param>
         /// <param name="loadAssetPath">加载资源路径模式(外部/Resources/StreamAsset ) default=ResourcesPath</param>
-        public static void LoadAsset<T>(string url, CompleteByteLoaderHandler completeHandler, LoadAssetModel loadModel = LoadAssetModel.Async, LoadAssetPathEnum loadAssetPath = LoadAssetPathEnum.ResourcesPath)
+        public static ByteLoader LoadAsset(string url, CompleteByteLoaderHandler completeHandler, LoadAssetModel loadModel = LoadAssetModel.Async, LoadAssetPathEnum loadAssetPath = LoadAssetPathEnum.ResourcesPath) 
         {
             bool isContainLoaders = false;
-            Dictionary<string, BaseAbstracResourceLoader> resultLoaders = ResourcesLoaderMgr.GetLoaderOfType<T>(ref isContainLoaders);
+            Dictionary<string, BaseAbstracResourceLoader> resultLoaders = ResourcesLoaderMgr.GetLoaderOfType<ByteLoader>(ref isContainLoaders);
             ByteLoader byteLoader = null;
             foreach (var item in resultLoaders)
             {
@@ -65,6 +66,7 @@ namespace GameFrameWork
                 if (completeHandler != null)
                     completeHandler(byteLoader.IsError, byteLoader.ResultBytes);
             }
+            return byteLoader;
 
         }
 
@@ -100,11 +102,11 @@ namespace GameFrameWork
         /// <summary>
         /// 同步加载资源
         /// </summary>
-        protected virtual void LoadByteAssetSync(string url)
+        protected virtual void LoadByteAssetSync(string path)
         {
             try
             {
-                fileStream = new FileStream(url, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                fileStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                 m_Data = new byte[fileStream.Length];
                 int realCount = fileStream.Read(m_Data, 0, m_Data.Length);
                 if(realCount!= m_Data.Length)
@@ -113,9 +115,10 @@ namespace GameFrameWork
                     Debug.Log("读取完成路径" + m_ResourcesUrl + " 文件大小 " + m_Data.Length);
 
                 this.IsCompleted = true;
-                this.IsError = (m_Data.Length != 0);
+                this.IsError = (m_Data.Length == 0);
                 this.Description = "CompleteLoad: " + m_ResourcesUrl;
                 this.ResultObj = m_Data;
+                this.Process = 1;
                 OnCompleteLoad();
             }
             catch (System.Exception ex)
@@ -138,13 +141,16 @@ namespace GameFrameWork
         /// <summary>
         /// 异步加载
         /// </summary>
-        protected virtual void LoadByteAssetASync(string url)
+        protected virtual void LoadByteAssetASync(string path)
         {
+            Debug.Log("LoadByteAssetASync  url=" + path);
+            Debug.Log(System.IO.File.Exists(path));
+
             try
             {
-                fileStream = new FileStream(url, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                fileStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                 m_Data = new byte[fileStream.Length];
-                fileStream.BeginRead(m_Data, 0, m_Data.Length, CompleteAsyncRead, m_AsyncStateObj);
+                fileStream.BeginRead(m_Data, 0, m_Data.Length, CompleteAsyncRead, fileStream);
             }
             catch (System.Exception ex)
             {
@@ -176,10 +182,10 @@ namespace GameFrameWork
                 Debug.Log("读取完成路径:" + m_ResourcesUrl + " 文件大小 " + m_Data.Length);
 
             this.IsCompleted = true;
-            this.IsError = (m_Data.Length != 0);
+            this.IsError = (m_Data.Length == 0);
             this.Description = "CompleteLoad: " + m_ResourcesUrl;
             this.ResultObj = m_Data;
-
+            this.Process = 1;
             stream.Close();
             OnCompleteLoad();
         }
@@ -192,13 +198,13 @@ namespace GameFrameWork
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="url"></param>
-        public static void UnLoadAsset<T>(string url)
+        public static void UnLoadAsset(string url)
         {
             bool isContainLoaders = false;
-            Dictionary<string, BaseAbstracResourceLoader> resultLoaders = ResourcesLoaderMgr.GetLoaderOfType<T>(ref isContainLoaders);
+            Dictionary<string, BaseAbstracResourceLoader> resultLoaders = ResourcesLoaderMgr.GetLoaderOfType<ByteLoader>(ref isContainLoaders);
             if (isContainLoaders == false)
             {
-                Debug.LogError("无法获取指定类型的加载器 " + typeof(T));
+                //Debug.LogError("无法获取指定类型的加载器 " + typeof(ByteLoader));
                 return;
             }
 
@@ -206,13 +212,13 @@ namespace GameFrameWork
             ResourcesLoaderMgr.GetLoaderOfTypeAndUrl<ByteLoader>(ref byteLoader, url, resultLoaders, null);
             if(byteLoader==null)
             {
-                Debug.LogError("UnLoadAsset Fail  ,无法找到指定Url 的加载器 : " + url);
+                //Debug.LogError("UnLoadAsset Fail  ,无法找到指定Url 的加载器 : " + url);
                 return;
             }
             byteLoader.ReduceReference();
             if (byteLoader.ReferCount <= 0)
             {
-                ResourcesLoaderMgr.DeleteLoader<ByteLoader>(false, byteLoader, url);
+                ResourcesLoaderMgr.DeleteLoader<ByteLoader>(url, false);
             }//引用计数为0时候开始回收资源
 
         }
