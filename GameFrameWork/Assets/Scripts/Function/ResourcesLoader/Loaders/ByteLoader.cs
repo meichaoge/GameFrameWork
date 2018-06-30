@@ -72,7 +72,7 @@ namespace GameFrameWork
 
         protected virtual void LoadByteAsset(string url, LoadAssetModel loadModel = LoadAssetModel.Async, LoadAssetPathEnum loadAssetPath = LoadAssetPathEnum.ResourcesPath)
         {
-            if (ResourcesLoaderMgr.GetAssetPathOfLoadAssetPath(ref url, loadAssetPath) == PathResultEnum.Invalid)
+            if (ResourcesLoaderMgr.GetAssetPathOfLoadAssetPath(ref url, loadAssetPath,true) == PathResultEnum.Invalid)
             {
                 this.IsCompleted = true;
                 this.IsError = true;

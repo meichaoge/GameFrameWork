@@ -17,7 +17,23 @@ namespace GameFrameWork
             {
                 return Application.persistentDataPath + "/GameFrame/";
             }
-        } 
+        }
+
+        private static string resourcesPath;
+        /// <summary>
+        /// Resources 目录的文件路径
+        /// </summary>
+        public static string S_ResourcesPath
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(resourcesPath))
+                    resourcesPath = Application.dataPath + "/Resources/";
+                return resourcesPath;
+            }
+        }
+
+
 
     }
 }

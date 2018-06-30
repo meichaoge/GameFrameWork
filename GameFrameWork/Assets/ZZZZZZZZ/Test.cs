@@ -8,9 +8,8 @@ public class Test : MonoBehaviour {
     public string url;
 	// Use this for initialization
 	void Start () {
-        ByteLoader loder = ResourcesLoaderMgr.CreateLoader<ByteLoader>(url, OnCompleteLoad);
+        ResourcesLoaderMgr.CreateLoader<ByteLoader>( OnCompleteLoad);
        
-
     }
 	
 	// Update is called once per frame

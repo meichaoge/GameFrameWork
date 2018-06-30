@@ -11,6 +11,14 @@ namespace GameFrameWork
     {
         protected override void Awake()
         {
+#if UNITY_EDITOR
+            Debug.Log(" Application.dataPath=" + Application.dataPath);
+            Debug.Log(" Application.persistentDataPath=" + Application.persistentDataPath);
+            Debug.Log(" Application.temporaryCachePath=" + Application.temporaryCachePath);
+            Debug.Log(" Application.streamingAssetsPath=" + Application.streamingAssetsPath);
+
+#endif
+
             base.Awake();
         }
 

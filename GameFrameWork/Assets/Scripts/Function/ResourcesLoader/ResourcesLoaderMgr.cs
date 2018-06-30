@@ -65,65 +65,19 @@ namespace GameFrameWork
         ///// <param name="completeCallback">加载完成回调</param>
         ///// <param name="forceCreateNew">是否强制重新创建</param>
         ///// <param name="loadModel">资源加载模式 默认异步加载</param>
-        public static T CreateLoader<T>(string url, System.Action completeCallback) where T : BaseAbstracResourceLoader, new()
+        public static void CreateLoader<T>(System.Action completeCallback) where T : BaseAbstracResourceLoader, new()
         {
-            BaseAbstracResourceLoader m_Loader = null;
             Dictionary<string, BaseAbstracResourceLoader> typeOfLoaders = null;
-            if (ResourcesLoaderMgr.S_AllTypeLoader.TryGetValue(typeof(T), out typeOfLoaders))
-            {
-                #region 存在这个类型加载器
-                List<System.Action> allCompleteAct = new List<Action>();
-                allCompleteAct.Add(completeCallback);
-                foreach (var loader in typeOfLoaders)
-                {
-                    if (loader.Key == url)
-                    {
-                        m_Loader = loader.Value;
-                        break;
-                    }
-                }
-
-                if (m_Loader != null)
-                {
-                    //if (forceCreateNew)
-                    //{
-                    //    allCompleteAct.AddRange(m_Loader.OnCompleteLoadAct);
-                    //    typeOfLoaders.Remove(url);
-                    //    DeleteLoader<T>(true, m_Loader, url);
-                    //    m_Loader = null;
-                    //}//如果已经存在这个加载器且需要强制删除 则记录之前的回调事件
-                    //else
-                    {
-                        m_Loader = ResourcesLoaderMgr.RecycleUnUseLoader<T>();
-                        //m_Loader.OnCompleteLoadAct.AddRange(allCompleteAct);
-                        m_Loader.AddReference();//增加引用计数
-                        typeOfLoaders.Add(url, m_Loader);
-                    }
-                }
-                else
-                {
-                    m_Loader = ResourcesLoaderMgr.RecycleUnUseLoader<T>();
-                    //m_Loader.OnCompleteLoadAct.AddRange(allCompleteAct);
-                    m_Loader.AddReference();//增加引用计数
-                    typeOfLoaders.Add(url, m_Loader);
-                }
-
-                #endregion
-            }
-            else
+            if (ResourcesLoaderMgr.S_AllTypeLoader.TryGetValue(typeof(T), out typeOfLoaders)==false)
             {
                 typeOfLoaders = new Dictionary<string, BaseAbstracResourceLoader>();
-                m_Loader = ResourcesLoaderMgr.RecycleUnUseLoader<T>();
-                m_Loader.OnCompleteLoadAct.Add(completeCallback);
-                typeOfLoaders.Add(url, m_Loader);
                 ResourcesLoaderMgr.S_AllTypeLoader.Add(typeof(T), typeOfLoaders);
             }//不存在这个类型
 
 
             if (completeCallback != null)
                 completeCallback();
-
-            return (T)m_Loader;
+        
         }
         #endregion
 
@@ -313,10 +267,11 @@ namespace GameFrameWork
         /// </summary>
         /// <param name="url"></param>
         /// <param name="loadPathEnum"></param>
+        /// <param name="isFileAbsolutelyPath">是否是绝对路径  (使用IO.File 加载时候必须)</param>
         /// <returns></returns>
-        public static PathResultEnum GetAssetPathOfLoadAssetPath(ref string url, LoadAssetPathEnum loadPathEnum)
+        public static PathResultEnum GetAssetPathOfLoadAssetPath(ref string url, LoadAssetPathEnum loadPathEnum,bool isFileAbsolutelyPath)
         {
-            if (string.IsNullOrEmpty(null))
+            if (string.IsNullOrEmpty(url))
             {
                 Debug.LogError("无法识别的路径 " + url);
                 return PathResultEnum.Invalid;
@@ -328,6 +283,8 @@ namespace GameFrameWork
                     url = ConstDefine.S_PersistentDataPath + url;
                     return PathResultEnum.Valid;
                 case LoadAssetPathEnum.ResourcesPath:
+                    if (isFileAbsolutelyPath)
+                        url = ConstDefine.S_ResourcesPath + url;
                     return PathResultEnum.Valid;
                 case LoadAssetPathEnum.StreamingAssetsPath:
                     return PathResultEnum.Valid;
