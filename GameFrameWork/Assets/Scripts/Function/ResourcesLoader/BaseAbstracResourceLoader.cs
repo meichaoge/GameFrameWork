@@ -89,7 +89,15 @@ namespace GameFrameWork
         }
 
 
-        protected abstract void OnCompleteLoad();
+        protected virtual void OnCompleteLoad(bool isError,string description,object result,float process=1)
+        {
+            IsCompleted = true;
+            IsError = isError;
+            Description = description;
+            ResultObj = result;
+            Process = process;
+        }
+      
 
 
         /// <summary>

@@ -13,6 +13,9 @@ namespace GameFrameWork
     /// </summary>
     public class ByteLoader : BaseAbstracResourceLoader
     {
+        /// <summary>
+        /// 最终加载的资源
+        /// </summary>
         public byte[] ResultBytes
         {
             get
@@ -71,16 +74,17 @@ namespace GameFrameWork
         }
 
         #region 资源加载
-
+        /// <summary>
+        /// 根据参数指定的加载方式和优先选择的路径加载资源
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="loadModel"></param>
+        /// <param name="loadAssetPath"></param>
         protected virtual void LoadByteAsset(string url, LoadAssetModel loadModel = LoadAssetModel.Async, LoadAssetPathEnum loadAssetPath = LoadAssetPathEnum.ResourcesPath)
         {
             if (ResourcesLoaderMgr.GetAssetPathOfLoadAssetPath(ref url, loadAssetPath,true) == PathResultEnum.Invalid)
             {
-                this.IsCompleted = true;
-                this.IsError = true;
-                this.Description = "Path is Invalidate";
-                this.ResultObj = null;
-                OnCompleteLoad();
+                OnCompleteLoad(true,string.Format("Path is Invalidate {0}" , url),null);
                 return;
             }
 
@@ -114,21 +118,12 @@ namespace GameFrameWork
                 else
                     Debug.Log("读取完成路径" + m_ResourcesUrl + " 文件大小 " + m_Data.Length);
 
-                this.IsCompleted = true;
-                this.IsError = (m_Data.Length == 0);
-                this.Description = "CompleteLoad: " + m_ResourcesUrl;
-                this.ResultObj = m_Data;
-                this.Process = 1;
-                OnCompleteLoad();
+                OnCompleteLoad((m_Data.Length == 0), string.Format("CompleteLoad: {0}", m_ResourcesUrl), m_Data);
             }
             catch (System.Exception ex)
             {
                 Debug.LogError("LoadByteAssetSync  Fail,error" + ex.Message);
-                this.IsCompleted = true;
-                this.IsError = true ;
-                this.Description = ex.Message;
-                this.ResultObj = null;
-                OnCompleteLoad();
+                OnCompleteLoad(IsError, ex.Message, null);
             }
             finally
             {
@@ -155,11 +150,7 @@ namespace GameFrameWork
             catch (System.Exception ex)
             {
                 Debug.LogError("LoadByteAssetASync  Fail,error" + ex.Message);
-                this.IsCompleted = true;
-                this.IsError = true;
-                this.Description = ex.Message;
-                this.ResultObj = null;
-                OnCompleteLoad();
+                OnCompleteLoad(true,ex.Message,null);
             }
             finally
             {
@@ -181,13 +172,8 @@ namespace GameFrameWork
             else
                 Debug.Log("读取完成路径:" + m_ResourcesUrl + " 文件大小 " + m_Data.Length);
 
-            this.IsCompleted = true;
-            this.IsError = (m_Data.Length == 0);
-            this.Description = "CompleteLoad: " + m_ResourcesUrl;
-            this.ResultObj = m_Data;
-            this.Process = 1;
             stream.Close();
-            OnCompleteLoad();
+            OnCompleteLoad((m_Data.Length == 0),string.Format("CompleteLoad: {0}", m_ResourcesUrl), m_Data);
         }
 
         #endregion
@@ -196,7 +182,6 @@ namespace GameFrameWork
         /// <summary>
         /// 卸载资源
         /// </summary>
-        /// <typeparam name="T"></typeparam>
         /// <param name="url"></param>
         public static void UnLoadAsset(string url)
         {
@@ -225,18 +210,22 @@ namespace GameFrameWork
         #endregion
 
 
-        protected override void OnCompleteLoad()
+
+        protected override void OnCompleteLoad(bool isError, string description, object result, float process = 1)
         {
-            for (   int dex=0;dex< m_AllCompleteLoader.Count;++dex)
+            base.OnCompleteLoad(isError, description, result, process);
+            for (int dex = 0; dex < m_AllCompleteLoader.Count; ++dex)
             {
                 if (m_AllCompleteLoader[dex] != null)
                     m_AllCompleteLoader[dex](this.IsError, this.ResultBytes);
             }
         }
 
+
         public override void Dispose()
         {
-
+            m_Data = null;
+            m_AllCompleteLoader.Clear();
         }
     }
 }

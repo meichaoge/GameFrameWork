@@ -68,12 +68,12 @@ namespace GameFrameWork
             Dictionary<string, BaseAbstracResourceLoader> allUseingLoadersOfType = null;
             if (S_AllTypeLoader.TryGetValue(typeof(T),out allUseingLoadersOfType) ==false)
             {
-                Debug.LogError("DeleteLoader Fail,Not Exit Type "+ typeof(T));
+                //Debug.LogError("DeleteLoader Fail,Not Exit Type "+ typeof(T));
                 return;
             }
             if(allUseingLoadersOfType.TryGetValue(url,out loader)==false)
             {
-                Debug.LogError("DeleteLoader Fail,Not Exit Loader  " + typeof(T)+"  loaderName="+ url);
+              //  Debug.LogError("DeleteLoader Fail,Not Exit Loader  " + typeof(T)+"  loaderName="+ url);
                 return;
             }
             allUseingLoadersOfType.Remove(url);
