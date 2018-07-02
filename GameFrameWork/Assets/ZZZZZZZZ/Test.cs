@@ -19,7 +19,7 @@ public class Test : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.A))
         {
-            ByteLoader.LoadAsset(url, CompleteLoadHandler, LoadAssetModel.Async, LoadAssetPathEnum.ResourcesPath);
+            ByteLoader.LoadAsset(url, CompleteLoadHandler, LoadAssetModel.Async);
         }
 
         if (Input.GetKeyDown(KeyCode.D))

@@ -12,6 +12,10 @@ namespace GameFrameWork
     /// </summary>
     public class ShaderLoader : BaseAbstracResourceLoader
     {
+        public ShaderLoader():base()
+        {
+            m_AssetTypeTag = AssetTypeTag.ShaderAsset;  
+        }
 
         public Shader ResultShader { get { return ResultObj as Shader; } }
 
@@ -64,13 +68,12 @@ namespace GameFrameWork
 
         protected virtual void LoadShader(string url, LoadAssetPathEnum loadAssetPath = LoadAssetPathEnum.ResourcesPath)
         {
-            if (ResourcesLoaderMgr.GetAssetPathOfLoadAssetPath(ref url, loadAssetPath, false) == PathResultEnum.Invalid)
+            if (ResourcesLoaderMgr.GetAssetPathOfLoadAssetPath(ref url, loadAssetPath, false, m_AssetTypeTag) == PathResultEnum.Invalid)
             {
                 OnCompleteLoad(true, string.Format("Path is Invalidate {0}", url), null);
                 return;
             }
-            Debug.Log("AA " + System.IO.Path.GetFileName(url));
-            ResultObj = Shader.Find(System.IO.Path.GetFileName(url));
+            ResultObj = Shader.Find(url);
             if (ResultObj == null)
             {
                 Debug.LogError("加载失败");
@@ -84,11 +87,13 @@ namespace GameFrameWork
         }
 
         /// <summary>
-        ///  卸载资源
+        ///  卸载资源  (Shader 资源不需要被卸载)
         /// </summary>
         /// <param name="url"></param>
         public static void UnLoadAsset(string url)
         {
+            return;
+
             bool isContainLoaders = false;
             Dictionary<string, BaseAbstracResourceLoader> resultLoaders = ResourcesLoaderMgr.GetLoaderOfType<ByteLoader>(ref isContainLoaders);
             if (isContainLoaders == false)

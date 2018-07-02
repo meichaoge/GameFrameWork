@@ -9,15 +9,46 @@ namespace GameFrameWork
     /// </summary>
     public partial class ConstDefine : Singleton_Static<ConstDefine>
     {
+
+        private static string _PersistentDataPath;
         /// <summary>
         /// 外部资源存储的主目录
         /// </summary>
         public static string S_PersistentDataPath {
             get
             {
-                return Application.persistentDataPath + "/GameFrame/";
+                if(string.IsNullOrEmpty(_PersistentDataPath))
+                    _PersistentDataPath= Application.persistentDataPath + "/GameFrame/";
+                return _PersistentDataPath;
             }
         }
+
+
+        private static string _AssetBundleTopPath;
+        /// <summary>
+        /// 打包后加载AssetBundle 资源的路径
+        /// </summary>
+        public static string S_AssetBundleTopPath
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(_AssetBundleTopPath))
+                    _AssetBundleTopPath = S_PersistentDataPath+"AssetBundleResources/";
+                return _AssetBundleTopPath;
+            }
+        }
+
+        /// <summary>
+        /// AssetBundle 资源的扩展名(在生成资源的时候加的)
+        /// </summary>
+        public const string AssetBundleExtensionName = ".unity3d";
+        #region 各个平台名称
+        public const string AndroidPlatform = "Android";
+        public const string WindowsPlatform = "Window";
+        public const string IphonePlatform = "Iphone";
+        public const string OSXPlatform = "OS";
+        #endregion
+
 
         private static string resourcesPath;
         /// <summary>

@@ -3,15 +3,17 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-
 namespace GameFrameWork
 {
+
+    /// <summary>
+    /// 标识返回结果是否可行
+    /// </summary>
     public enum PathResultEnum
     {
-        Valid,
-        Invalid,
+        Valid,  //有效路径
+        Invalid, //无效路径
     }
-
 
     /// <summary>
     /// 资源加载器管理器
@@ -233,6 +235,44 @@ namespace GameFrameWork
             }
         }
 
+        /// <summary>
+        /// / 获取指定类型的加载器  如果不存在则创建
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="url"></param>
+        /// <param name="isLoaderExit">标识这个加载器是否存在(false 标识是刚创建的)</param>
+        /// <returns></returns>
+        public static T GetLoaderInstance<T>(string url,ref bool isLoaderExit) where T: BaseAbstracResourceLoader ,new()
+        {
+            T resultLoader=null;
+            isLoaderExit = false;
+            Dictionary<string, BaseAbstracResourceLoader> typeOfLoaders = null;
+            if (ResourcesLoaderMgr.S_AllTypeLoader.TryGetValue(typeof(T), out typeOfLoaders)==false)
+            {
+                typeOfLoaders = new Dictionary<string, BaseAbstracResourceLoader>();
+                S_AllTypeLoader.Add(typeof(T), typeOfLoaders);
+            }
+
+            foreach (var item in typeOfLoaders)
+            {
+                if (item.Key == url)
+                {
+                    isLoaderExit = true;
+                    resultLoader = (T)item.Value;
+                    break;
+                }
+            }
+
+            if(resultLoader==null)
+            {
+                resultLoader = new T();
+                typeOfLoaders.Add(url, resultLoader);
+                resultLoader.InitialLoader();
+            }
+
+            return resultLoader;
+        }
+
         #endregion
 
 
@@ -245,7 +285,7 @@ namespace GameFrameWork
         /// <param name="loadPathEnum"></param>
         /// <param name="isFileAbsolutelyPath">是否是绝对路径  (使用IO.File 加载时候必须)</param>
         /// <returns></returns>
-        public static PathResultEnum GetAssetPathOfLoadAssetPath(ref string url, LoadAssetPathEnum loadPathEnum,bool isFileAbsolutelyPath)
+        public static PathResultEnum GetAssetPathOfLoadAssetPath(ref string url, LoadAssetPathEnum loadPathEnum,bool isFileAbsolutelyPath, AssetTypeTag assetType=AssetTypeTag.None)
         {
             if (string.IsNullOrEmpty(url))
             {
@@ -259,13 +299,15 @@ namespace GameFrameWork
                     url = ConstDefine.S_PersistentDataPath + url;
                     return PathResultEnum.Valid;
                 case LoadAssetPathEnum.ResourcesPath:
+                    if (assetType == AssetTypeTag.ShaderAsset)
+                        return PathResultEnum.Valid;  //Shade 路径不处理
                     if (isFileAbsolutelyPath)
                         url = ConstDefine.S_ResourcesPath + url;
                     return PathResultEnum.Valid;
                 case LoadAssetPathEnum.StreamingAssetsPath:
                     return PathResultEnum.Valid;
-                case LoadAssetPathEnum.EditorAssetDataPath:
-                    return PathResultEnum.Valid;
+                //case LoadAssetPathEnum.EditorAssetDataPath:
+                //    return PathResultEnum.Valid;
                 default:
                     break;
             }

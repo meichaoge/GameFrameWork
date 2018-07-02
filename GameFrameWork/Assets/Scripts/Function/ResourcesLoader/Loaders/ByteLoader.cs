@@ -41,7 +41,7 @@ namespace GameFrameWork
         /// <param name="completeHandler">加载完成回调</param>
         /// <param name="loadModel">加载模式(同步/异步) default=异步</param>
         /// <param name="loadAssetPath">加载资源路径模式(外部/Resources/StreamAsset ) default=ResourcesPath</param>
-        public static ByteLoader LoadAsset(string url, CompleteByteLoaderHandler completeHandler, LoadAssetModel loadModel = LoadAssetModel.Async, LoadAssetPathEnum loadAssetPath = LoadAssetPathEnum.ResourcesPath) 
+        public static ByteLoader LoadAsset(string url, CompleteByteLoaderHandler completeHandler, LoadAssetModel loadModel = LoadAssetModel.Async)
         {
             bool isContainLoaders = false;
             Dictionary<string, BaseAbstracResourceLoader> resultLoaders = ResourcesLoaderMgr.GetLoaderOfType<ByteLoader>(ref isContainLoaders);
@@ -61,7 +61,7 @@ namespace GameFrameWork
                 byteLoader.m_ResourcesUrl = url;
                 resultLoaders.Add(url, byteLoader);
                 byteLoader.m_AllCompleteLoader.Add(completeHandler);
-                byteLoader. LoadByteAsset(url, loadModel, loadAssetPath);
+                byteLoader. LoadByteAsset(url, loadModel);
             }
             else
             {
@@ -80,26 +80,28 @@ namespace GameFrameWork
         /// <param name="url"></param>
         /// <param name="loadModel"></param>
         /// <param name="loadAssetPath"></param>
-        protected virtual void LoadByteAsset(string url, LoadAssetModel loadModel = LoadAssetModel.Async, LoadAssetPathEnum loadAssetPath = LoadAssetPathEnum.ResourcesPath)
+        protected virtual void LoadByteAsset(string url, LoadAssetModel loadModel = LoadAssetModel.Async)
         {
-            if (ResourcesLoaderMgr.GetAssetPathOfLoadAssetPath(ref url, loadAssetPath,true) == PathResultEnum.Invalid)
-            {
-                OnCompleteLoad(true,string.Format("Path is Invalidate {0}" , url),null);
-                return;
-            }
+            //if (ResourcesLoaderMgr.GetAssetPathOfLoadAssetPath(ref url, loadAssetPath,true ,m_AssetTypeTag) == PathResultEnum.Invalid)
+            //{
+            //    OnCompleteLoad(true,string.Format("Path is Invalidate {0}" , url),null);
+            //    return;
+            //}
 
-            switch (loadModel)
-            {
-                case LoadAssetModel.Sync:
-                    LoadByteAssetSync(url);
-                    break;
-                case LoadAssetModel.Async:
-                    LoadByteAssetASync(url);
-                    break;
-                default:
-                    Debug.LogError("无法识别的加载模式 "+ loadModel);
-                    break;
-            }
+            //switch (loadModel)
+            //{
+            //    case LoadAssetModel.Sync:
+            //        LoadByteAssetSync(url);
+            //        break;
+            //    case LoadAssetModel.Async:
+            //        LoadByteAssetASync(url);
+            //        break;
+            //    default:
+            //        Debug.LogError("无法识别的加载模式 "+ loadModel);
+            //        break;
+            //}
+
+            LoadByteAssetASync(url);
         }
 
 

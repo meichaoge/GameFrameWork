@@ -11,19 +11,39 @@ namespace GameFrameWork
     /// </summary>
     public enum LoadAssetModel
     {
-        Sync, //同步加载 当前帧返回
+    ///    Sync, //同步加载 当前帧返回
         Async, //协程异步加载
     }
 
     /// <summary>
     /// 资源加载时候选择的路径
     /// </summary>
+    [System.Serializable]
     public enum LoadAssetPathEnum
     {
         PersistentDataPath,  //外部的资源目录
         ResourcesPath, //Resources路径
         StreamingAssetsPath, //
-        EditorAssetDataPath,  //编辑器下路径
+      //  EditorAssetDataPath,  //编辑器下路径
+    }
+
+    /// <summary>
+    /// 资源的类型  会根据资源类型处理不同的
+    /// </summary>
+    public enum AssetTypeTag
+    {
+        None,  //  不做处理
+        ShaderAsset,  //Shader资源
+        Material,  //材质球
+    }
+
+    /// <summary>
+    /// 资源类型和扩展名对应关系
+    /// </summary>
+    public class AssetTypeAndExtension
+    {
+        public AssetTypeTag m_AssetTypeTag;  //资源类型
+        public string m_ExtensionName; //扩展名
     }
 
 
@@ -50,6 +70,8 @@ namespace GameFrameWork
                     OnUpdateDescriptionAct(m_Description);
             }
         }//描述更新 触发事件
+        public System.Action<string> OnUpdateDescriptionAct = null; //更新描述信息
+
         public object ResultObj { get; protected set; }
 
         /// <summary>
@@ -71,12 +93,12 @@ namespace GameFrameWork
         /// <summary>
         /// 资源的唯一标识
         /// </summary>
-        public string m_ResourcesUrl { get; protected set; } 
+        public string m_ResourcesUrl { get; protected set; }
 
-        protected float m_DisposeDelayTime = 0f; //(加载完成后引用计数为0时候)延迟销毁的时间
+
+        public AssetTypeTag m_AssetTypeTag = AssetTypeTag.None; //资源类型
         public float UnUseTime { get; protected set; } //加载器失效时候的时间
 
-        public System.Action<string> OnUpdateDescriptionAct = null; //更新描述信息
 
         /// <summary>
         /// 引用计数
@@ -88,16 +110,16 @@ namespace GameFrameWork
             ResetLoader(); //创建 /重置 时候引用计数为1
         }
 
-
-        protected virtual void OnCompleteLoad(bool isError,string description,object result,float process=1)
+        /// <summary>
+        /// 创建时候初始化
+        /// </summary>
+        public virtual void InitialLoader()
         {
-            IsCompleted = true;
-            IsError = isError;
-            Description = description;
-            ResultObj = result;
-            Process = process;
+
         }
-      
+
+
+        #region 加载/卸载资源
 
 
         /// <summary>
@@ -135,6 +157,30 @@ namespace GameFrameWork
         {
             --ReferCount;
         }
+
+        #endregion
+
+        #region 类型扩展名处理  TODO 
+
+        #endregion
+
+        /// <summary>
+        /// 完成下载
+        /// </summary>
+        /// <param name="isError"></param>
+        /// <param name="description"></param>
+        /// <param name="result"></param>
+        /// <param name="process"></param>
+        protected virtual void OnCompleteLoad(bool isError, string description, object result, float process = 1)
+        {
+            IsCompleted = true;
+            IsError = isError;
+            Description = description;
+            ResultObj = result;
+            Process = process;
+        }
+
+
 
         public abstract void Dispose();
     }
