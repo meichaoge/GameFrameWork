@@ -21,11 +21,11 @@ public class TestLoadAssetBundle : MonoBehaviour {
 
 
 
-    private void CompleteLoad(object bundle)
+    private void CompleteLoad(BaseAbstracResourceLoader bunleLoader)
     {
         //GameObject go = bundle.LoadAsset<GameObject>("TestObj");
-        GameObject.Instantiate<GameObject>(bundle as GameObject);
-        Debug.Log("CompleteLoad"+ bundle);
+        GameObject.Instantiate<GameObject>(bunleLoader.ResultObj as GameObject);
+        Debug.Log("CompleteLoad");
 
     }
 

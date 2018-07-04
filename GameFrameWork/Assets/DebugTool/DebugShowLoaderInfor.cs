@@ -61,7 +61,7 @@ namespace GameFrameWork.EditorExpand
             foreach (var item in ResourcesLoaderMgr.S_AllTypeLoader)
             {
                 EditorResourceLoaderTypeInfor typeLoadersInfor = new EditorResourceLoaderTypeInfor();
-                typeLoadersInfor.m_LoderTypeName = item.Key.ToString();
+                typeLoadersInfor.m_LoderTypeName = item.Key.Name.ToString();
                 foreach (var loader in item .Value)
                 {
                     EditorLoaderInfor loaderInfor = new EditorLoaderInfor();
@@ -88,7 +88,7 @@ namespace GameFrameWork.EditorExpand
             foreach (var item in ResourcesLoaderMgr.S_UnUseLoader)
             {
                 EditorResourceLoaderTypeInfor typeLoadersInfor = new EditorResourceLoaderTypeInfor();
-                typeLoadersInfor.m_LoderTypeName = item.Key.ToString();
+                typeLoadersInfor.m_LoderTypeName = item.Key.Name.ToString();
                 List<BaseAbstracResourceLoader> data = new List<BaseAbstracResourceLoader>();
                 data.AddRange(item.Value);
 

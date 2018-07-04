@@ -28,16 +28,16 @@ namespace GameFrameWork
             get
             {
                 if (Application.platform == RuntimePlatform.WindowsEditor || Application.platform == RuntimePlatform.OSXEditor)
-                    return 0.1f;//编辑器下0.1秒
+                    return 1f;//编辑器下0.1秒
 
                 if (UnityEngine.Debug.isDebugBuild)
-                    return 0.3f;  //打包时候开启 Develop Builder 
-                return 1;
+                    return 2f;  //打包时候开启 Develop Builder 
+                return 3;
             }
         }
 
-        private static float lastCheckTime = 0;
-   
+        private static float lastCheckTime = 0; //上一次GC检测时间
+
 
 
         /// <summary>
@@ -49,36 +49,27 @@ namespace GameFrameWork
         /// </summary>
         public static Dictionary<Type, Queue<BaseAbstracResourceLoader>> S_UnUseLoader = new Dictionary<Type, Queue<BaseAbstracResourceLoader>>();
 
-        #region  创建初始化
-        public static void InitialResourcesMgr()
-        {
-           
-        }
-        #endregion
+        //#region  创建初始化
+        //public static void InitialResourcesMgr()
+        //{
+
+        //}
+        //#endregion
 
 
- 
+
         #region 删除加载器  添加到待删除队列中
 
         /// <summary>
         ///  将Loader 删除放到不使用的字典中等待删除(需要判断引用计数是否小于1)
         /// </summary>
         /// <param name="loader">Loader.</param>
-        public static void DeleteLoader<T>(  string url, bool isForceDelete)
+        public static void DeleteLoader<T>(string url, bool isForceDelete) where T : BaseAbstracResourceLoader
         {
-            BaseAbstracResourceLoader loader = null;
-            Dictionary<string, BaseAbstracResourceLoader> allUseingLoadersOfType = null;
-            if (S_AllTypeLoader.TryGetValue(typeof(T),out allUseingLoadersOfType) ==false)
-            {
-                //Debug.LogError("DeleteLoader Fail,Not Exit Type "+ typeof(T));
+
+            T loader = DeleteExitLoaderInstance<T>(url);
+            if (loader == null)
                 return;
-            }
-            if(allUseingLoadersOfType.TryGetValue(url,out loader)==false)
-            {
-              //  Debug.LogError("DeleteLoader Fail,Not Exit Loader  " + typeof(T)+"  loaderName="+ url);
-                return;
-            }
-            allUseingLoadersOfType.Remove(url);
 
             Queue<BaseAbstracResourceLoader> allUnUseLoadersOfType = null;
             if (S_UnUseLoader.TryGetValue(typeof(T), out allUnUseLoadersOfType) == false)
@@ -100,43 +91,41 @@ namespace GameFrameWork
             }
             loader.ReleaseLoader();
             allUnUseLoadersOfType.Enqueue(loader);  //释放资源加载器资源并加入队列中
-            Debug.Log(S_UnUseLoader[typeof(T)].Count);
-            Debug.Log("回收加载器  " + typeof(T) + "::" + url+"  count="+ allUnUseLoadersOfType.Count);
+          //  Debug.Log("回收加载器  " + typeof(T) + "::" + url + "  count=" + allUnUseLoadersOfType.Count);
         }
         #endregion
 
-        #region 获取一个指定类型的加载器 避免创建资源
+        //#region 获取一个指定类型的加载器 避免创建资源
+        ///// <summary>
+        ///// 尝试循环利用待删除的加载器 如果不存在则创建
+        ///// </summary>
+        ///// <typeparam name="T"></typeparam>
+        ///// <returns></returns>
+        //public static T RecycleUnUseLoader<T>() where T : BaseAbstracResourceLoader,new()
+        //{
+        //    Queue<BaseAbstracResourceLoader> typeOfLoaders = null;
+        //    T result = null;
+        //    if (S_UnUseLoader.TryGetValue(typeof(T), out typeOfLoaders))
+        //    {
+        //        if (typeOfLoaders.Count > 0)
+        //        {
+        //            result = (T)typeOfLoaders.Dequeue();
+        //            result.ResetLoader();
+        //        }
+        //    }
 
-        /// <summary>
-        /// 尝试循环利用待删除的加载器 如果不存在则创建
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
-        public static T RecycleUnUseLoader<T>() where T : BaseAbstracResourceLoader,new()
-        {
-            Queue<BaseAbstracResourceLoader> typeOfLoaders = null;
-            T result = null;
-            if (S_UnUseLoader.TryGetValue(typeof(T), out typeOfLoaders))
-            {
-                if (typeOfLoaders.Count > 0)
-                {
-                    result = (T)typeOfLoaders.Dequeue();
-                    result.ResetLoader();
-                }
-            }
-
-            if (result == null)
-            {
-                result =new T() ;
-            }
-            return result;
-        }
-        #endregion
+        //    if (result == null)
+        //    {
+        //        result =new T() ;
+        //    }
+        //    return result;
+        //}
+        //#endregion
 
         #region 检测是否需要释放加载器资源
         public static void Tick()
         {
-          if(Time.realtimeSinceStartup- lastCheckTime>= S_CheckGCTime)
+            if (Time.realtimeSinceStartup - lastCheckTime >= S_CheckGCTime)
             {
                 CheckLoaderStateForGC();
                 lastCheckTime = Time.realtimeSinceStartup;
@@ -167,7 +156,7 @@ namespace GameFrameWork
                     if (Time.realtimeSinceStartup - checkLoader.UnUseTime < checkLoader.m_GCInterval)
                         break;  //由于加载器是一个队列 因此最前面的加载肯定先到达最长生命周期
 
-                    Debug.LogInfor("[GC Loaders ] Type=" + checkLoader .GetType()+ "  Url" + checkLoader.m_ResourcesUrl);
+                    Debug.LogInfor("[GC Loaders ] Type=" + checkLoader.GetType() + "  Url" + checkLoader.m_ResourcesUrl);
 
                     //当前加载器回收后超过了最大生命周期时间需要被删除回收资源
                     checkLoader.Dispose();  //加载器释放最后的资源
@@ -188,66 +177,20 @@ namespace GameFrameWork
 
         #region 加载器检测/获取接口
 
-
         /// <summary>
-        /// 检获取指定类型的加载器 如果不存在则创建一个
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="isRecorded"></param>
-        /// <returns></returns>
-        public static Dictionary<string, BaseAbstracResourceLoader> GetLoaderOfType<T>(ref bool isRecorded)
-        {
-            Dictionary<string, BaseAbstracResourceLoader> typeOfLoaders = null;
-            if (ResourcesLoaderMgr.S_AllTypeLoader.TryGetValue(typeof(T), out typeOfLoaders))
-            {
-                isRecorded = true;
-                return typeOfLoaders;
-            }
-            isRecorded = false;
-            typeOfLoaders = new Dictionary<string, BaseAbstracResourceLoader>();
-            S_AllTypeLoader.Add(typeof(T), typeOfLoaders);
-            return typeOfLoaders;
-        }
-
-        /// <summary>
-        /// 在指定类型的加载器集合中查找一个加载器 并返回这个加载器
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="loader">查找返回的加载器(为null标识没有找打)</param>
-        /// <param name="url">加载器对应的路径</param>
-        /// <param name="searchArrange">查找的范围</param>
-        /// <param name="OnFindLoaderAct">r如果找到这个加载器执行的操作</param>
-        public static void GetLoaderOfTypeAndUrl<T>(ref T loader, string url, Dictionary<string, BaseAbstracResourceLoader> searchArrange, System.Action OnFindLoaderAct) where T : BaseAbstracResourceLoader, new()
-        {
-            loader = null;
-            if (searchArrange == null)
-                return;
-
-            foreach (var item in searchArrange)
-            {
-                if (item.Key == url)
-                {
-                    loader = (T)item.Value;
-                    if (OnFindLoaderAct != null)
-                        OnFindLoaderAct();
-                    break;
-                }
-            }
-        }
-
-        /// <summary>
-        /// / 获取指定类型的加载器  如果不存在则创建
+        /// /获取指定类型的加载器  如果不存在则创建
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="url"></param>
         /// <param name="isLoaderExit">标识这个加载器是否存在(false 标识是刚创建的)</param>
         /// <returns></returns>
-        public static T GetLoaderInstance<T>(string url,ref bool isLoaderExit) where T: BaseAbstracResourceLoader ,new()
+        public static T GetOrCreateLoaderInstance<T>(string url, ref bool isLoaderExit) where T : BaseAbstracResourceLoader, new()
         {
-            T resultLoader=null;
+            url = string.Format(@"{0}", url);
+            T resultLoader = null;
             isLoaderExit = false;
             Dictionary<string, BaseAbstracResourceLoader> typeOfLoaders = null;
-            if (ResourcesLoaderMgr.S_AllTypeLoader.TryGetValue(typeof(T), out typeOfLoaders)==false)
+            if (ResourcesLoaderMgr.S_AllTypeLoader.TryGetValue(typeof(T), out typeOfLoaders) == false)
             {
                 typeOfLoaders = new Dictionary<string, BaseAbstracResourceLoader>();
                 S_AllTypeLoader.Add(typeof(T), typeOfLoaders);
@@ -263,13 +206,57 @@ namespace GameFrameWork
                 }
             }
 
-            if(resultLoader==null)
+            if (resultLoader == null)
             {
                 resultLoader = new T();
                 typeOfLoaders.Add(url, resultLoader);
                 resultLoader.InitialLoader();
             }
 
+            return resultLoader;
+        }
+
+        /// <summary>
+        /// 获取一个指定类型的加载器是否存在 如果存在则返回这个加载器 否则返回null
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="url"></param>
+        /// <returns></returns>
+        public static T GetExitLoaderInstance<T>(string url) where T : BaseAbstracResourceLoader
+        {
+            url = string.Format(@"{0}", url);
+            Dictionary<string, BaseAbstracResourceLoader> typeOfLoaders = null;
+            if (ResourcesLoaderMgr.S_AllTypeLoader.TryGetValue(typeof(T), out typeOfLoaders) == false)
+                return null;
+
+            foreach (var item in typeOfLoaders)
+            {
+                if (item.Key == url)
+                {
+                    return (T)item.Value;
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// 如果存在 则删除指定类型的加载器
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="url"></param>
+        public static T DeleteExitLoaderInstance<T>(string url) where T : BaseAbstracResourceLoader
+        {
+            T resultLoader = null;
+            url = string.Format(@"{0}", url);
+            Dictionary<string, BaseAbstracResourceLoader> typeOfLoaders = null;
+            if (S_AllTypeLoader.TryGetValue(typeof(T), out typeOfLoaders) == false)
+                return null;
+
+            if (typeOfLoaders.ContainsKey(url) == false)
+                return null;
+
+            resultLoader = (T)typeOfLoaders[url];
+            typeOfLoaders.Remove(url);
             return resultLoader;
         }
 
@@ -285,7 +272,7 @@ namespace GameFrameWork
         /// <param name="loadPathEnum"></param>
         /// <param name="isFileAbsolutelyPath">是否是绝对路径  (使用IO.File 加载时候必须)</param>
         /// <returns></returns>
-        public static PathResultEnum GetAssetPathOfLoadAssetPath(ref string url, LoadAssetPathEnum loadPathEnum,bool isFileAbsolutelyPath, AssetTypeTag assetType=AssetTypeTag.None)
+        public static PathResultEnum GetAssetPathOfLoadAssetPath(ref string url, LoadAssetPathEnum loadPathEnum, bool isFileAbsolutelyPath, AssetTypeTag assetType = AssetTypeTag.None)
         {
             if (string.IsNullOrEmpty(url))
             {
@@ -299,13 +286,13 @@ namespace GameFrameWork
                     url = ConstDefine.S_PersistentDataPath + url;
                     return PathResultEnum.Valid;
                 case LoadAssetPathEnum.ResourcesPath:
-                    if (assetType == AssetTypeTag.ShaderAsset)
-                        return PathResultEnum.Valid;  //Shade 路径不处理
+                    //if (assetType == AssetTypeTag.ShaderAsset)
+                    //    return PathResultEnum.Valid;  //Shade 路径不处理
                     if (isFileAbsolutelyPath)
                         url = ConstDefine.S_ResourcesPath + url;
                     return PathResultEnum.Valid;
-                case LoadAssetPathEnum.StreamingAssetsPath:
-                    return PathResultEnum.Valid;
+                //case LoadAssetPathEnum.StreamingAssetsPath:
+                //    return PathResultEnum.Valid;
                 //case LoadAssetPathEnum.EditorAssetDataPath:
                 //    return PathResultEnum.Valid;
                 default:

@@ -19,7 +19,7 @@ public class Test : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.A))
         {
-            ByteLoader.LoadAsset(url, CompleteLoadHandler, LoadAssetModel.Async);
+            ByteLoader.LoadAsset(url, CompleteLoadHandler);
         }
 
         if (Input.GetKeyDown(KeyCode.D))
@@ -29,11 +29,12 @@ public class Test : MonoBehaviour
     }
 
 
-    private void CompleteLoadHandler(bool isError, byte[] data)
+    private void CompleteLoadHandler(BaseAbstracResourceLoader loader)
     {
-        if (isError == false)
+        ByteLoader byteLoader = loader as ByteLoader;
+        if (byteLoader.IsError == false)
         {
-            Debug.Log(Encoding.UTF8.GetString(data));
+            Debug.Log(Encoding.UTF8.GetString(byteLoader.ResultObj as byte[]));
         }
     }
 

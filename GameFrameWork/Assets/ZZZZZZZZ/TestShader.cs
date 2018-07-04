@@ -6,6 +6,7 @@ using UnityEngine;
 public class TestShader : MonoBehaviour
 {
     public string m_Url;
+    public GameObject go;
     // Use this for initialization
     void Start()
     {
@@ -17,7 +18,7 @@ public class TestShader : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.A))
         {
-            ShaderLoader.LoadAsset(m_Url, CompleteLoadHandler, LoadAssetPathEnum.ResourcesPath);
+            ShaderLoader.LoadAsset(m_Url, CompleteLoadHandler);
         }
 
         if (Input.GetKeyDown(KeyCode.D))
@@ -26,11 +27,12 @@ public class TestShader : MonoBehaviour
         }
     }
 
-    private void CompleteLoadHandler(bool isError, Shader data)
+    private void CompleteLoadHandler(BaseAbstracResourceLoader loader)
     {
-        if (isError == false)
+        ShaderLoader shaderLoader = loader as ShaderLoader;
+        if (shaderLoader.IsError == false)
         {
-            Debug.Log("Success");
+            go.GetComponent<MeshRenderer>().material.shader = shaderLoader.ResultObj as Shader;
         }
     }
 
@@ -40,7 +42,7 @@ public class TestShader : MonoBehaviour
     private void OnApplicationQuit()
     {
         Debug.Log("OnApplicationQuit");
-        ShaderLoader.UnLoadAsset(m_Url);
+       ShaderLoader.UnLoadAsset(m_Url);
     }
 # else
     private void OnDestroy()

@@ -6,32 +6,20 @@ using UnityEngine;
 
 namespace GameFrameWork
 {
-    public delegate void CompleteByteLoaderHandler(bool isError, byte[] data);
 
     /// <summary>
     /// 以字节流方式加载资源
     /// </summary>
     public class ByteLoader : BaseAbstracResourceLoader
     {
-        /// <summary>
-        /// 最终加载的资源
-        /// </summary>
-        public byte[] ResultBytes
-        {
-            get
-            {
-                if (ResultObj != null)
-                    return ResultObj as byte[];
-                return new byte[0];
-            }
-        }
-
         protected byte[] m_Data;
         protected FileStream fileStream = null;  //读取文件的流对象
-        /// <summary>
-        /// 加载完成的回调
-        /// </summary>
-        public readonly List<CompleteByteLoaderHandler> m_AllCompleteLoader = new List<CompleteByteLoaderHandler>();
+
+        public override void InitialLoader()
+        {
+            base.InitialLoader();
+
+        }
 
         /// <summary>
         /// 生成一个指定路径的加载器并加载资源
@@ -41,36 +29,20 @@ namespace GameFrameWork
         /// <param name="completeHandler">加载完成回调</param>
         /// <param name="loadModel">加载模式(同步/异步) default=异步</param>
         /// <param name="loadAssetPath">加载资源路径模式(外部/Resources/StreamAsset ) default=ResourcesPath</param>
-        public static ByteLoader LoadAsset(string url, CompleteByteLoaderHandler completeHandler, LoadAssetModel loadModel = LoadAssetModel.Async)
+        public static ByteLoader LoadAsset(string url, System.Action<BaseAbstracResourceLoader> onCompleteAct)
         {
-            bool isContainLoaders = false;
-            Dictionary<string, BaseAbstracResourceLoader> resultLoaders = ResourcesLoaderMgr.GetLoaderOfType<ByteLoader>(ref isContainLoaders);
-            ByteLoader byteLoader = null;
-            foreach (var item in resultLoaders)
-            {
-                if (item.Key == url)
-                {
-                    byteLoader = item.Value as ByteLoader;
-                    break;
-                }
-            }
+            bool isLoaderExit = false;
+            ByteLoader byteLoader = ResourcesLoaderMgr.GetOrCreateLoaderInstance<ByteLoader>(url, ref isLoaderExit);
+            byteLoader.m_OnCompleteAct.Add(onCompleteAct);
 
-            if (byteLoader == null)
+            if (isLoaderExit)
             {
-                byteLoader = new ByteLoader();
-                byteLoader.m_ResourcesUrl = url;
-                resultLoaders.Add(url, byteLoader);
-                byteLoader.m_AllCompleteLoader.Add(completeHandler);
-                byteLoader. LoadByteAsset(url, loadModel);
+                if (byteLoader.IsCompleted)
+                    byteLoader.OnCompleteLoad(byteLoader.IsError, byteLoader.Description, byteLoader.ResultObj, true);  //如果当前加载器已经完成加载 则手动触发事件
+                return byteLoader;  //如果已经存在 且当前加载器还在加载中，则只需要等待加载完成则回调用回调
             }
-            else
-            {
-                byteLoader.AddReference();
-                if (completeHandler != null)
-                    completeHandler(byteLoader.IsError, byteLoader.ResultBytes);
-            }
+            byteLoader.LoadByteAssetASync(url);
             return byteLoader;
-
         }
 
         #region 资源加载
@@ -115,17 +87,17 @@ namespace GameFrameWork
                 fileStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                 m_Data = new byte[fileStream.Length];
                 int realCount = fileStream.Read(m_Data, 0, m_Data.Length);
-                if(realCount!= m_Data.Length)
-                    Debug.LogError("数据长度不统一 " + m_Data.Length+"::"+ realCount);
+                if (realCount != m_Data.Length)
+                    Debug.LogError("数据长度不统一 " + m_Data.Length + "::" + realCount);
                 else
                     Debug.Log("读取完成路径" + m_ResourcesUrl + " 文件大小 " + m_Data.Length);
 
-                OnCompleteLoad((m_Data.Length == 0), string.Format("CompleteLoad: {0}", m_ResourcesUrl), m_Data);
+                OnCompleteLoad((m_Data.Length == 0), string.Format("CompleteLoad: {0}", m_ResourcesUrl), m_Data, true);
             }
             catch (System.Exception ex)
             {
                 Debug.LogError("LoadByteAssetSync  Fail,error" + ex.Message);
-                OnCompleteLoad(IsError, ex.Message, null);
+                OnCompleteLoad(IsError, ex.Message, null, true);
             }
             finally
             {
@@ -141,7 +113,12 @@ namespace GameFrameWork
         protected virtual void LoadByteAssetASync(string path)
         {
             Debug.Log("LoadByteAssetASync  url=" + path);
-            Debug.Log(System.IO.File.Exists(path));
+            if (System.IO.File.Exists(path) == false)
+            {
+                Debug.LogError(string.Format("Load File Not Exit Path:{0}", path));
+                OnCompleteLoad(true, string.Format("Load File Not Exit Path:{0}", path), null, true);
+                return;
+            }
 
             try
             {
@@ -151,8 +128,8 @@ namespace GameFrameWork
             }
             catch (System.Exception ex)
             {
-                Debug.LogError("LoadByteAssetASync  Fail,error" + ex.Message);
-                OnCompleteLoad(true,ex.Message,null);
+                Debug.LogError("LoadByteAssetASync  Fail,error {0}" + ex.Message);
+                OnCompleteLoad(true, ex.Message, null, true);
             }
             finally
             {
@@ -175,7 +152,7 @@ namespace GameFrameWork
                 Debug.Log("读取完成路径:" + m_ResourcesUrl + " 文件大小 " + m_Data.Length);
 
             stream.Close();
-            OnCompleteLoad((m_Data.Length == 0),string.Format("CompleteLoad: {0}", m_ResourcesUrl), m_Data);
+            OnCompleteLoad((m_Data.Length == 0), string.Format("CompleteLoad: {0}", m_ResourcesUrl), m_Data, true);
         }
 
         #endregion
@@ -187,47 +164,32 @@ namespace GameFrameWork
         /// <param name="url"></param>
         public static void UnLoadAsset(string url)
         {
-            bool isContainLoaders = false;
-            Dictionary<string, BaseAbstracResourceLoader> resultLoaders = ResourcesLoaderMgr.GetLoaderOfType<ByteLoader>(ref isContainLoaders);
-            if (isContainLoaders == false)
+            ByteLoader byteLoader = ResourcesLoaderMgr.GetExitLoaderInstance<ByteLoader>(url);
+            if (byteLoader == null)
             {
                 //Debug.LogError("无法获取指定类型的加载器 " + typeof(ByteLoader));
                 return;
             }
-
-            ByteLoader byteLoader = null;
-            ResourcesLoaderMgr.GetLoaderOfTypeAndUrl<ByteLoader>(ref byteLoader, url, resultLoaders, null);
-            if(byteLoader==null)
-            {
-                //Debug.LogError("UnLoadAsset Fail  ,无法找到指定Url 的加载器 : " + url);
-                return;
-            }
             byteLoader.ReduceReference();
-            if (byteLoader.ReferCount <= 0)
-            {
-                ResourcesLoaderMgr.DeleteLoader<ByteLoader>(url, false);
-            }//引用计数为0时候开始回收资源
-
+         
         }
         #endregion
 
-
-
-        protected override void OnCompleteLoad(bool isError, string description, object result, float process = 1)
+        public override void ReduceReference()
         {
-            base.OnCompleteLoad(isError, description, result, process);
-            for (int dex = 0; dex < m_AllCompleteLoader.Count; ++dex)
+            base.ReduceReference();
+            if (ReferCount <= 0)
             {
-                if (m_AllCompleteLoader[dex] != null)
-                    m_AllCompleteLoader[dex](this.IsError, this.ResultBytes);
-            }
+                ResourcesLoaderMgr.DeleteLoader<ByteLoader>(m_ResourcesUrl, false);
+            }//引用计数为0时候开始回收资源
         }
 
 
         public override void Dispose()
         {
             m_Data = null;
-            m_AllCompleteLoader.Clear();
+            base.Dispose();
+
         }
     }
 }

@@ -116,6 +116,9 @@ namespace GameFrameWork
 
             m_LoadAssetPathOfPriority.Sort((lparameter, rparameter) =>
             {
+                if (lparameter.m_AssetPathEnum == LoadAssetPathEnum.None)
+                    return 1;
+
                 if (lparameter.m_Priority < rparameter.m_Priority)
                     return 1;
                 if (lparameter.m_Priority == rparameter.m_Priority)
@@ -144,7 +147,7 @@ namespace GameFrameWork
         }
 
         /// <summary>
-        /// 获取优先级醉倒的路径
+        /// 获取优先级最高的路径
         /// </summary>
         /// <returns></returns>
         public LoadAssetPathEnum GetFirstPriortyAssetPathEnum()

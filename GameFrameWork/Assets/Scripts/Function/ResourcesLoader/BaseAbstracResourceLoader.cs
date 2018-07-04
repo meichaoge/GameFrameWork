@@ -6,47 +6,7 @@ using System.IO;
 
 namespace GameFrameWork
 {
-    /// <summary>
-    /// 资源加载模式(同步/异步)
-    /// </summary>
-    public enum LoadAssetModel
-    {
-    ///    Sync, //同步加载 当前帧返回
-        Async, //协程异步加载
-    }
-
-    /// <summary>
-    /// 资源加载时候选择的路径
-    /// </summary>
-    [System.Serializable]
-    public enum LoadAssetPathEnum
-    {
-        PersistentDataPath,  //外部的资源目录
-        ResourcesPath, //Resources路径
-        StreamingAssetsPath, //
-      //  EditorAssetDataPath,  //编辑器下路径
-    }
-
-    /// <summary>
-    /// 资源的类型  会根据资源类型处理不同的
-    /// </summary>
-    public enum AssetTypeTag
-    {
-        None,  //  不做处理
-        ShaderAsset,  //Shader资源
-        Material,  //材质球
-    }
-
-    /// <summary>
-    /// 资源类型和扩展名对应关系
-    /// </summary>
-    public class AssetTypeAndExtension
-    {
-        public AssetTypeTag m_AssetTypeTag;  //资源类型
-        public string m_ExtensionName; //扩展名
-    }
-
-
+    
     /// <summary>
     /// 所有其他资源加载器的父类
     /// </summary>
@@ -96,7 +56,6 @@ namespace GameFrameWork
         public string m_ResourcesUrl { get; protected set; }
 
 
-        public AssetTypeTag m_AssetTypeTag = AssetTypeTag.None; //资源类型
         public float UnUseTime { get; protected set; } //加载器失效时候的时间
 
 
@@ -104,6 +63,10 @@ namespace GameFrameWork
         /// 引用计数
         /// </summary>
         public int ReferCount { get; protected set; }
+
+        protected readonly HashSet<System.Action<BaseAbstracResourceLoader>> m_OnCompleteAct = new HashSet<System.Action<BaseAbstracResourceLoader>>(); //加载完成回调
+
+
 
         protected BaseAbstracResourceLoader()
         {
@@ -115,7 +78,11 @@ namespace GameFrameWork
         /// </summary>
         public virtual void InitialLoader()
         {
-
+            IsCompleted = false;
+            IsError = false;
+            Process = 0;
+            m_Description = "";
+            ResultObj = null;
         }
 
 
@@ -125,7 +92,7 @@ namespace GameFrameWork
         /// <summary>
         ///  将Loader重新激活
         /// </summary>
-        public virtual void ResetLoader(int refCount=1)
+        public virtual void ResetLoader(int refCount = 1)
         {
             ReferCount = refCount;
             IsError = IsCompleted = false;
@@ -164,6 +131,16 @@ namespace GameFrameWork
 
         #endregion
 
+
+        #region  状态更新接口
+        //public void UpdateLoadingState(AsyncOperation asyncOperate)
+        //{
+        //    IsCompleted = asyncOperate.isDone;
+        //    Process = asyncOperate.progress;
+        //    IsError = false;
+        //}
+        #endregion
+
         /// <summary>
         /// 完成下载
         /// </summary>
@@ -171,17 +148,36 @@ namespace GameFrameWork
         /// <param name="description"></param>
         /// <param name="result"></param>
         /// <param name="process"></param>
-        protected virtual void OnCompleteLoad(bool isError, string description, object result, float process = 1)
+        protected virtual void OnCompleteLoad(bool isError, string description, object result, bool iscomplete, float process = 1)
         {
-            IsCompleted = true;
+            IsCompleted = iscomplete;
             IsError = isError;
             Description = description;
             ResultObj = result;
             Process = process;
+
+#if UNITY_EDITOR
+            if (IsError)
+                Debug.LogError(Description);
+            else
+                Debug.LogInfor(Description);
+
+#endif
+            foreach (var item in m_OnCompleteAct)
+            {
+                if (item != null)
+                    item(this);
+            }
+            m_OnCompleteAct.Clear();
+
         }
 
 
 
-        public abstract void Dispose();
+        public virtual void Dispose()
+        {
+            m_OnCompleteAct.Clear();
+            ResultObj = null;
+        }
     }
 }
