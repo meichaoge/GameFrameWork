@@ -10,45 +10,21 @@ namespace GameFrameWork
     public partial class ConstDefine : Singleton_Static<ConstDefine>
     {
 
+        #region Application. PersistentData/ Application. Resources  路径配置
+
         private static string _PersistentDataPath;
         /// <summary>
         /// 外部资源存储的主目录
         /// </summary>
-        public static string S_PersistentDataPath {
-            get
-            {
-                if(string.IsNullOrEmpty(_PersistentDataPath))
-                    _PersistentDataPath= Application.persistentDataPath + "/GameFrame/";
-                return _PersistentDataPath;
-            }
-        }
-
-
-        private static string _AssetBundleTopPath;
-        /// <summary>
-        /// 打包后加载AssetBundle 资源的路径
-        /// </summary>
-        public static string S_AssetBundleTopPath
+        public static string S_PersistentDataPath
         {
             get
             {
-                if (string.IsNullOrEmpty(_AssetBundleTopPath))
-                    _AssetBundleTopPath = S_PersistentDataPath+"AssetBundleResources/";
-                return _AssetBundleTopPath;
+                if (string.IsNullOrEmpty(_PersistentDataPath))
+                    _PersistentDataPath = Application.persistentDataPath + "/GameFrame/";
+                return _PersistentDataPath;
             }
         }
-
-        /// <summary>
-        /// AssetBundle 资源的扩展名(在生成资源的时候加的)
-        /// </summary>
-        public const string AssetBundleExtensionName = ".unity3d";
-        #region 各个平台名称
-        public const string AndroidPlatform = "Android";
-        public const string WindowsPlatform = "Window";
-        public const string IphonePlatform = "Iphone";
-        public const string OSXPlatform = "OS";
-        #endregion
-
 
         private static string resourcesPath;
         /// <summary>
@@ -64,7 +40,51 @@ namespace GameFrameWork
             }
         }
 
+        #endregion
 
+
+        #region  AssetBundle 相关
+
+        private static string _AssetBundleTopPath;
+        /// <summary>
+        /// 打包后加载AssetBundle 资源的路径
+        /// </summary>
+        public static string S_AssetBundleTopPath
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(_AssetBundleTopPath))
+                    _AssetBundleTopPath = S_PersistentDataPath + "AssetBundleResources/";
+                return _AssetBundleTopPath;
+            }
+        }
+
+        /// <summary>
+        /// AssetBundle 资源的扩展名(在生成资源的时候加的)
+        /// </summary>
+        public const string AssetBundleExtensionName = ".unity3d";
+
+        /// <summary>
+        /// AssetBundleManifest 的名字 
+        /// </summary>
+        public static string S_AssetBundleManifest { get { return "AssetBundleManifest"; } }
+
+        public static string S_AssetBundleBuildRecordConfigureName { get { return "_AssetBundleInfor.txt"; } }
+        #endregion
+
+
+        #region 各个平台名称
+        public const string AndroidPlatform = "Android";
+        public const string WindowsPlatform = "Window";
+        public const string IphonePlatform = "Iphone";
+        public const string OSXPlatform = "OS";
+        #endregion
+
+
+        /// <summary>
+        /// Asset的名字
+        /// </summary>
+        public static string S_AssetName { get { return "Assets"; } }
 
     }
 }

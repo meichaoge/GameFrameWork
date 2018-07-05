@@ -1,13 +1,16 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 namespace GameFrameWork
 {
 
     /// <summary>
     /// AssetBundle 资源加载管理器
     /// </summary>
+   [InitializeOnLoad]
     public class AssetBundleMgr : Singleton_Static<AssetBundleMgr>
     {
         private AssetBundleManifest _AssetBundleManifest = null;
@@ -25,6 +28,7 @@ namespace GameFrameWork
         }
 
 
+
         #region  加载 AssetBundleManifest
         /// <summary>
         /// 加载 AssetBundleManifest 资源
@@ -36,10 +40,10 @@ namespace GameFrameWork
             AssetBundle mainAssetBundle = AssetBundle.LoadFromFile(manifestPath);
             if (mainAssetBundle == null)
             {
-                Debug.LogError("mainAssetBundle is Null At Path"+ manifestPath);
+                Debug.LogError("mainAssetBundle is Null At Path" + manifestPath);
                 return;
             }
-            _AssetBundleManifest = mainAssetBundle.LoadAsset<AssetBundleManifest>("AssetBundleManifest");
+            _AssetBundleManifest = mainAssetBundle.LoadAsset<AssetBundleManifest>(ConstDefine.S_AssetBundleManifest);
         }
         #endregion
 
@@ -52,7 +56,17 @@ namespace GameFrameWork
         /// <returns></returns>
         public string GetAssetBundlePlatformName()
         {
-            switch (Application.platform)
+            return GetHotAssetBuildPlatformName(Application.platform);
+        }
+
+        /// <summary>
+        /// 根据指定平台生成资源
+        /// </summary>
+        /// <param name="runtimePlatform"></param>
+        /// <returns></returns>
+        public string GetHotAssetBuildPlatformName(RuntimePlatform runtimePlatform)
+        {
+            switch (runtimePlatform)
             {
                 case RuntimePlatform.Android:
                     return ConstDefine.AndroidPlatform;
@@ -65,10 +79,54 @@ namespace GameFrameWork
                 case RuntimePlatform.OSXPlayer:
                     return ConstDefine.OSXPlatform;
                 default:
-                    Debug.LogError("无法处理的平台类型");
+                    Debug.LogError("无法处理的平台类型" + runtimePlatform);
                     return null;
             }
         }
+
+#if UNITY_EDITOR
+        /// <summary>
+        /// 根据指定平台生成资源
+        /// </summary>
+        /// <param name="runtimePlatform"></param>
+        /// <returns></returns>
+        public string GetHotAssetBuildPlatformName(BuildTarget buildPlatform)
+        {
+            return GetHotAssetBuildPlatformName(BuildTarget2RuntimePlatform(buildPlatform));
+        }
+
+        /// <summary>
+        /// 打包平台到运行时平台的转换
+        /// </summary>
+        /// <param name="buildPlatform"></param>
+        /// <returns></returns>
+        private RuntimePlatform BuildTarget2RuntimePlatform(BuildTarget buildPlatform)
+        {
+            switch (buildPlatform)
+            {
+                case BuildTarget.StandaloneOSXIntel:
+                case BuildTarget.StandaloneOSXIntel64:
+                    return RuntimePlatform.OSXPlayer;
+
+                case BuildTarget.iOS:
+                    return RuntimePlatform.IPhonePlayer;
+
+                case BuildTarget.StandaloneWindows:
+                case BuildTarget.StandaloneWindows64:
+                    return RuntimePlatform.WindowsPlayer;
+
+                case BuildTarget.Android:
+                    return RuntimePlatform.Android;
+                default:
+                    Debug.LogError("没有指定配置的类型 " + buildPlatform);
+                    return RuntimePlatform.Android;
+            }
+        }
+
+
+
+#endif
+
         #endregion
 
 
