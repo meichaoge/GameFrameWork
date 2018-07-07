@@ -33,7 +33,7 @@ namespace GameFrameWork.EditorExpand
         public static List<BuildAssetBundleTreeNode> m_AllResourcesTopPath = new List<BuildAssetBundleTreeNode>(); //Resources 目录下顶层的文件名和目录名
 
         private Vector2 m_ScrollRect = Vector2.zero;
-        private float m_ShowToggleWidth = 70;
+        private float m_ShowToggleWidth = 10;
         private float m_SubItemSpace = 20; //两个层级间距
 
         [MenuItem("Tools/热更新/打包生成 AssetBundle资源")]
@@ -41,7 +41,7 @@ namespace GameFrameWork.EditorExpand
         {
             S_BuildAssetBundleWindows = EditorWindow.GetWindow<BuildAssetBundleWindows>("打包AssetBundle");
             S_BuildAssetBundleWindows.minSize = new Vector2(400, 400);
-            //S_BuildAssetBundleWindows.maxSize = new Vector2(400, 600);
+            S_BuildAssetBundleWindows.maxSize = new Vector2(800, 600);
             S_BuildAssetBundleWindows.Show();
             GetAllShowPaths();
         }
@@ -65,21 +65,27 @@ namespace GameFrameWork.EditorExpand
             #endregion
 
             #region 全选、全部非选择
+
             GUILayout.BeginHorizontal();
+
+
             isSelectAll = GUILayout.Toggle(isSelectAll, new GUIContent("全部选中"));
+            isDeSelectAll = GUILayout.Toggle(isDeSelectAll, new GUIContent("全部非选中"));
+
+            #region     设置状态
+
             if (isSelectAll)
             {
                 isDeSelectAll = false;
                 SelectAllAsset();
             }
-
-
-            isDeSelectAll = GUILayout.Toggle(isDeSelectAll, new GUIContent("全部非选中"));
             if (isDeSelectAll)
             {
                 isSelectAll = false;
                 UnSelectAllAsset();
             }
+            #endregion
+
             GUILayout.EndHorizontal();
             #endregion
 
@@ -92,6 +98,25 @@ namespace GameFrameWork.EditorExpand
             }
             GUILayout.EndScrollView();
             GUILayout.Space(15);
+            #endregion
+
+
+            //for (int dex = 0; dex < m_AllResourcesTopPath.Count; ++dex)
+            //{
+            //    if (m_AllResourcesTopPath[dex].IsSelected)
+            //        isDeSelectAll = false;
+            //    else
+            //        isSelectAll = false;
+            //}
+
+            #region  显示打包按钮
+            GUILayout.BeginHorizontal();
+            GUILayout.Space(10);
+            if (GUILayout.Button(new GUIContent("开始打包"), GUILayout.Width(150), GUILayout.Height(50)))
+            {
+                BuildAssetBundleTool.BegingPackAssetBundle(LoalBuildTarget2UnityEngine(m_BuildTarget), S_BuildAssetBundleWindows);
+            }
+            GUILayout.EndVertical();
             #endregion
 
             EditorGUILayout.EndVertical();
@@ -142,15 +167,15 @@ namespace GameFrameWork.EditorExpand
             GUILayout.BeginHorizontal();
             GUILayout.Label("", GUILayout.Width(m_SubItemSpace * layer));
 
-            bool isShowNode= GUILayout.Toggle(recordInfor.IsOn, new GUIContent("是否展开"),GUILayout.Width(m_ShowToggleWidth));
-            if(recordInfor.IsOn!= isShowNode)
+            bool isShowNode = GUILayout.Toggle(recordInfor.IsOn, new GUIContent(""), GUILayout.Width(m_ShowToggleWidth));
+            if (recordInfor.IsOn != isShowNode)
                 recordInfor.IsOn = isShowNode;
             bool isSelect = GUILayout.Toggle(recordInfor.IsSelected, new GUIContent(GetRelativePath(recordInfor.m_ViewName)));
             if (recordInfor.IsSelected != isSelect)
             {
                 recordInfor.IsSelected = isSelect;
             }
-           GUILayout.EndHorizontal();
+            GUILayout.EndHorizontal();
 
             layer += 1;
             foreach (var item in recordInfor.m_AllSubNodesInfor)
@@ -158,16 +183,16 @@ namespace GameFrameWork.EditorExpand
                 BuildAssetBundleTreeNode node = item as BuildAssetBundleTreeNode;
                 if (item.IsTreeNode)
                 {
-                   GUILayout.BeginHorizontal();
+                    GUILayout.BeginHorizontal();
                     GUILayout.Label("", GUILayout.Width(m_SubItemSpace * layer));
-                    bool isShowSubNode = GUILayout.Toggle(item.IsOn, new GUIContent("是否展开"), GUILayout.Width(m_ShowToggleWidth));
+                    bool isShowSubNode = GUILayout.Toggle(item.IsOn, new GUIContent(""), GUILayout.Width(m_ShowToggleWidth));
                     if (item.IsOn != isShowSubNode)
                         item.IsOn = isShowSubNode;
 
                     bool isSubSelect = GUILayout.Toggle(node.IsSelected, new GUIContent(GetRelativePath(node.m_ViewName)));
                     if (node.IsSelected != isSubSelect)
                         node.IsSelected = isSubSelect;
-                   GUILayout.EndHorizontal();
+                    GUILayout.EndHorizontal();
                 }
                 else
                 {
@@ -178,7 +203,6 @@ namespace GameFrameWork.EditorExpand
         }
 
         #endregion
-
 
 
         #region 接口
@@ -272,7 +296,6 @@ namespace GameFrameWork.EditorExpand
             return "";
         }
 
-
         /// <summary>
         /// 检测当前文件或者目录是否需要被打包
         /// </summary>
@@ -298,8 +321,30 @@ namespace GameFrameWork.EditorExpand
             return false;
         }
 
+        private BuildTarget LoalBuildTarget2UnityEngine(EditorBuildTarget target)
+        {
+            switch (target)
+            {
+                case EditorBuildTarget.Win64:
+                    return BuildTarget.StandaloneWindows64;
+                case EditorBuildTarget.Android:
+                    return BuildTarget.Android;
+                case EditorBuildTarget.iOS:
+                    return BuildTarget.iOS;
+                default:
+                    Debug.LogError("没有定义的类型 " + target);
+                    return BuildTarget.StandaloneWindows;
+            }
+        }
+
         #endregion
 
+        public  void OnCompleteBuildAssetBundle()
+        {
+            EditorUtility.DisplayDialog("打包AssetBundle ","打包完成，AssetBundle 保存在"+ConstDefine.S_AssetBundleTopPath,"已知晓");
+            if (S_BuildAssetBundleWindows != null)
+                S_BuildAssetBundleWindows.Close();
+        }
 
     }
 }

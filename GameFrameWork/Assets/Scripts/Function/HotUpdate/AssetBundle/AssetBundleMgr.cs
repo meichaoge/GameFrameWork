@@ -10,7 +10,6 @@ namespace GameFrameWork
     /// <summary>
     /// AssetBundle 资源加载管理器
     /// </summary>
-   [InitializeOnLoad]
     public class AssetBundleMgr : Singleton_Static<AssetBundleMgr>
     {
         private AssetBundleManifest _AssetBundleManifest = null;

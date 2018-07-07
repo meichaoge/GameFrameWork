@@ -24,7 +24,7 @@ public class Test : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.D))
         {
-            OnApplicationQuit();
+           // OnApplicationQuit();
         }
     }
 

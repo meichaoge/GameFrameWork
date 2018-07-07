@@ -35,7 +35,7 @@ namespace GameFrameWork
             get
             {
                 if (string.IsNullOrEmpty(resourcesPath))
-                    resourcesPath = Application.dataPath + "/Resources/";
+                    resourcesPath = string.Format("{0}/{1}/", Application.dataPath, S_ResourcesName);
                 return resourcesPath;
             }
         }
@@ -58,6 +58,21 @@ namespace GameFrameWork
                 return _AssetBundleTopPath;
             }
         }
+
+        private static string StreamingAssetPath = "";
+        /// <summary>
+        /// StreamingAssetpath
+        /// </summary>
+        public static string S_StreamingAssetPath
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(StreamingAssetPath))
+                    StreamingAssetPath = Application.streamingAssetsPath;
+                return StreamingAssetPath;
+            }
+        }
+
 
         /// <summary>
         /// AssetBundle 资源的扩展名(在生成资源的时候加的)
@@ -85,6 +100,9 @@ namespace GameFrameWork
         /// Asset的名字
         /// </summary>
         public static string S_AssetName { get { return "Assets"; } }
-
+        /// <summary>
+        /// Asset的名字
+        /// </summary>
+        public static string S_ResourcesName { get { return "Resources"; } }
     }
 }

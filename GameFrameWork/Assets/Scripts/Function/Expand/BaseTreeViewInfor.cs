@@ -5,12 +5,16 @@ using UnityEngine;
 
 namespace GameFrameWork
 {
+  
+
     /// <summary>
     /// 树形结构节点信息
     /// </summary>
     [System.Serializable]
     public class BaseTreeNodeInfor
     {
+
+
         public string m_ViewName;  //显示的节点名
         public List<BaseTreeNodeInfor> m_AllSubNodesInfor = new List<BaseTreeNodeInfor>(); //子节点 （嵌套结构）
         public bool IsTreeNode {

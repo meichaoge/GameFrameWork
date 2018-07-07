@@ -108,7 +108,7 @@ namespace GameFrameWork
             m_LoadAssetPathOfPriority.Clear();
             m_LoadAssetPathOfPriority.AddRange(m_LoadAssetPath);
 
-            if(m_LoadAssetPathOfPriority.Count==0)
+            if (m_LoadAssetPathOfPriority.Count == 0)
             {
                 Debug.LogError("没有配置资源加载路径 优先级关系");
                 return;

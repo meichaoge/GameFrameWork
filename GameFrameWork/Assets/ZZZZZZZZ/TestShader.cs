@@ -23,7 +23,7 @@ public class TestShader : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.D))
         {
-            OnApplicationQuit();
+     //       OnApplicationQuit();
         }
     }
 
@@ -48,7 +48,7 @@ public class TestShader : MonoBehaviour
     private void OnDestroy()
     {
         Debug.Log("OnDestroy");
-            ShaderLoader.UnLoadAsset(url);
+            ShaderLoader.UnLoadAsset(m_Url);
     }
 #endif
 }

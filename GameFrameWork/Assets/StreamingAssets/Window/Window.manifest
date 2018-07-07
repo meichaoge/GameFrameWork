@@ -1,0 +1,17 @@
+ManifestFileVersion: 0
+CRC: 3976583308
+AssetBundleManifest:
+  AssetBundleInfos:
+    Info_0:
+      Name: testasset/111/111.unity3d
+      Dependencies: {}
+    Info_1:
+      Name: testasset/testasset.unity3d
+      Dependencies: {}
+    Info_2:
+      Name: testmaterial/testmaterial.unity3d
+      Dependencies:
+        Dependency_0: testshader/testshader.unity3d
+    Info_3:
+      Name: testshader/testshader.unity3d
+      Dependencies: {}

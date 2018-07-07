@@ -6,14 +6,29 @@ using UnityEngine;
 namespace GameFrameWork.EditorExpand
 {
     /// <summary>
+    /// 树形节点选中状态
+    /// </summary>
+    public enum TreeNodeSelectState
+    {
+        AllSelected, //全部选择
+        NoSelected, //全部非选择
+        SomeSelected, //有些选择了
+
+    }
+
+
+    /// <summary>
     /// 打包生成AssetBundle 时候显示需要打包目录的树形节点
     /// </summary>
     [System.Serializable]
     public class BuildAssetBundleTreeNode : BaseTreeNodeInfor
     {
-        //public SuperToggle m_IsSelectedToggle;  //是否选中
+     /// <summary>
+     /// 是否需要被选中(只要有子项是选中的则选中 否则非选择)
+     /// </summary>
         protected bool m_IsSelected = false;
         public bool IsSelected { get { return GetTreeNodeIsSelectedState(); } set { SetTreeNodeIsSelectedState(value); } }   //是否选中
+  //      public TreeNodeSelectState m_TreeNodeSelectState { get; protected set; } //节点的选择状态
 
         public BuildAssetBundleTreeNode(string name) : base(name)
         {
@@ -24,7 +39,14 @@ namespace GameFrameWork.EditorExpand
         protected bool GetTreeNodeIsSelectedState()
         {
             if (IsTreeNode)
+            {
+                //if (m_IsSelected)
+                //    m_TreeNodeSelectState = TreeNodeSelectState.AllSelected;
+                //else
+                //    m_TreeNodeSelectState = TreeNodeSelectState.NoSelected;
                 return m_IsSelected;
+            }
+
 
             bool isHasItemSelected = false;
             foreach (var item in m_AllSubNodesInfor)
@@ -50,7 +72,6 @@ namespace GameFrameWork.EditorExpand
             }
             return isHasItemSelected;
         }
-
         /// <summary>
         /// 递归遍历子目录
         /// </summary>
@@ -113,7 +134,6 @@ namespace GameFrameWork.EditorExpand
             }
             m_IsSelected = isselected;
         }
-
         protected void SetSubTreeNodeIsSelectedState(BaseTreeNodeInfor target, bool isselected)
         {
             if (target.IsTreeNode)

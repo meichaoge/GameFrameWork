@@ -10,10 +10,10 @@ namespace GameFrameWork.EditorExpand
     /// <summary>
     /// 打包Resource 目录下BuildAssetBundlePath 目录中的资源(如果不存在需要创建一个目录)
     /// </summary>
-    public class BuildAssetBundleTool : Editor
+    public class BuildAssetBundleTool 
     {
         private static BuildTarget S_CurrentBuildTarget = BuildTarget.StandaloneWindows64;  //打包的资源平台
-        private static string S_AssetBundleOutPath { get { return ConstDefine.S_AssetBundleTopPath; } }  //AssetBundle 输出目录
+        private static string S_AssetBundleOutPath { get { return ConstDefine.S_StreamingAssetPath +"/"+ AssetBundleMgr.Instance.GetHotAssetBuildPlatformName(S_CurrentBuildTarget); } }  //AssetBundle 输出目录
         /// <summary>
         ///需要打包的AssetBundle 资源  Key :文件相对resource路径，value所属的AssetBundleName
         /// </summary>
@@ -36,16 +36,18 @@ namespace GameFrameWork.EditorExpand
         private static void PackAssetBundle()
         {
             S_HotAssetBaseRecordInfor.m_AllAssetRecordsDic.Clear();  //清理本地记录的数据
+            S_AllFileNeedBuildAssetBundleRecord.Clear();
             ClearAllPreviousAssetBundleName();
             GetAndSetNeedPackAssetName(ConstDefine.S_ResourcesPath);
             CallAPIBuildAssetBundle();  //生成AssetBundle
+            AssetDatabase.Refresh();
 
+            CopyAndMoveAssetBundleAsset();
             CreateAssetBundleDepends(); //创建依赖关系字典
             SaveAllDepdenceToLocalFile();
 
             AssetDatabase.Refresh();
-            if (S_BuildAssetBundleWindows != null)
-                S_BuildAssetBundleWindows.Close();
+            S_BuildAssetBundleWindows.OnCompleteBuildAssetBundle();
         }
 
 
@@ -119,7 +121,8 @@ namespace GameFrameWork.EditorExpand
             }
 
             string fileAssetPath = filePath.Substring(filePath.IndexOf(string.Format("{0}/", ConstDefine.S_AssetName))); //相对于Assets目录 方便AssetImporter 使用
-            string filePathRelativeResource = fileAssetPath.Substring(ConstDefine.S_ResourcesPath.Length);//相对于Resource的路径
+            int index = fileAssetPath.IndexOf(string.Format("{0}/", ConstDefine.S_ResourcesName));
+            string filePathRelativeResource = fileAssetPath.Substring(index+ ConstDefine.S_ResourcesName.Length+1);//相对于Resource的路径
             //相对于Resource路径下不带扩展名的文件名
             string filePathRelativeResourceWithoutExtension = filePathRelativeResource.Substring(0, filePathRelativeResource.IndexOf(Path.GetExtension(filePathRelativeResource)));
             Debug.Log("fileAssetPath=" + fileAssetPath + "   filePathRelativeResource=" + filePathRelativeResource);
@@ -170,11 +173,18 @@ namespace GameFrameWork.EditorExpand
         /// </summary>
         private static void CleanAssetBundleOutputPath()
         {
+            Debug.LogInfor("CleanAssetBundleOutputPath >>>" + S_AssetBundleOutPath);
             if (Directory.Exists(S_AssetBundleOutPath))
                 Directory.Delete(S_AssetBundleOutPath, true);
 
             Directory.CreateDirectory(S_AssetBundleOutPath);
         }
+
+        private  static void CopyAndMoveAssetBundleAsset()
+        {
+            IoUtility.Instance.ForceCopyDirectoryFile(ConstDefine.S_StreamingAssetPath, ConstDefine.S_AssetBundleTopPath);
+        }
+
 
         /// <summary>
         /// 创建依赖关系
