@@ -23,16 +23,16 @@ namespace GameFrameWork.EditorExpand
     [System.Serializable]
     public class BuildAssetBundleTreeNode : BaseTreeNodeInfor
     {
-     /// <summary>
-     /// 是否需要被选中(只要有子项是选中的则选中 否则非选择)
-     /// </summary>
+        /// <summary>
+        /// 是否需要被选中(只要有子项是选中的则选中 否则非选择)
+        /// </summary>
         protected bool m_IsSelected = false;
         public bool IsSelected { get { return GetTreeNodeIsSelectedState(); } set { SetTreeNodeIsSelectedState(value); } }   //是否选中
-  //      public TreeNodeSelectState m_TreeNodeSelectState { get; protected set; } //节点的选择状态
+                                                                                                                             //      public TreeNodeSelectState m_TreeNodeSelectState { get; protected set; } //节点的选择状态
 
         public BuildAssetBundleTreeNode(string name) : base(name)
         {
-          
+
         }
 
 
@@ -87,7 +87,7 @@ namespace GameFrameWork.EditorExpand
             {
                 if (item.IsTreeNode)
                 {
-                    if( (item as BuildAssetBundleTreeNode).m_IsSelected)
+                    if ((item as BuildAssetBundleTreeNode).m_IsSelected)
                     {
                         isHasItemSelected = true;
                     }

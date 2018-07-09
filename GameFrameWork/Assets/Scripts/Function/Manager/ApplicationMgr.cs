@@ -33,6 +33,7 @@ namespace GameFrameWork
         /// <summary>
         /// 全局控制资源加载的方式 要么同步，要么异步加载，否则同步异步同时进行有问题
         /// </summary>
+        [Header("资源加载同步/异步")]
         public LoadAssetModel m_CurLoadAssetModel = LoadAssetModel.Async;
 
         #endregion
@@ -97,6 +98,14 @@ namespace GameFrameWork
         {
             ResourcesLoaderMgr.Tick();
         }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            if (AssetBundleMgr.Instance.m_MainAssetBundle)
+                AssetBundleMgr.Instance.m_MainAssetBundle.Unload(true); //卸载所有的 AssetBundle 资源
+        }
+
         #endregion
 
         #region 配置

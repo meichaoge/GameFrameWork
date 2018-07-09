@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 1811258902
+CRC: 125088494
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 13ca5d26c880e6a1e2bb96245026ba8c
+    Hash: f5abdd5e278b99d483d7d8f2f6d60dcb
   TypeTreeHash:
     serializedVersion: 2
     Hash: 0520077050483de6babb9bd310d40764
@@ -16,6 +16,7 @@ ClassTypes:
 - Class: 48
   Script: {instanceID: 0}
 Assets:
+- Assets/Resources/TestMaterial/TestMaterial2.mat
 - Assets/Resources/TestMaterial/TestMaterial.mat
 Dependencies:
 - E:/My_WorkSpace/GameFrameWork/Assets/StreamingAssets/Window/testshader/testshader.unity3d

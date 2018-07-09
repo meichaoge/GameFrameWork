@@ -26,6 +26,13 @@ namespace GameFrameWork
             }
         }
 
+        private AssetBundle _mainAssetBundle = null;
+        public AssetBundle m_MainAssetBundle
+        {
+            get { return _mainAssetBundle; }
+        }//主AssetBundle 资源
+
+
 
 
         #region  加载 AssetBundleManifest
@@ -36,16 +43,15 @@ namespace GameFrameWork
         {
             string platformName = GetAssetBundlePlatformName();
             string manifestPath = string.Format("{0}{1}/{2}", ConstDefine.S_AssetBundleTopPath, platformName, platformName);
-            AssetBundle mainAssetBundle = AssetBundle.LoadFromFile(manifestPath);
-            if (mainAssetBundle == null)
+            _mainAssetBundle = AssetBundle.LoadFromFile(manifestPath);
+            if (_mainAssetBundle == null)
             {
                 Debug.LogError("mainAssetBundle is Null At Path" + manifestPath);
                 return;
             }
-            _AssetBundleManifest = mainAssetBundle.LoadAsset<AssetBundleManifest>(ConstDefine.S_AssetBundleManifest);
+            _AssetBundleManifest = _mainAssetBundle.LoadAsset<AssetBundleManifest>(ConstDefine.S_AssetBundleManifest);
         }
         #endregion
-
 
 
         #region  获取运行时的平台AssetBundle 路径

@@ -191,9 +191,6 @@ namespace GameFrameWork.EditorExpand
         /// </summary>
         private static void CreateAssetBundleDepends()
         {
-            //   AssetBundle mainAssetBundle = AssetBundle.LoadFromFile(string.Format("{0}/{1}", S_AssetBundleOutPath, AssetBundleMgr.Instance.GetHotAssetBuildPlatformName(S_CurrentBuildTarget)));
-            //   AssetBundleManifest mainFest = mainAssetBundle.LoadAsset<AssetBundleManifest>("AssetBundleManifest"); //获得主AssetBundleManifest
-
             RecordPackAbundleMainifestInfor(AssetBundleMgr.Instance.GetHotAssetBuildPlatformName(S_CurrentBuildTarget));  //不同平台的打包主AssetBundle
             RecordPackAbundleMainifestInfor(AssetBundleMgr.Instance.GetHotAssetBuildPlatformName(S_CurrentBuildTarget) + ".manifest");  // AssetBundleManifest
 
@@ -233,8 +230,6 @@ namespace GameFrameWork.EditorExpand
 
             }
             #endregion
-
-            //    mainAssetBundle.Unload(true);//卸载所有的 AssetBundle 资源
         }
 
         /// <summary>
@@ -268,7 +263,8 @@ namespace GameFrameWork.EditorExpand
         private static void SaveAllDepdenceToLocalFile()
         {
             string msg = LitJson.JsonMapper.ToJson(S_HotAssetBaseRecordInfor);
-            string configRecordPath = string.Format("{0}{1}/{2}", ConstDefine.S_AssetBundleTopPath, AssetBundleMgr.Instance.GetHotAssetBuildPlatformName(S_CurrentBuildTarget), ConstDefine.S_AssetBundleBuildRecordConfigureName);//        Application.streamingAssetsPath + "/" + GetPlatformPath(CurrentBuildTarget) + ConstDefine.ABundleConfigFileName;
+            string configRecordPath = string.Format("{0}{1}", ConstDefine.S_AssetBundleTopPath, AssetBundleMgr.Instance.GetHotAssetBuildPlatformName(S_CurrentBuildTarget)+
+                ConstDefine.S_AssetBundleBuildRecordConfigureName);//        Application.streamingAssetsPath + "/" + GetPlatformPath(CurrentBuildTarget) + ConstDefine.ABundleConfigFileName;
             if (System.IO.File.Exists(configRecordPath))
             {
                 System.IO.File.Delete(configRecordPath);

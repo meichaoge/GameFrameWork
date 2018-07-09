@@ -1,0 +1,28 @@
+﻿using System.Collections.Generic;
+using System.Collections;
+using UnityEngine;
+using UnityEngine.UI;
+
+namespace GameFrameWork
+{
+    public class #CLASSNAME# : UIViewBase
+  {
+       #region UI
+      #UIPARAMETER#
+      #endregion
+
+     #region Frame
+    protected override void Awake()
+    {
+      base.Awake();
+         this.InitView();
+    }
+
+    private void  InitView() {
+      #INITVIEW#
+      //**
+      #INITVIEWTOPARAMETER#
+    }
+    #endregion
+  }
+}

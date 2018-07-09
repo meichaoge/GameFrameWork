@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 866911812
+CRC: 224875823
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 2e894578a01de3fb2c09a759baf7ddd8
+    Hash: db26681d478c1d859409c244b97c934e
   TypeTreeHash:
     serializedVersion: 2
     Hash: cc7b69794a2bdada249e557ebbfded10
@@ -12,5 +12,6 @@ ClassTypes:
 - Class: 48
   Script: {instanceID: 0}
 Assets:
+- Assets/Resources/TestShader/TestShader2.shader
 - Assets/Resources/TestShader/TestShader.shader
 Dependencies: []

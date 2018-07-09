@@ -172,7 +172,7 @@ namespace GameFrameWork
                 if (allDependenceAssetLoader[dex].IsError)
                 {
                     Debug.LogError("LoadAssetBundleSync  Fail, 依赖的 AssetBundle 资源不存在 " + allDependenceAssetLoader[dex].m_ResourcesUrl);
-                    OnCompleteLoad(false, string.Format("LoadAssetBundle Fail,AssetBundle Path= {0}" + allDependenceAssetLoader[dex].m_ResourcesUrl), null, true);
+                    OnCompleteLoad(false, string.Format("LoadAssetBundle Fail,AssetBundle Path= {0}" , allDependenceAssetLoader[dex].m_ResourcesUrl), null, true);
                     yield break;
                 }
             } //判断依赖项是否加载完成
@@ -184,13 +184,13 @@ namespace GameFrameWork
 
             if (wwwLoader.IsError)
             {
-                OnCompleteLoad(false, string.Format("LoadAssetBundle Fail, AssetBundle Path= {0}" + (S_AssetBundleTopPath + m_ResourcesUrl)), null, true);
+                OnCompleteLoad(false, string.Format("LoadAssetBundle Fail, AssetBundle Path= {0}" , (S_AssetBundleTopPath + m_ResourcesUrl)), null, true);
                 WWWLoader.UnLoadAsset(wwwLoader.m_ResourcesUrl);
                 yield break;
             }
 
             ResultObj = (wwwLoader.ResultObj as WWW).assetBundle.LoadAsset(System.IO.Path.GetFileNameWithoutExtension(m_ResourcesUrl));
-            OnCompleteLoad(ResultObj == null, string.Format("LoadAssetBundleSuccess  {0}" + m_ResourcesUrl), ResultObj, true);
+            OnCompleteLoad(ResultObj == null, string.Format("LoadAssetBundleSuccess  {0}" , m_ResourcesUrl), ResultObj, true);
             WWWLoader.UnLoadAsset(wwwLoader.m_ResourcesUrl);
             #endregion
 

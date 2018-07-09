@@ -94,20 +94,11 @@ namespace GameFrameWork.EditorExpand
 
             for (int dex = 0; dex < m_AllResourcesTopPath.Count; ++dex)
             {
-                ShowSubFilePath(m_AllResourcesTopPath[dex], 1);
+                ShowSubFilePath(m_AllResourcesTopPath[dex], 1,true);
             }
             GUILayout.EndScrollView();
             GUILayout.Space(15);
             #endregion
-
-
-            //for (int dex = 0; dex < m_AllResourcesTopPath.Count; ++dex)
-            //{
-            //    if (m_AllResourcesTopPath[dex].IsSelected)
-            //        isDeSelectAll = false;
-            //    else
-            //        isSelectAll = false;
-            //}
 
             #region  显示打包按钮
             GUILayout.BeginHorizontal();
@@ -161,8 +152,9 @@ namespace GameFrameWork.EditorExpand
         /// </summary>
         /// <param name="recordInfor"></param>
         /// <param name="layer"></param>
-        private void ShowSubFilePath(BuildAssetBundleTreeNode recordInfor, int layer)
+        private void ShowSubFilePath(BuildAssetBundleTreeNode recordInfor, int layer,bool isShow)
         {
+            if (isShow == false) return;
             GUILayout.BeginVertical();
             GUILayout.BeginHorizontal();
             GUILayout.Label("", GUILayout.Width(m_SubItemSpace * layer));
@@ -196,7 +188,7 @@ namespace GameFrameWork.EditorExpand
                 }
                 else
                 {
-                    ShowSubFilePath(node, layer);
+                    ShowSubFilePath(node, layer, item.IsOn);
                 }
             }
             GUILayout.EndVertical();
@@ -223,6 +215,7 @@ namespace GameFrameWork.EditorExpand
                 if (System.IO.Path.GetExtension(directory) != ".meta")
                 {
                     BuildAssetBundleTreeNode infor = new BuildAssetBundleTreeNode(directory);
+                    infor.IsOn = true;
                     GetSearchAllSubFile(infor, directory);
                     m_AllResourcesTopPath.Add(infor);
                 }
@@ -234,6 +227,7 @@ namespace GameFrameWork.EditorExpand
                 if (System.IO.Path.GetExtension(file) != ".meta")
                 {
                     BuildAssetBundleTreeNode infor = new BuildAssetBundleTreeNode(file);
+                    infor.IsOn = true;
                     m_AllResourcesTopPath.Add(infor);
                 }
             }
@@ -261,6 +255,7 @@ namespace GameFrameWork.EditorExpand
                 if (System.IO.Path.GetExtension(directory) != ".meta")
                 {
                     BuildAssetBundleTreeNode subInfor = new BuildAssetBundleTreeNode(directory);
+                    subInfor.IsOn = false;
                     infor.m_AllSubNodesInfor.Add(subInfor);
                     GetSearchAllSubFile(subInfor, directory);
                 }
@@ -272,6 +267,7 @@ namespace GameFrameWork.EditorExpand
                 if (System.IO.Path.GetExtension(file) != ".meta")
                 {
                     BuildAssetBundleTreeNode subInfor = new BuildAssetBundleTreeNode(file);
+                    subInfor.IsOn = false;
                     GetSearchAllSubFile(subInfor, file);
                     infor.m_AllSubNodesInfor.Add(subInfor);
                 }
