@@ -14,7 +14,7 @@ public class TestLoadAssetBundle : MonoBehaviour {
 	void Update () {
 		if(Input.GetKeyDown(KeyCode.A))
         {
-            AssetBundleLoader.LoadAssetBundleAsset(URL, CompleteLoad);
+            AssetBundleLoader.LoadAssetBundleAsset(URL, System.IO.Path.GetFileNameWithoutExtension(URL),CompleteLoad);
         }
 	}
 

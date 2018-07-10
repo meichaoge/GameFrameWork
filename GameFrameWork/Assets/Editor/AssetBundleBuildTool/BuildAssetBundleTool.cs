@@ -102,7 +102,6 @@ namespace GameFrameWork.EditorExpand
             {
                 SetAssetBundleNameByPath(file);
             }
-
         }
 
         #endregion

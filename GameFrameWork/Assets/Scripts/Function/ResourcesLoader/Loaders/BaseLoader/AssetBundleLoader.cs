@@ -7,6 +7,16 @@ using UnityEngine;
 namespace GameFrameWork
 {
     /// <summary>
+    /// 指定Url 的AssetBundle 存在方式
+    /// </summary>
+    public enum AssetBundleExitState
+    {
+        SinglePrefab,  //单独的预制体
+        FolderPrefab, //按照文件夹目录名打包成一个整体
+        None, //不存在这个AssetBundle 资源
+    }
+
+    /// <summary>
     /// 加载AssetBundle 资源  (需要区分是加载单个预制体还是打包到一起的资源)
     /// </summary>
     public class AssetBundleLoader : BaseAbstracResourceLoader
@@ -40,39 +50,50 @@ namespace GameFrameWork
         /// 检测这个url 对应的资源是否存在 (会检测资源路径扩展名是否是。unity3d,)
         /// </summary>
         /// <param name="url"></param>
-        /// <returns></returns>
-        public static bool CheckIsAssetBundleExit(string url)
+        /// <param name="newUrl">如果这个url 对应的AssetBundle 资源是以整个文件夹名的预制体，则返回这个整预制体的url(只再这个情况下有效)</param>
+        /// <returns>这个资源是否存在 已经存在的方式(单独预制体/整个文件夹名的预制体/不存在)</returns>
+        public static AssetBundleExitState CheckIsAssetBundleExit(string url, ref string newUrl)
         {
             string platformtName = AssetBundleMgr.Instance.GetAssetBundlePlatformName();
-            string assetPersistentPath = "";
+            string templePath = "";
             if (System.IO.Path.GetExtension(url) != ConstDefine.AssetBundleExtensionName)
-                assetPersistentPath = string.Format("{0}{1}/{2}{3}", ConstDefine.S_AssetBundleTopPath, platformtName, url, ConstDefine.AssetBundleExtensionName);
+                templePath = string.Format("{0}{1}/{2}{3}", ConstDefine.S_AssetBundleTopPath, platformtName, url, ConstDefine.AssetBundleExtensionName);
             else
-                assetPersistentPath = string.Format("{0}{1}/{2}", ConstDefine.S_AssetBundleTopPath, platformtName, url);
+                templePath = string.Format("{0}{1}/{2}", ConstDefine.S_AssetBundleTopPath, platformtName, url);
 
-            if (System.IO.File.Exists(assetPersistentPath))
-                return true;
+            //     Debug.Log("AA assetPersistentPath=" + assetPersistentPath);
+            if (System.IO.File.Exists(templePath))
+                return AssetBundleExitState.SinglePrefab;
 
-            assetPersistentPath = System.IO.Path.GetDirectoryName(assetPersistentPath);
-            if (System.IO.Path.GetExtension(assetPersistentPath) != ConstDefine.AssetBundleExtensionName)
-                assetPersistentPath += ConstDefine.AssetBundleExtensionName;
-            if (System.IO.File.Exists(assetPersistentPath))
+            string shortDirectoryName = templePath.GetPathParentDirectoryName().ToLower(); //当前文件路径父级目录名
+            templePath = string.Format("{0}/{1}", System.IO.Path.GetDirectoryName(templePath), shortDirectoryName);
+            //         Debug.Log("BB assetPersistentPath=" + assetPersistentPath);
+            if (System.IO.Path.GetExtension(templePath) != ConstDefine.AssetBundleExtensionName)
+                templePath += ConstDefine.AssetBundleExtensionName;
+            if (System.IO.File.Exists(templePath))
             {
-                Debug.LogInfor("当前AssetBundle 资源是被打成一个统一的AssetBundle" + url);
-                return true;
+                string parentFolderPath = System.IO.Path.GetDirectoryName(url); //当前路径对应的父路径
+                string parentFolderPathwithoutExtension = System.IO.Path.GetFileNameWithoutExtension(parentFolderPath);
+                newUrl = string.Format("{0}/{1}{2}", parentFolderPathwithoutExtension, shortDirectoryName, ConstDefine.AssetBundleExtensionName);  //返回文件
+                Debug.LogInfor("当前AssetBundle 资源是被打成一个统一的AssetBundle ::" + newUrl);
+
+                return AssetBundleExitState.FolderPrefab;
             }
-            return false;
+            return AssetBundleExitState.None;
         }
 
         #region 加载AssetBundle 资源
 
 
+
         /// <summary>
         /// 加载AssetBundle 资源
         /// </summary>
-        /// <param name="url">相对于AseetBundle 资源存放路径的路径</param>
+        /// <param name="url">相对于AseetBundle 资源存放路径的路径 (如果是打包成整个预制体则是整个预制体的路径)</param>
+        /// <param name="assetFileName">实际加载AssetBundle 时候的文件名称(考虑到加载整个AssetBundle 中一个资源的情况)</param>
         /// <param name="onCompleteAct"></param>
-        public static AssetBundleLoader LoadAssetBundleAsset(string url, System.Action<BaseAbstracResourceLoader> onCompleteAct)
+        /// <returns></returns>
+        public static AssetBundleLoader LoadAssetBundleAsset(string url,string assetFileName, System.Action<BaseAbstracResourceLoader> onCompleteAct)
         {
             bool isLoaderExit = false;
             AssetBundleLoader assetBundleLoader = ResourcesLoaderMgr.GetOrCreateLoaderInstance<AssetBundleLoader>(url, ref isLoaderExit);
@@ -84,7 +105,7 @@ namespace GameFrameWork
                     assetBundleLoader.OnCompleteLoad(assetBundleLoader.IsError, assetBundleLoader.Description, assetBundleLoader.ResultObj, true);  //如果当前加载器已经完成加载 则手动触发事件
                 return assetBundleLoader;  //如果已经存在 且当前加载器还在加载中，则只需要等待加载完成则回调用回调
             }
-            ApplicationMgr.Instance.StartCoroutine(assetBundleLoader.LoadAssetBundleASync(url, assetBundleLoader));
+            ApplicationMgr.Instance.StartCoroutine(assetBundleLoader.LoadAssetBundleASync(url,  assetFileName, assetBundleLoader));
             return assetBundleLoader;
         }
 
@@ -147,7 +168,7 @@ namespace GameFrameWork
         /// 异步加载资源
         /// </summary>
         /// <param name="url"></param>
-        protected IEnumerator LoadAssetBundleASync(string url, AssetBundleLoader assetBundleLoade)
+        protected IEnumerator LoadAssetBundleASync(string url, string assetFileName, AssetBundleLoader assetBundleLoade)
         {
             m_ResourcesUrl = url;
             if (System.IO.Path.GetExtension(m_ResourcesUrl) != ConstDefine.AssetBundleExtensionName)
@@ -172,7 +193,7 @@ namespace GameFrameWork
                 if (allDependenceAssetLoader[dex].IsError)
                 {
                     Debug.LogError("LoadAssetBundleSync  Fail, 依赖的 AssetBundle 资源不存在 " + allDependenceAssetLoader[dex].m_ResourcesUrl);
-                    OnCompleteLoad(false, string.Format("LoadAssetBundle Fail,AssetBundle Path= {0}" , allDependenceAssetLoader[dex].m_ResourcesUrl), null, true);
+                    OnCompleteLoad(false, string.Format("LoadAssetBundle Fail,AssetBundle Path= {0}", allDependenceAssetLoader[dex].m_ResourcesUrl), null, true);
                     yield break;
                 }
             } //判断依赖项是否加载完成
@@ -184,13 +205,13 @@ namespace GameFrameWork
 
             if (wwwLoader.IsError)
             {
-                OnCompleteLoad(false, string.Format("LoadAssetBundle Fail, AssetBundle Path= {0}" , (S_AssetBundleTopPath + m_ResourcesUrl)), null, true);
+                OnCompleteLoad(false, string.Format("LoadAssetBundle Fail, AssetBundle Path= {0}", (S_AssetBundleTopPath + m_ResourcesUrl)), null, true);
                 WWWLoader.UnLoadAsset(wwwLoader.m_ResourcesUrl);
                 yield break;
             }
 
-            ResultObj = (wwwLoader.ResultObj as WWW).assetBundle.LoadAsset(System.IO.Path.GetFileNameWithoutExtension(m_ResourcesUrl));
-            OnCompleteLoad(ResultObj == null, string.Format("LoadAssetBundleSuccess  {0}" , m_ResourcesUrl), ResultObj, true);
+            ResultObj = (wwwLoader.ResultObj as WWW).assetBundle.LoadAsset(System.IO.Path.GetFileNameWithoutExtension(assetFileName));
+            OnCompleteLoad(ResultObj == null, string.Format("LoadAssetBundleSuccess  {0}", m_ResourcesUrl), ResultObj, true);
             WWWLoader.UnLoadAsset(wwwLoader.m_ResourcesUrl);
             #endregion
 
@@ -221,10 +242,6 @@ namespace GameFrameWork
         /// <returns></returns>
         protected virtual IEnumerator LoadDepdenceAssetBundleAsync(string url, AssetBundleLoader depdebceAssetBundleLoader)
         {
-
-
-
-
             depdebceAssetBundleLoader.m_ResourcesUrl = url;
             if (System.IO.Path.GetExtension(depdebceAssetBundleLoader.m_ResourcesUrl) != ConstDefine.AssetBundleExtensionName)
                 depdebceAssetBundleLoader.m_ResourcesUrl += ConstDefine.AssetBundleExtensionName;  //组合上扩展名
@@ -334,7 +351,6 @@ namespace GameFrameWork
                 Debug.LogError(Description);
             else
                 Debug.LogInfor(Description);
-
 #endif
         }
 

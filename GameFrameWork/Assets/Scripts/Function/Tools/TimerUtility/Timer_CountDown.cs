@@ -11,29 +11,30 @@ namespace GameFrameWork
     public  class Timer_CountDown: AbstractTimerRecord
     {
         public float m_DeadTime;  //倒计时时长
-        public float m_LastRecordTime;
+        public float m_LastRecordTime=0;
+
 
         public override void InitialTimer()
         {
             base.InitialTimer();
-            m_LastRecordTime = 0;
+            m_DeadTime += m_InitialedTime;
         }
 
         public override void TimeTicked()
         {
-            m_DeadTime -= Time.deltaTime;
-            if (m_DeadTime <= 0)
+            if (Time.realtimeSinceStartup- m_DeadTime >= 0)
             {
                 if (m_CallbackAct != null)
                     m_CallbackAct(0, m_HashCode);
                 TimeTickUtility.Instance.UnRegisterTimer_Delay(this);  //标记为要删除
                 return;
             }
-            m_LastRecordTime += Time.deltaTime;
-            if (m_LastRecordTime >= m_SpaceTime)
+
+            m_LastRecordTime = Time.realtimeSinceStartup;
+            if (m_LastRecordTime - m_InitialedTime >= m_SpaceTime)
             {
                 if (m_CallbackAct != null)
-                    m_CallbackAct(m_DeadTime, m_HashCode);
+                    m_CallbackAct(m_DeadTime- m_InitialedTime, m_HashCode);
                 m_LastRecordTime -= m_SpaceTime;
             }
 

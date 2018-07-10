@@ -76,7 +76,7 @@ namespace GameFrameWork
             Debug.Log(" Application.streamingAssetsPath=" + Application.streamingAssetsPath);
 
 #endif
-
+            TimeTickUtility.Instance.StartUpTimer();
             base.Awake();
             Debug.LogInfor("ApplicationMgr Start...");
             SortLoadAssetPathPriority();
@@ -84,14 +84,14 @@ namespace GameFrameWork
 
         }
 
-        void Start()
+        private void Start()
         {
 
         }
 
         void Update()
         {
-
+            TimeTickUtility.Instance.Tick();  //启动计时器
         }
 
         private void FixedUpdate()
@@ -102,8 +102,18 @@ namespace GameFrameWork
         protected override void OnDestroy()
         {
             base.OnDestroy();
+#if UNITY_EDITOR
             if (AssetBundleMgr.Instance.m_MainAssetBundle)
                 AssetBundleMgr.Instance.m_MainAssetBundle.Unload(true); //卸载所有的 AssetBundle 资源
+#endif
+        }
+
+        private void OnApplicationQuit()
+        {
+#if !UNITY_EDITOR
+            if (AssetBundleMgr.Instance.m_MainAssetBundle)
+                AssetBundleMgr.Instance.m_MainAssetBundle.Unload(true); //卸载所有的 AssetBundle 资源
+#endif
         }
 
         #endregion
@@ -143,11 +153,11 @@ namespace GameFrameWork
         /// <returns></returns>
         public bool GetNextLoadAssetPath(ref LoadAssetPathEnum curAssetPath)
         {
-            for (int dex = 0; dex < m_LoadAssetPath.Count; ++dex)
+            for (int dex = 0; dex < m_LoadAssetPath.Count - 1; ++dex)
             {
                 if (m_LoadAssetPath[dex].m_AssetPathEnum == curAssetPath)
                 {
-                    curAssetPath = m_LoadAssetPath[dex].m_AssetPathEnum;
+                    curAssetPath = m_LoadAssetPath[dex + 1].m_AssetPathEnum;
                     return true;
                 }
             }

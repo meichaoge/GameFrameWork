@@ -82,6 +82,7 @@ namespace GameFrameWork
         /// </summary>
         protected virtual void LoadByteAssetSync(string path)
         {
+            m_ResourcesUrl = path;
             try
             {
                 fileStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
@@ -112,6 +113,7 @@ namespace GameFrameWork
         /// </summary>
         protected virtual void LoadByteAssetASync(string path)
         {
+            m_ResourcesUrl = path;
             Debug.Log("LoadByteAssetASync  url=" + path);
             if (System.IO.File.Exists(path) == false)
             {
@@ -171,7 +173,7 @@ namespace GameFrameWork
                 return;
             }
             byteLoader.ReduceReference();
-         
+
         }
         #endregion
 

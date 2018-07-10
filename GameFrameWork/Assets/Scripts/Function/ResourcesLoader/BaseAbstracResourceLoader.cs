@@ -161,8 +161,9 @@ namespace GameFrameWork
                 Debug.LogError(Description);
             else
                 Debug.LogInfor(Description);
-
 #endif
+
+
             foreach (var item in m_OnCompleteAct)
             {
                 if (item != null)

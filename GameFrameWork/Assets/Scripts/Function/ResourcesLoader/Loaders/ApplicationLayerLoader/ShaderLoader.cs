@@ -9,10 +9,8 @@ namespace GameFrameWork
     /// <summary>
     /// Shader 加载器 缓存已经加载的Shader
     /// </summary>
-    public class ShaderLoader : BaseAbstracResourceLoader
+    public class ShaderLoader : ApplicationLayerBaseLoader
     {
-
-        private BridgeLoader m_BridgeLoader;  //加载不同路径的资源桥接器
 
         #region  加载资源
         /// <summary>

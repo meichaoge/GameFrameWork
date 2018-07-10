@@ -17,12 +17,13 @@ namespace GameFrameWork
         /// </summary>
         public int m_HashCode { protected set; get; }
         public float m_SpaceTime;  //间隔
-
+        protected float m_InitialedTime {  get; private set; } //初始化时候的时间
 
 
         public virtual void InitialTimer()
         {
             m_HashCode = GetHashCode();
+            m_InitialedTime = Time.realtimeSinceStartup;
         }
 
         /// <summary>

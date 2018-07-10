@@ -8,13 +8,36 @@ namespace GameFrameWork
 {
 
     /// <summary>
-    /// 全局的计时器
+    /// 全局的计时器  (由于Time.timescale=0时候FixedUpdate() 不执行， Time.deltaTime=0，且因为缩放比例不一样导致计时会出错，所以需要使用Time.realtimeSinceStartup)
     /// </summary>
-    public class TimeTickUtility : Singleton_Mono<TimeTickUtility>
+    public class TimeTickUtility : Singleton_Static<TimeTickUtility>
     {
 
+        private static float _TimeStartUp = 0;
+        /// <summary>
+        /// 应用启动时候的时间
+        /// </summary>
+        public static float S_TimeStartUp
+        {
+            get { return _TimeStartUp; }
+        }
         private Dictionary<int, AbstractTimerRecord> m_AllTimerCallback = new Dictionary<int, AbstractTimerRecord>();
         private List<AbstractTimerRecord> m_AllDeadTimers = new List<AbstractTimerRecord>();  //需要被注销的计时器
+
+        protected override void InitialSingleton()
+        {
+            base.InitialSingleton();
+            _TimeStartUp = Time.realtimeSinceStartup; //只赋值一次
+        }
+
+        /// <summary>
+        /// 启动计时器 空操作是因为在 InitialSingleton 中开始计时了
+        /// </summary>
+        public void StartUpTimer()
+        {
+            Debug.LogInfor("计时器开始工作 " + S_TimeStartUp);
+        }
+
 
         public void Tick()
         {

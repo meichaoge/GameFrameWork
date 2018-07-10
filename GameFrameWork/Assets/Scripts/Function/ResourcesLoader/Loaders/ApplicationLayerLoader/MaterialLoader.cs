@@ -10,7 +10,7 @@
 //    /// <summary>
 //    /// 加载材质球
 //    /// </summary>
-//    public class MaterialLoader : BaseAbstracResourceLoader
+//    public class MaterialLoader : ApplicationLayerBaseLoader
 //    {
 //        public MaterialLoader():base()
 //        {

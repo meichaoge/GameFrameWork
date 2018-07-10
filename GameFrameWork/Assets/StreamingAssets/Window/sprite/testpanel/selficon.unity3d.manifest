@@ -1,0 +1,28 @@
+ManifestFileVersion: 0
+CRC: 1527366752
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 8a423070f410aba09dea9071dbf76533
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 96ca4d0d14899a0756f95d81a2824914
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 4
+  Script: {instanceID: 0}
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 48
+  Script: {instanceID: 0}
+- Class: 212
+  Script: {instanceID: 0}
+- Class: 213
+  Script: {instanceID: 0}
+Assets:
+- Assets/Resources/Sprite/TestPanel/SelfIcon.prefab
+Dependencies: []

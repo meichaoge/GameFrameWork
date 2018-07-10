@@ -10,12 +10,58 @@ namespace GameFrameWork.EditorExpand
     /// </summary>
     public class EditorCreateSpriteRender //: Editor
     {
-        //[MenuItem("Assets/创建精灵 SpriteRender 预制体")]
+        /// <summary>
+        /// 根据选择的图片生成预制体并关联这个图片
+        /// </summary>
         public static void CreateSpriteRender()
         {
-            UnityEngine.Object selectObj = Selection.activeObject;
-            string path = AssetDatabase.GetAssetPath(selectObj);
-            //  Debug.Log(path + "                     " + System.IO.Path.GetExtension(path).ToLower());
+            UnityEngine.Object[] selectObj = Selection.objects;
+            if (selectObj.Length == 1)
+            {
+                SaveSingleSprite(selectObj[0]);
+            }
+            else
+            {
+                SaveMultiSprite(selectObj);
+            }
+            AssetDatabase.Refresh();
+        }
+
+
+        private static void SaveSingleSprite(UnityEngine.Object obj)
+        {
+            string path = AssetDatabase.GetAssetPath(obj);
+            CreateOrUpdateSpritePrefab(path);
+        }
+
+        private static void SaveMultiSprite(UnityEngine.Object[] selectObj)
+        {
+            if (selectObj == null || selectObj.Length == 0) return;
+            string savePrefabPath = EditorDialogUtility.SaveFileDialog("保存生成的预制体", Application.dataPath + "/Resources", "只需要选择合适的目录，不需要填写文件名", "prefab");
+            if (string.IsNullOrEmpty(savePrefabPath))
+            {
+                Debug.LogInfor("取消 创建SpriteRender");
+                return;
+            }
+
+            Debug.Log("savePrefabPath=" + savePrefabPath);
+            Debug.Log("savePrefabPath=" + System.IO.Path.GetDirectoryName(savePrefabPath));
+
+
+            foreach (var item in selectObj)
+            {
+                string path = AssetDatabase.GetAssetPath(item);
+                CreateOrUpdateSpritePrefab(path, System.IO.Path.GetDirectoryName(savePrefabPath));
+            }
+        }
+
+        /// <summary>
+        /// 创建或者更新精灵预制体
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="savePrefabPath"></param>
+        private static void CreateOrUpdateSpritePrefab(string path, string savePrefabPath = "")
+        {
             if (System.IO.Path.GetExtension(path).ToLower() != ".png" && System.IO.Path.GetExtension(path).ToLower() != ".jpg")
             {
                 Debug.Log("Not Sprite");
@@ -33,12 +79,20 @@ namespace GameFrameWork.EditorExpand
             } //修改选中图片资源的格式为Sprite
 
             string prefabName = System.IO.Path.GetFileNameWithoutExtension(path);
-            string savePrefabPath = EditorDialogUtility.SaveFileDialog("保存生成的预制体", Application.dataPath + "/Resources", prefabName, "prefab");
             if (string.IsNullOrEmpty(savePrefabPath))
             {
-                Debug.LogInfor("取消 创建SpriteRender");
-                return;
+                savePrefabPath = EditorDialogUtility.SaveFileDialog("保存生成的预制体", Application.dataPath + "/Resources", prefabName, "prefab");
+                if (string.IsNullOrEmpty(savePrefabPath))
+                {
+                    Debug.LogInfor("取消 创建SpriteRender");
+                    return;
+                }
             }
+            else
+            {
+                savePrefabPath = string.Format("{0}/{1}.prefab", savePrefabPath, prefabName);
+            }
+
             Debug.Log("CreateSpriteRender  savePrefabPath=" + savePrefabPath);
             //********需要考虑已经存在的时候只需要替换Sprite  TODO
 
@@ -50,8 +104,8 @@ namespace GameFrameWork.EditorExpand
 
             GameObject prefab = PrefabUtility.CreatePrefab(savePrefabPath.Substring(savePrefabPath.IndexOf("Assets")), go); //创建预制体资源 路径必须从 Assets开始
             GameObject.DestroyImmediate(go);
-            AssetDatabase.Refresh();
         }
+
 
     }
 }

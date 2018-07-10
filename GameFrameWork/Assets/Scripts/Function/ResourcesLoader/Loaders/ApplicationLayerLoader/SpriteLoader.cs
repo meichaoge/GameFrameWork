@@ -6,11 +6,10 @@ using UnityEngine;
 namespace GameFrameWork
 {
     /// <summary>
-    ///  Sprite2D 加载器 缓存已经加载的Sprite
+    ///  Sprite2D加载器，加载已经制作成Prefab 的Sprite
     /// </summary>
-    public class SpriteLoader : BaseAbstracResourceLoader
+    public class SpriteLoader : ApplicationLayerBaseLoader
     {
-        private BridgeLoader m_BridgeLoader;  //加载不同路径的资源桥接器
 
         #region      加载资源
         /// <summary>
@@ -57,7 +56,7 @@ namespace GameFrameWork
             SpriteLoader spriteLoader = ResourcesLoaderMgr.GetExitLoaderInstance<SpriteLoader>(url);
             if (spriteLoader == null)
             {
-                //Debug.LogError("无法获取指定类型的加载器 " + typeof(WWWLoader));
+                //Debug.LogError("无法获取指定类型的加载器 " + typeof(TextAssetLoader));
                 return;
             }
             spriteLoader.ReduceReference();
@@ -71,8 +70,10 @@ namespace GameFrameWork
 
         protected override void OnCompleteLoad(bool isError, string description, object result, bool iscomplete, float process = 1)
         {
-            base.OnCompleteLoad(isError, description, result, iscomplete, process);
+            //  Debug.LogInfor("AAAAAAA>>>> " + (result as GameObject).GetComponent<SpriteRenderer>());
             ResultObj = (result as GameObject).GetComponent<SpriteRenderer>().sprite;
+            base.OnCompleteLoad(isError, description, ResultObj, iscomplete, process);
+
         }
 
     }
