@@ -7,9 +7,9 @@ namespace GameFrameWork
 {
 
     /// <summary>
-    /// Shader 加载器 缓存已经加载的Shader
+    /// Shader 加载器 缓存已经加载的Shader (不需要卸载)
     /// </summary>
-    public class ShaderLoader : ApplicationLayerBaseLoader
+    public class ShaderLoader : ApplicationLoader_NotDestroy
     {
 
         #region  加载资源
@@ -21,15 +21,15 @@ namespace GameFrameWork
         /// <param name="completeHandler">加载完成回调</param>
         /// <param name="loadModel">加载模式(同步/异步) default=异步</param>
         /// <param name="loadAssetPath">加载资源路径模式(外部/Resources/StreamAsset ) default=ResourcesPath</param>
-        public static ShaderLoader LoadAsset(string url, System.Action<BaseAbstracResourceLoader> completeHandler)
+        public static ShaderLoader LoadAsset(GameObject requestTarget, string url, System.Action<BaseAbstracResourceLoader> completeHandler)
         {
             bool isContainLoaders = false;
             ShaderLoader shaderLoader = ResourcesLoaderMgr.GetOrCreateLoaderInstance<ShaderLoader>(url, ref isContainLoaders);
             shaderLoader.m_OnCompleteAct.Add(completeHandler);
 
+            shaderLoader.AddReference(requestTarget, url);
             if (isContainLoaders)
             {
-                shaderLoader.AddReference();
                 if (shaderLoader.IsCompleted)
                     shaderLoader.OnCompleteLoad(shaderLoader.IsError, shaderLoader.Description, shaderLoader.ResultObj, shaderLoader.IsCompleted);
                 return shaderLoader;
@@ -54,20 +54,16 @@ namespace GameFrameWork
         #endregion
 
         #region 卸载资源
-        public static void UnLoadAsset(string url)
-        {
-            ShaderLoader shaderLoader = ResourcesLoaderMgr.GetExitLoaderInstance<ShaderLoader>(url);
-            if (shaderLoader == null)
-            {
-                //Debug.LogError("无法获取指定类型的加载器 " + typeof(WWWLoader));
-                return;
-            }
-            shaderLoader.ReduceReference();
-            if (shaderLoader.ReferCount <= 0)
-            {
-                ResourcesLoaderMgr.DeleteLoader<ShaderLoader>(url, false);
-            }//引用计数为0时候开始回收资源
-        }
+        //public static void UnLoadAsset(string url, bool isForceDelete=false)
+        //{
+        //    ShaderLoader shaderLoader = ResourcesLoaderMgr.GetExitLoaderInstance<ShaderLoader>(url);
+        //    if (shaderLoader == null)
+        //    {
+        //        //Debug.LogError("无法获取指定类型的加载器 " + typeof(WWWLoader));
+        //        return;
+        //    }
+        //    shaderLoader.ReduceReference(isForceDelete);
+        //}
         #endregion
 
         protected override void OnCompleteLoad(bool isError, string description, object result, bool iscomplete, float process = 1)
@@ -75,7 +71,7 @@ namespace GameFrameWork
             base.OnCompleteLoad(isError, description, result, iscomplete, process);
             ResultObj = result as Shader;
             if (m_BridgeLoader != null)
-                ResourcesLoaderMgr.DeleteExitLoaderInstance<BridgeLoader>(m_ResourcesUrl);
+                ResourcesLoaderMgr.DeleteExitLoaderInstance(typeof(BridgeLoader),m_ResourcesUrl);
         }
 
 

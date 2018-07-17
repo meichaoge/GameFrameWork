@@ -1,5 +1,5 @@
 ManifestFileVersion: 0
-CRC: 3771277910
+CRC: 3989060452
 AssetBundleManifest:
   AssetBundleInfos:
     Info_0:
@@ -12,7 +12,7 @@ AssetBundleManifest:
       Name: sprite/testpanel/selficon.unity3d
       Dependencies: {}
     Info_3:
-      Name: testasset/111/111.unity3d
+      Name: testasset/111/test_asset/test_asset.unity3d
       Dependencies: {}
     Info_4:
       Name: testasset/testasset.unity3d

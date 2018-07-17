@@ -6,7 +6,6 @@ using System.IO;
 
 namespace GameFrameWork
 {
-    
     /// <summary>
     /// 所有其他资源加载器的父类
     /// </summary>
@@ -33,6 +32,8 @@ namespace GameFrameWork
         public System.Action<string> OnUpdateDescriptionAct = null; //更新描述信息
 
         public object ResultObj { get; protected set; }
+        [SerializeField]
+        protected object m_RequesterTarget;  //请求加载资源的对象
 
         /// <summary>
         /// GC回收时间间隔
@@ -70,7 +71,7 @@ namespace GameFrameWork
 
         protected BaseAbstracResourceLoader()
         {
-            ResetLoader(); //创建 /重置 时候引用计数为1
+            ResetLoader(0); //创建  时候引用计数为0
         }
 
         /// <summary>
@@ -87,7 +88,6 @@ namespace GameFrameWork
 
 
         #region 加载/卸载资源
-
 
         /// <summary>
         ///  将Loader重新激活
@@ -112,22 +112,37 @@ namespace GameFrameWork
         /// <summary>
         /// 增加引用计数
         /// </summary>
-        public virtual void AddReference()
+        protected virtual void AddReference(GameObject requestTarget, string url)
         {
             ++ReferCount;
         }
 
-        /// <summary>
-        /// 减少引用计数
-        /// </summary>
-        public virtual void ReduceReference()
+        ///// <summary>
+        ///// 减少引用计数
+        ///// </summary>
+        //protected  void ReduceReference<T>(bool isForcesDelete) where T:BaseAbstracResourceLoader
+        //{
+        //    ReduceReference(typeof(T), isForcesDelete);
+        //}
+        protected  void ReduceReference( bool isForcesDelete)
         {
-            --ReferCount;
+            ReduceReference(this.GetType(), isForcesDelete);
         }
 
-        #endregion
+        public void ReduceReference(BaseAbstracResourceLoader loader,bool isForcesDelete)
+        {
+            ReduceReference(loader.GetType(), isForcesDelete);
+        }
 
-        #region 类型扩展名处理  TODO 
+        protected virtual void ReduceReference(Type loaderType,bool isForcesDelete) 
+        {
+            --ReferCount;
+            if (ReferCount <= 0)
+            {
+                ResourcesLoaderMgr.DeleteLoader(loaderType, m_ResourcesUrl, false);
+            }//引用计数为0时候开始回收资源
+        }
+
 
         #endregion
 

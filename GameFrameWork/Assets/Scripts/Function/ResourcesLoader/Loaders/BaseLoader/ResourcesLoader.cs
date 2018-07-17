@@ -11,6 +11,12 @@ namespace GameFrameWork
     /// </summary>
     public class ResourcesLoader : BaseAbstracResourceLoader
     {
+
+        //public override void InitialLoader()
+        //{
+        //    base.InitialLoader();
+        //}
+
         #region 加载资源
 
         /// <summary>
@@ -54,7 +60,7 @@ namespace GameFrameWork
             if (resourcesRequest.asset == null)
                 resourcesLoader.OnCompleteLoad(true, string.Format("Load Resource Asset Fail,Not Exit {0}", url), null, true);
             else
-                resourcesLoader.OnCompleteLoad(false, string.Format("Load Resource Asset Success: {0}", url), resourcesRequest.asset, true);
+                resourcesLoader.OnCompleteLoad(false, string.Format("Load Resource Asset Success: {0}", url), resourcesRequest.asset,  true);
 
             yield break;
         }
@@ -76,21 +82,14 @@ namespace GameFrameWork
         #endregion
 
         #region 资源卸载
-        public static void UnLoadAsset(string url)
+        public static void UnLoadAsset(string url, bool isForceDelete=false)
         {
             ResourcesLoader resourcesLoader = ResourcesLoaderMgr.GetExitLoaderInstance<ResourcesLoader>(url);
             if (resourcesLoader == null) return;
-            resourcesLoader.ReduceReference();
+            resourcesLoader.ReduceReference(isForceDelete);
         }
         #endregion  
 
-
-        public override void ReduceReference()
-        {
-            base.ReduceReference();
-            if (ReferCount <= 0)
-                ResourcesLoaderMgr.DeleteLoader<ResourcesLoader>(m_ResourcesUrl, false);
-        }
 
 
         public override void Dispose()

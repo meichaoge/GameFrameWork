@@ -82,7 +82,7 @@ namespace GameFrameWork
                 }
                 else
                 {
-                    bridgeLoader.m_ConnectLoader.ReduceReference();  //卸载这个加载器
+                    bridgeLoader.m_ConnectLoader.ReduceReference(bridgeLoader.m_ConnectLoader, false);  //卸载这个加载器
                     ApplicationMgr.Instance.GetNextLoadAssetPath(ref curLoadAssetPathEnum);
                     continue;  //如果加载得到则返回否则继续尝试其他的加载方式
                 }
@@ -122,7 +122,7 @@ namespace GameFrameWork
 
 
         #region 资源卸载
-        public static void UnLoadAsset(string url)
+        public static void UnLoadAsset(string url, bool isForceDelete=false)
         {
             BridgeLoader bridgeLoader = ResourcesLoaderMgr.GetExitLoaderInstance<BridgeLoader>(url);
             if (bridgeLoader == null)
@@ -130,7 +130,7 @@ namespace GameFrameWork
                 //Debug.LogError("无法获取指定类型的加载器 " + typeof(ByteLoader));
                 return;
             }
-            bridgeLoader.ReduceReference();
+            bridgeLoader.ReduceReference(isForceDelete);
         }
         #endregion  
 
@@ -140,17 +140,8 @@ namespace GameFrameWork
         {
             base.OnCompleteLoad(isError, description, result, iscomplete, process);
             if (m_ConnectLoader != null)
-                m_ConnectLoader.ReduceReference();
-            ReduceReference();
-        }
-
-        public override void ReduceReference()
-        {
-            base.ReduceReference();
-            if (ReferCount <= 0)
-            {
-                ResourcesLoaderMgr.DeleteLoader<BridgeLoader>(m_ResourcesUrl, false);
-            }//引用计数为0时候开始回收资源
+                m_ConnectLoader.ReduceReference(m_ConnectLoader, false);
+            ReduceReference(false);
         }
 
 

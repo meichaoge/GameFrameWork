@@ -51,6 +51,31 @@ namespace GameFrameWork.EditorExpand
         }
 
 
+        /// <summary>
+        /// 框架的版本信息
+        /// </summary>
+        public static string S_FrameWorkVersionLogPath
+        {
+            get
+            {
+                return "Configure/FrameWorkVersion_config";
+            }
+        }
+
+
+        private static GUISkin _CustomerGUISkin;
+        public static GUISkin S_CustomerGUISkin
+        {
+            get
+            {
+                if (_CustomerGUISkin == null)
+                    _CustomerGUISkin = Resources.Load<GUISkin>("CustomerGUISkin") ;
+                return _CustomerGUISkin;
+            }
+        }
+
+
+
 #endif
     }
 }

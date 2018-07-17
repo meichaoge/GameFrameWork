@@ -7,14 +7,15 @@ using UnityEngine;
 namespace GameFrameWork
 {
     /// <summary>
-    /// 加载配置文件 以string 形式返回结果
+    /// 加载配置文件 以string 形式返回结果 (加载完成不会主动卸载)
     /// </summary>
-    public class TextAssetLoader : ApplicationLayerBaseLoader
+    public class TextAssetLoader : ApplicationLoader_NotDestroy
     {
         #region      加载资源
         /// <summary>
-        /// 加载.text 文件 并以string 形式返回
+        ///  加载.text 文件 并以string 形式返回
         /// </summary>
+        /// <param name="requestTarget">请求加载资源的对象</param>
         /// <param name="url"></param>
         /// <param name="completeHandler"></param>
         /// <returns></returns>
@@ -24,17 +25,19 @@ namespace GameFrameWork
             TextAssetLoader textAssetLoader = ResourcesLoaderMgr.GetOrCreateLoaderInstance<TextAssetLoader>(url, ref isContainLoaders);
             textAssetLoader.m_OnCompleteAct.Add(completeHandler);
 
+
+            textAssetLoader.AddReference(null, url);
             if (isContainLoaders)
             {
-                textAssetLoader.AddReference();
                 if (textAssetLoader.IsCompleted)
                     textAssetLoader.OnCompleteLoad(textAssetLoader.IsError, textAssetLoader.Description, textAssetLoader.ResultObj, textAssetLoader.IsCompleted);
                 return textAssetLoader;
             }
-
-
-            ApplicationMgr.Instance.StartCoroutine(textAssetLoader.LoadTextAsset(url));
-            return textAssetLoader;
+            else
+            {
+                ApplicationMgr.Instance.StartCoroutine(textAssetLoader.LoadTextAsset(url));
+                return textAssetLoader;
+            }
         }
 
 
@@ -51,26 +54,31 @@ namespace GameFrameWork
         #endregion
 
         #region 卸载资源
-        public static void UnLoadAsset(string url)
-        {
-            TextAssetLoader textAssetLoader = ResourcesLoaderMgr.GetExitLoaderInstance<TextAssetLoader>(url);
-            if (textAssetLoader == null)
-            {
-                //Debug.LogError("无法获取指定类型的加载器 " + typeof(TextAssetLoader));
-                return;
-            }
-            textAssetLoader.ReduceReference();
-            if (textAssetLoader.ReferCount <= 0)
-            {
-                ResourcesLoaderMgr.DeleteLoader<TextAssetLoader>(url, false);
-            }//引用计数为0时候开始回收资源
-        }
+        ///// <summary>
+        ///// 卸载指定的资源  
+        ///// </summary>
+        ///// <param name="url"></param>
+        ///// <param name="requestTarget">为null 则卸载加载时候请求的对象</param>
+        //public static void UnLoadAsset( string url, bool isForceDelete=false,object requestTarget=null)
+        //{
+        //    TextAssetLoader textAssetLoader = ResourcesLoaderMgr.GetExitLoaderInstance<TextAssetLoader>(url);
+        //    if (textAssetLoader == null)
+        //    {
+        //        //Debug.LogError("无法获取指定类型的加载器 " + typeof(TextAssetLoader));
+        //        return;
+        //    }
+        //    if (requestTarget == null)
+        //        requestTarget = textAssetLoader. m_RequesterTarget;
+
+        //    if (textAssetLoader.TryDeleteRecord(requestTarget))
+        //        textAssetLoader.ReduceReference(isForceDelete);
+        //}
         #endregion
 
 
         protected override void OnCompleteLoad(bool isError, string description, object result, bool iscomplete, float process = 1)
         {
-            Debug.Log("result.GetType()== " + result.GetType());
+       
             if (result.GetType() == typeof(byte[]))
             {
                 ResultObj = Encoding.UTF8.GetString(result as byte[]);
@@ -91,7 +99,14 @@ namespace GameFrameWork
             {
                 ResultObj = (result as UnityEngine.TextAsset).text;
             }
+            else if (result.GetType() == typeof(string))
+            {
 
+            }
+            else
+            {
+                Debug.Log("没有定义的类型  result.GetType()== " + result.GetType());
+            }
 
             base.OnCompleteLoad(isError, description, ResultObj, iscomplete, process);
         }

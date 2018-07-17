@@ -18,12 +18,12 @@ public class TestShader : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.A))
         {
-            ShaderLoader.LoadAsset(m_Url, CompleteLoadHandler);
+            ShaderLoader.LoadAsset(go, m_Url, CompleteLoadHandler);
         }
 
         if (Input.GetKeyDown(KeyCode.D))
         {
-     //       OnApplicationQuit();
+            //       OnApplicationQuit();
         }
     }
 
@@ -42,13 +42,13 @@ public class TestShader : MonoBehaviour
     private void OnApplicationQuit()
     {
         Debug.Log("OnApplicationQuit");
-       ShaderLoader.UnLoadAsset(m_Url);
+        //       ShaderLoader.UnLoadAsset(m_Url);
     }
 # else
     private void OnDestroy()
     {
         Debug.Log("OnDestroy");
-            ShaderLoader.UnLoadAsset(m_Url);
+        //    ShaderLoader.UnLoadAsset(m_Url);
     }
 #endif
 }

@@ -64,18 +64,33 @@ namespace GameFrameWork
         ///  将Loader 删除放到不使用的字典中等待删除(需要判断引用计数是否小于1)
         /// </summary>
         /// <param name="loader">Loader.</param>
-        public static void DeleteLoader<T>(string url, bool isForceDelete) where T : BaseAbstracResourceLoader
+        public static void DeleteLoader(Type loaderType, string url, bool isForceDelete) //where T : BaseAbstracResourceLoader
         {
 
-            T loader = DeleteExitLoaderInstance<T>(url);
+            BaseAbstracResourceLoader loader = DeleteExitLoaderInstance(loaderType,url);
             if (loader == null)
                 return;
 
+            ReleaseLoader(loader, isForceDelete);
+        }
+        public static void DeleteLoader<T>(string url, bool isForceDelete) where T : BaseAbstracResourceLoader
+        {
+            DeleteLoader(typeof(T), url, isForceDelete);
+        }
+
+
+        /// <summary>
+        /// 释放加载器资源(如果强制删除或者计数为0则加入到待删除队列中)
+        /// </summary>
+        /// <param name="loader"></param>
+        /// <param name="isForceDelete"></param>
+        private static void ReleaseLoader(BaseAbstracResourceLoader loader, bool isForceDelete)
+        {
             Queue<BaseAbstracResourceLoader> allUnUseLoadersOfType = null;
-            if (S_UnUseLoader.TryGetValue(typeof(T), out allUnUseLoadersOfType) == false)
+            if (S_UnUseLoader.TryGetValue(loader.GetType(), out allUnUseLoadersOfType) == false)
             {
                 allUnUseLoadersOfType = new Queue<BaseAbstracResourceLoader>();
-                S_UnUseLoader.Add(typeof(T), allUnUseLoadersOfType);
+                S_UnUseLoader.Add(loader.GetType(), allUnUseLoadersOfType);
             }
             if (isForceDelete)
             {
@@ -91,8 +106,11 @@ namespace GameFrameWork
             }
             loader.ReleaseLoader();
             allUnUseLoadersOfType.Enqueue(loader);  //释放资源加载器资源并加入队列中
-          //  Debug.Log("回收加载器  " + typeof(T) + "::" + url + "  count=" + allUnUseLoadersOfType.Count);
+               //  Debug.Log("回收加载器  " + typeof(T) + "::" + url + "  count=" + allUnUseLoadersOfType.Count);
         }
+
+
+
         #endregion
 
         //#region 获取一个指定类型的加载器 避免创建资源
@@ -127,8 +145,24 @@ namespace GameFrameWork
         {
             if (Time.realtimeSinceStartup - lastCheckTime >= S_CheckGCTime)
             {
+                CheckUnRefenceLoader();
                 CheckLoaderStateForGC();
                 lastCheckTime = Time.realtimeSinceStartup;
+            }
+        }
+
+        /// <summary>
+        /// 检测哪些资源不再被引用
+        /// </summary>
+        private static void CheckUnRefenceLoader()
+        {
+            foreach (var item in S_AllTypeLoader.Values)
+            {
+                foreach (var loader in item.Values)
+                {
+                    if (loader is ApplicationLoader_Alone)
+                        (loader as ApplicationLoader_Alone).CheckLoaderIsReference();
+                }
             }
         }
 
@@ -244,18 +278,18 @@ namespace GameFrameWork
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="url"></param>
-        public static T DeleteExitLoaderInstance<T>(string url) where T : BaseAbstracResourceLoader
+        public static BaseAbstracResourceLoader DeleteExitLoaderInstance(Type loaderType,string url) 
         {
-            T resultLoader = null;
+            BaseAbstracResourceLoader resultLoader = null;
             url = string.Format(@"{0}", url);
             Dictionary<string, BaseAbstracResourceLoader> typeOfLoaders = null;
-            if (S_AllTypeLoader.TryGetValue(typeof(T), out typeOfLoaders) == false)
+            if (S_AllTypeLoader.TryGetValue(loaderType, out typeOfLoaders) == false)
                 return null;
 
             if (typeOfLoaders.ContainsKey(url) == false)
                 return null;
 
-            resultLoader = (T)typeOfLoaders[url];
+            resultLoader =typeOfLoaders[url];
             typeOfLoaders.Remove(url);
             return resultLoader;
         }

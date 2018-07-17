@@ -19,7 +19,7 @@ public class Test_LoadTextAsset : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.A))
         {
-            TextAssetLoader loader = TextAssetLoader.LoadAsset(m_Url, OnComplete);
+            TextAssetLoader loader = TextAssetLoader.LoadAsset(  m_Url, OnComplete);
         }
     }
 

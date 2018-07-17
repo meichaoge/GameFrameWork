@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,7 +9,7 @@ namespace GameFrameWork
     /// <summary>
     ///  Sprite2D加载器，加载已经制作成Prefab 的Sprite
     /// </summary>
-    public class SpriteLoader : ApplicationLayerBaseLoader
+    public class SpriteLoader : ApplicationLoader_Alone
     {
 
         #region      加载资源
@@ -18,15 +19,16 @@ namespace GameFrameWork
         /// <param name="url"></param>
         /// <param name="completeHandler"></param>
         /// <returns></returns>
-        public static SpriteLoader LoadAsset(string url, System.Action<BaseAbstracResourceLoader> completeHandler)
+        public static SpriteLoader LoadAsset(GameObject requestTarget, string url, System.Action<BaseAbstracResourceLoader> completeHandler)
         {
             bool isContainLoaders = false;
             SpriteLoader spriteLoader = ResourcesLoaderMgr.GetOrCreateLoaderInstance<SpriteLoader>(url, ref isContainLoaders);
             spriteLoader.m_OnCompleteAct.Add(completeHandler);
 
+
+            spriteLoader.AddReference(requestTarget, url);
             if (isContainLoaders)
             {
-                spriteLoader.AddReference();
                 if (spriteLoader.IsCompleted)
                     spriteLoader.OnCompleteLoad(spriteLoader.IsError, spriteLoader.Description, spriteLoader.ResultObj, spriteLoader.IsCompleted);
                 return spriteLoader;
@@ -51,7 +53,7 @@ namespace GameFrameWork
         #endregion
 
         #region 卸载资源
-        public static void UnLoadAsset(string url)
+        public static void UnLoadAsset(string url, object requestTarget = null)
         {
             SpriteLoader spriteLoader = ResourcesLoaderMgr.GetExitLoaderInstance<SpriteLoader>(url);
             if (spriteLoader == null)
@@ -59,11 +61,10 @@ namespace GameFrameWork
                 //Debug.LogError("无法获取指定类型的加载器 " + typeof(TextAssetLoader));
                 return;
             }
-            spriteLoader.ReduceReference();
-            if (spriteLoader.ReferCount <= 0)
-            {
-                ResourcesLoaderMgr.DeleteLoader<SpriteLoader>(url, false);
-            }//引用计数为0时候开始回收资源
+            if (requestTarget == null)
+                requestTarget = spriteLoader.m_RequesterTarget;
+
+            spriteLoader.ReduceReference(false);
         }
         #endregion
 
@@ -71,7 +72,14 @@ namespace GameFrameWork
         protected override void OnCompleteLoad(bool isError, string description, object result, bool iscomplete, float process = 1)
         {
             //  Debug.LogInfor("AAAAAAA>>>> " + (result as GameObject).GetComponent<SpriteRenderer>());
-            ResultObj = (result as GameObject).GetComponent<SpriteRenderer>().sprite;
+            Type resultType = result.GetType();
+            if (resultType == typeof(UnityEngine.GameObject))
+                ResultObj = (result as GameObject).GetComponent<SpriteRenderer>().sprite;
+            else if (resultType == typeof(UnityEngine.Sprite))
+                ResultObj = result as Sprite;
+            else
+                Debug.LogError("没有定义的类型" + resultType);
+
             base.OnCompleteLoad(isError, description, ResultObj, iscomplete, process);
 
         }

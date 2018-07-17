@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 3825883941
+CRC: 2716702230
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 548c7174689298894b80a637f7b3013e
+    Hash: 532fc2cb27e8dec629186d59f038a38c
   TypeTreeHash:
     serializedVersion: 2
     Hash: 1033bf7ddfd4c6d43e7a6382c0a0a61a
@@ -12,5 +12,5 @@ ClassTypes:
 - Class: 49
   Script: {instanceID: 0}
 Assets:
-- Assets/Resources/TestAsset/111/11112.txt
+- Assets/Resources/TestAsset/111/Test_Asset/11112.txt
 Dependencies: []

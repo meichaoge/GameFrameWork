@@ -7,7 +7,7 @@ using UnityEngine;
 namespace GameFrameWork
 {
     /// <summary>
-    /// 指定Url 的AssetBundle 存在方式
+    /// 指定Url 的AssetBundle 存在方式 (注意 
     /// </summary>
     public enum AssetBundleExitState
     {
@@ -18,6 +18,8 @@ namespace GameFrameWork
 
     /// <summary>
     /// 加载AssetBundle 资源  (需要区分是加载单个预制体还是打包到一起的资源)
+    ///  由于AssetBundle 打包的资源都是小写的路径，所以再传参数的时候已经改成小写形式
+    ///  打包AssetBundle 时候有的是直接单独打包成一个预制体 有些是按照文件夹打包在一起的
     /// </summary>
     public class AssetBundleLoader : BaseAbstracResourceLoader
     {
@@ -72,9 +74,8 @@ namespace GameFrameWork
                 templePath += ConstDefine.AssetBundleExtensionName;
             if (System.IO.File.Exists(templePath))
             {
-                string parentFolderPath = System.IO.Path.GetDirectoryName(url); //当前路径对应的父路径
-                string parentFolderPathwithoutExtension = System.IO.Path.GetFileNameWithoutExtension(parentFolderPath);
-                newUrl = string.Format("{0}/{1}{2}", parentFolderPathwithoutExtension, shortDirectoryName, ConstDefine.AssetBundleExtensionName);  //返回文件
+                string parentFolderPath = System.IO.Path.GetDirectoryName(url.GetFilePathWithoutExtension()); //当前路径对应的父路径
+                newUrl = string.Format("{0}/{1}{2}", parentFolderPath, shortDirectoryName, ConstDefine.AssetBundleExtensionName);  //返回文件
                 Debug.LogInfor("当前AssetBundle 资源是被打成一个统一的AssetBundle ::" + newUrl);
 
                 return AssetBundleExitState.FolderPrefab;
@@ -316,7 +317,7 @@ namespace GameFrameWork
         #endregion
 
         #region 卸载资源
-        public static void UnLoadAsset(string url)
+        public static void UnLoadAsset(string url, bool isForceDelete=false)
         {
             AssetBundleLoader assetBundleLoader = ResourcesLoaderMgr.GetExitLoaderInstance<AssetBundleLoader>(url);
             if (assetBundleLoader == null)
@@ -324,18 +325,9 @@ namespace GameFrameWork
                 //Debug.LogError("无法获取指定类型的加载器 " + typeof(WWWLoader));
                 return;
             }
-            assetBundleLoader.ReduceReference();
+            assetBundleLoader.ReduceReference(isForceDelete);
         }
         #endregion
-
-        public override void ReduceReference()
-        {
-            base.ReduceReference();
-            if (ReferCount <= 0)
-            {
-                ResourcesLoaderMgr.DeleteLoader<AssetBundleLoader>(m_ResourcesUrl, false);
-            }//引用计数为0时候开始回收资源
-        }
 
 
         protected void OnCompleteLoadDepdenceAsset(bool isError, string description, object result, bool iscomplete, float process = 1)

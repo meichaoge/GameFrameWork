@@ -77,7 +77,7 @@ namespace GameFrameWork
                 yield return null;
             }
             if (string.IsNullOrEmpty(www.error))
-                OnCompleteLoad(false, string.Format("Complete WWW Load {0}", fileAbsolutelyPath), www, true);
+                OnCompleteLoad(false, string.Format("Complete WWW Load {0}", fileAbsolutelyPath),www, true);
             else
                 OnCompleteLoad(true, www.error, null, true);
         }
@@ -89,7 +89,7 @@ namespace GameFrameWork
         /// 卸载指定类型的加载器
         /// </summary>
         /// <param name="url"></param>
-        public static void UnLoadAsset(string url)
+        public static void UnLoadAsset(string url,bool isForceDelete=false)
         {
             WWWLoader wwwLoader = ResourcesLoaderMgr.GetExitLoaderInstance<WWWLoader>(url);
             if (wwwLoader == null)
@@ -97,18 +97,18 @@ namespace GameFrameWork
                 //Debug.LogError("无法获取指定类型的加载器 " + typeof(WWWLoader));
                 return;
             }
-            wwwLoader.ReduceReference();
+            wwwLoader.ReduceReference(isForceDelete);
         }
         #endregion
 
-        public override void ReduceReference()
-        {
-            base.ReduceReference();
-            if (ReferCount <= 0)
-            {
-                ResourcesLoaderMgr.DeleteLoader<WWWLoader>(m_ResourcesUrl, false);
-            }//引用计数为0时候开始回收资源
-        }
+        //public override void ReduceReference()
+        //{
+        //    base.ReduceReference();
+        //    if (ReferCount <= 0)
+        //    {
+        //        ResourcesLoaderMgr.DeleteLoader<WWWLoader>(m_ResourcesUrl, false);
+        //    }//引用计数为0时候开始回收资源
+        //}
 
 
 

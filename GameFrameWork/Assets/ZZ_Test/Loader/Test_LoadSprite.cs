@@ -11,7 +11,6 @@ public class Test_LoadSprite : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-
     }
 
     // Update is called once per frame
@@ -19,7 +18,7 @@ public class Test_LoadSprite : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.A))
         {
-            SpriteLoader loader = SpriteLoader.LoadAsset(m_Url, OnComplete);
+            SpriteLoader loader = SpriteLoader.LoadAsset(m_Image.gameObject, m_Url, OnComplete);
         }
     }
 

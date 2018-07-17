@@ -95,6 +95,21 @@ namespace GameFrameWork
         public const string OSXPlatform = "OS";
         #endregion
 
+        #region  应用版本信息
+
+        /// <summary>
+        /// 框架的版本信息
+        /// </summary>
+        public static string S_ApplicationVersionLogPath
+        {
+            get
+            {
+                return "Configure/ApplicationVersion_config";
+            }
+        }
+        #endregion
+
+
 
         /// <summary>
         /// Asset的名字

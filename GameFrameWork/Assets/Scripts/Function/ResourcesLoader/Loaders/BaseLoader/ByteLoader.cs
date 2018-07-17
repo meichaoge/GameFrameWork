@@ -93,7 +93,7 @@ namespace GameFrameWork
                 else
                     Debug.Log("读取完成路径" + m_ResourcesUrl + " 文件大小 " + m_Data.Length);
 
-                OnCompleteLoad((m_Data.Length == 0), string.Format("CompleteLoad: {0}", m_ResourcesUrl), m_Data, true);
+                OnCompleteLoad((m_Data.Length == 0), string.Format("CompleteLoad: {0}", m_ResourcesUrl),m_Data , true);
             }
             catch (System.Exception ex)
             {
@@ -164,7 +164,7 @@ namespace GameFrameWork
         /// 卸载资源
         /// </summary>
         /// <param name="url"></param>
-        public static void UnLoadAsset(string url)
+        public static void UnLoadAsset(string url, bool isForceDelete=false)
         {
             ByteLoader byteLoader = ResourcesLoaderMgr.GetExitLoaderInstance<ByteLoader>(url);
             if (byteLoader == null)
@@ -172,19 +172,11 @@ namespace GameFrameWork
                 //Debug.LogError("无法获取指定类型的加载器 " + typeof(ByteLoader));
                 return;
             }
-            byteLoader.ReduceReference();
+            byteLoader.ReduceReference(isForceDelete);
 
         }
         #endregion
 
-        public override void ReduceReference()
-        {
-            base.ReduceReference();
-            if (ReferCount <= 0)
-            {
-                ResourcesLoaderMgr.DeleteLoader<ByteLoader>(m_ResourcesUrl, false);
-            }//引用计数为0时候开始回收资源
-        }
 
 
         public override void Dispose()
