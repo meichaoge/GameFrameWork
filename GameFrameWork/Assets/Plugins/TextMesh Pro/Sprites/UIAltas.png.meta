@@ -1,0 +1,434 @@
+fileFormatVersion: 2
+guid: 1d9c72ae1b1a5624da001932622ca9fc
+timeCreated: 1515122707
+licenseType: Pro
+TextureImporter:
+  fileIDToRecycleName:
+    21300000: icon_card_blue
+    21300002: icon_card_orange
+    21300004: icon_card_zise
+    21300006: icon_duiwujingyan
+    21300008: icon_jinbi
+    21300010: icon_jinengshi_1
+    21300012: icon_jinengshi_2
+    21300014: icon_jinengshi_3
+    21300016: icon_jinengshi_4
+    21300018: icon_jinengshi_cheng
+    21300020: icon_jinengshi_lan
+    21300022: icon_jinengshi_lv
+    21300024: icon_jinengshi_zi
+    21300026: icon_nuqidian
+    21300028: icon_pinxing_yes
+    21300030: icon_sj_jyyaoshui
+    21300032: icon_sj_jyyaoshui_cheng
+    21300034: icon_sj_jyyaoshui_lan
+    21300036: icon_sj_jyyaoshui_zi
+    21300038: icon_tiantibi
+    21300040: icon_tili
+    21300042: icon_wannengsuipian
+    21300044: icon_yuangu
+    21300046: icon_zhushenbi
+    21300048: icon_zuanshi
+  serializedVersion: 4
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+  isReadable: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    filterMode: -1
+    aniso: -1
+    mipBias: -1
+    wrapMode: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spritePixelsToUnits: 100
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  platformSettings:
+  - buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+  - buildTarget: Standalone
+    maxTextureSize: 2048
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+  - buildTarget: Android
+    maxTextureSize: 2048
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: icon_card_blue
+      rect:
+        serializedVersion: 2
+        x: 212
+        y: 316
+        width: 74
+        height: 74
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: icon_card_orange
+      rect:
+        serializedVersion: 2
+        x: 212
+        y: 240
+        width: 74
+        height: 74
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: icon_card_zise
+      rect:
+        serializedVersion: 2
+        x: 339
+        y: 203
+        width: 74
+        height: 74
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: icon_duiwujingyan
+      rect:
+        serializedVersion: 2
+        x: 444
+        y: 447
+        width: 66
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: icon_jinbi
+      rect:
+        serializedVersion: 2
+        x: 130
+        y: 393
+        width: 115
+        height: 118
+      alignment: 9
+      pivot: {x: 0.49565217, y: 0.4915254}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: icon_jinengshi_1
+      rect:
+        serializedVersion: 2
+        x: 415
+        y: 181
+        width: 70
+        height: 70
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: icon_jinengshi_2
+      rect:
+        serializedVersion: 2
+        x: 171
+        y: 168
+        width: 69
+        height: 70
+      alignment: 9
+      pivot: {x: 0.5072464, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: icon_jinengshi_3
+      rect:
+        serializedVersion: 2
+        x: 242
+        y: 140
+        width: 69
+        height: 70
+      alignment: 9
+      pivot: {x: 0.5072464, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: icon_jinengshi_4
+      rect:
+        serializedVersion: 2
+        x: 171
+        y: 96
+        width: 69
+        height: 70
+      alignment: 9
+      pivot: {x: 0.5072464, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: icon_jinengshi_cheng
+      rect:
+        serializedVersion: 2
+        x: 1
+        y: 157
+        width: 83
+        height: 120
+      alignment: 9
+      pivot: {x: 0.5180723, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: icon_jinengshi_lan
+      rect:
+        serializedVersion: 2
+        x: 1
+        y: 35
+        width: 83
+        height: 120
+      alignment: 9
+      pivot: {x: 0.5180723, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: icon_jinengshi_lv
+      rect:
+        serializedVersion: 2
+        x: 86
+        y: 157
+        width: 83
+        height: 120
+      alignment: 9
+      pivot: {x: 0.5180723, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: icon_jinengshi_zi
+      rect:
+        serializedVersion: 2
+        x: 86
+        y: 35
+        width: 83
+        height: 120
+      alignment: 9
+      pivot: {x: 0.5180723, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: icon_nuqidian
+      rect:
+        serializedVersion: 2
+        x: 443
+        y: 253
+        width: 50
+        height: 54
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: icon_pinxing_yes
+      rect:
+        serializedVersion: 2
+        x: 288
+        y: 212
+        width: 44
+        height: 42
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: icon_sj_jyyaoshui
+      rect:
+        serializedVersion: 2
+        x: 288
+        y: 324
+        width: 49
+        height: 66
+      alignment: 9
+      pivot: {x: 0.48979592, y: 0.530303}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: icon_sj_jyyaoshui_cheng
+      rect:
+        serializedVersion: 2
+        x: 444
+        y: 377
+        width: 50
+        height: 68
+      alignment: 9
+      pivot: {x: 0.5, y: 0.4852941}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: icon_sj_jyyaoshui_lan
+      rect:
+        serializedVersion: 2
+        x: 288
+        y: 256
+        width: 49
+        height: 66
+      alignment: 9
+      pivot: {x: 0.48979592, y: 0.530303}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: icon_sj_jyyaoshui_zi
+      rect:
+        serializedVersion: 2
+        x: 443
+        y: 309
+        width: 50
+        height: 66
+      alignment: 9
+      pivot: {x: 0.5, y: 0.530303}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: icon_tiantibi
+      rect:
+        serializedVersion: 2
+        x: 1
+        y: 279
+        width: 113
+        height: 120
+      alignment: 9
+      pivot: {x: 0.45132744, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: icon_tili
+      rect:
+        serializedVersion: 2
+        x: 352
+        y: 395
+        width: 90
+        height: 116
+      alignment: 9
+      pivot: {x: 0.45555556, y: 0.5086207}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: icon_wannengsuipian
+      rect:
+        serializedVersion: 2
+        x: 116
+        y: 301
+        width: 94
+        height: 90
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: icon_yuangu
+      rect:
+        serializedVersion: 2
+        x: 352
+        y: 279
+        width: 89
+        height: 114
+      alignment: 9
+      pivot: {x: 0.505618, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: icon_zhushenbi
+      rect:
+        serializedVersion: 2
+        x: 247
+        y: 392
+        width: 103
+        height: 119
+      alignment: 9
+      pivot: {x: 0.5631068, y: 0.49579832}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: icon_zuanshi
+      rect:
+        serializedVersion: 2
+        x: 1
+        y: 401
+        width: 127
+        height: 110
+      alignment: 9
+      pivot: {x: 0.511811, y: 0.5090909}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    outline: []
+  spritePackingTag: 
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

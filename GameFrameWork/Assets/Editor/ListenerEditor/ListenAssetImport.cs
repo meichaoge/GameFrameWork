@@ -42,7 +42,7 @@ namespace GameFrameWork.EditorExpand
         private void OnPresProcessUITextureSetting(TextureImporter textureImporter)
         {
 
-            ////textureImporter.textureType = TextureImporterType.Sprite;
+            textureImporter.textureType = TextureImporterType.Sprite;
             textureImporter.spriteImportMode = SpriteImportMode.Single;
             textureImporter.spritePackingTag = EditorHelper.Instance.GetUITexturePackingName(this.assetPath); ///所属的图集
 
@@ -61,6 +61,7 @@ namespace GameFrameWork.EditorExpand
             settings.compressionQuality = 100;   //图片压缩比例
             settings.maxTextureSize = textureImporter.maxTextureSize;
             textureImporter.SetPlatformTextureSettings(settings);
+
         }
 
         #endregion

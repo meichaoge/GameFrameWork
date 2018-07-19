@@ -5,16 +5,18 @@
 //using System.Text;
 //using UnityEngine;
 
-/// <summary>
-/// Class containing methods to ease debugging while developing a game.
-/// 重载了Untiy引擎自带的Debug
-/// 彭鑫
-/// 2017年8月24日10:04:13
-/// </summary>
-///  新增日志级别控制 public static LogLevel S_LogLevel = LogLevel.Log  以及 Infor 级别的日志(LogInfor)     注：当S_LogLevel=S_LogLevel.None时候无日志输出
+///// <summary>
+///// Class containing methods to ease debugging while developing a game.
+///// 重载了Untiy引擎自带的Debug
+///// 2017年8月24日10:04:13
+///// </summary>
+/////  新增日志级别控制    public static LogLevel S_LogLevel = LogLevel.Log  以及 Infor 级别的日志(LogInfor)     注：当S_LogLevel=S_LogLevel.None时候无日志输出
 
 //public static class Debug
 //{
+//    /// <summary>
+//    /// 日志输出级别与DebugVersionEnum 配合使用
+//    /// </summary>
 //    public enum LogLevel
 //    {
 //        Log = 0,
@@ -27,8 +29,19 @@
 //        None             //无日志级别
 //    }
 
+//    /// <summary>
+//    /// 日志输出控制 (Release 版本时候很多Debug 不会输出)
+//    /// </summary>
+//    public enum DebugVersionEnum
+//    {
+//        Debug,  //测试版本
+//        Release, //正式版本
+//    }
+
 
 //    public static LogLevel S_LogLevel = LogLevel.Log;  //当前使用的日记级别
+//    public static DebugVersionEnum S_DebugVersion = DebugVersionEnum.Debug;  //当前日志输出级别
+
 
 //    public static string m_InforColor = "#5EAB15FF"; //Infor 级别的日志颜色
 
@@ -82,14 +95,14 @@
 //        UnityEngine.Debug.Log(message, context);
 //    }
 
-//    新增 高于Debug级别的日志
+//    //新增 高于Debug级别的日志
 //    public static void LogInfor(object message)
 //    {
 //        if (S_LogLevel > LogLevel.Infor) return;
 //        message = string.Format("<color={0}> {1}</color>", m_InforColor, message);
 //        UnityEngine.Debug.Log(message);
 //    }
-//    新增 高于Debug级别的日志
+//    //新增 高于Debug级别的日志
 //    public static void LogInfor(object message, UnityEngine.Object context)
 //    {
 //        if (S_LogLevel > LogLevel.Infor) return;
