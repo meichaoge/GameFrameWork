@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace GameFrameWork
+namespace GameFrameWork.ResourcesLoader
 {
     /// <summary>
     /// 加载资源的桥连接器 会根据配置路径加载优先级加载资源,加载完成自动卸载当前加载器 (优先级在ApplicationMgr 脚本界面配置)
@@ -130,7 +130,7 @@ namespace GameFrameWork
                 //Debug.LogError("无法获取指定类型的加载器 " + typeof(ByteLoader));
                 return;
             }
-            bridgeLoader.ReduceReference(isForceDelete);
+            bridgeLoader.ReduceReference(bridgeLoader, isForceDelete);
         }
         #endregion  
 
@@ -141,7 +141,16 @@ namespace GameFrameWork
             base.OnCompleteLoad(isError, description, result, iscomplete, process);
             if (m_ConnectLoader != null)
                 m_ConnectLoader.ReduceReference(m_ConnectLoader, false);
-            ReduceReference(false);
+            ReduceReference(this,false);
+        }
+
+
+        protected override void ForceBreakLoaderProcess()
+        {
+            if (m_ConnectLoader.IsCompleted) return;
+
+            ApplicationMgr.Instance.StopCoroutine(LoadAssetByPriority(m_ResourcesUrl, this));
+            ApplicationMgr.Instance.StopCoroutine(LoadAsset(m_ResourcesUrl, this));
         }
 
 

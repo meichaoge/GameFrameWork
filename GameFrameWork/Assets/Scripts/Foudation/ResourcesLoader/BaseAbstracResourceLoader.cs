@@ -4,7 +4,7 @@ using UnityEngine;
 using System;
 using System.IO;
 
-namespace GameFrameWork
+namespace GameFrameWork.ResourcesLoader
 {
     /// <summary>
     /// 所有其他资源加载器的父类
@@ -116,37 +116,35 @@ namespace GameFrameWork
         /// <summary>
         /// 增加引用计数
         /// </summary>
-        protected virtual void AddReference(GameObject requestTarget, string url)
+        protected virtual void AddReference(Transform requestTarget, string url)
         {
             ++ReferCount;
         }
 
-
         /// <summary>
-        /// 减少引用计数
+        /// 减少引用计数  (新增在减少引用计数的时候 如果资源没有加载完 则强制结束并释放资源)
         /// </summary>
+        /// <param name="loader"></param>
         /// <param name="isForcesDelete"></param>
-        protected void ReduceReference( bool isForcesDelete)
+        public virtual  void ReduceReference(BaseAbstracResourceLoader loader,bool isForcesDelete)
         {
-            ReduceReference(this.GetType(), isForcesDelete);
-        }
-
-        public void ReduceReference(BaseAbstracResourceLoader loader,bool isForcesDelete)
-        {
-            ReduceReference(loader.GetType(), isForcesDelete);
-        }
-
-        protected virtual void ReduceReference(Type loaderType,bool isForcesDelete) 
-        {
-            --ReferCount;
-            if (ReferCount <= 0)
+            if(loader.IsCompleted==false)
             {
-                ResourcesLoaderMgr.DeleteLoader(loaderType, m_ResourcesUrl, false);
+                Debug.LogEditorInfor(string.Format("资源(TypeLoader={0})在加载过程中被中断  url={1}", this.GetType(),m_ResourcesUrl));
+                isForcesDelete = true;
+                loader.ForceBreakLoaderProcess();
+            }  //被中断的加载器
+
+            --ReferCount;
+            if (ReferCount <= 0|| isForcesDelete)
+            {
+                ResourcesLoaderMgr.DeleteLoader(loader.GetType(), m_ResourcesUrl, false);
             }//引用计数为0时候开始回收资源
         }
 
-
+        
         #endregion
+
 
 
         #region  状态更新接口
@@ -191,11 +189,20 @@ namespace GameFrameWork
         }
 
 
+        /// <summary>
+        ///强制结束加载进程
+        /// </summary>
+        protected abstract void ForceBreakLoaderProcess();
+   
 
         public virtual void Dispose()
         {
             m_OnCompleteAct.Clear();
             ResultObj = null;
         }
+
+
+
+
     }
 }

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-namespace GameFrameWork
+namespace GameFrameWork.ResourcesLoader
 {
     /// <summary>
     /// 指定Url 的AssetBundle 存在方式 (注意 
@@ -37,6 +37,9 @@ namespace GameFrameWork
                 return _AssetBundleTopPath;
             }
         }
+
+        protected string m_AssetFileName = ""; //实际加载AssetBundle 时候的文件名称(考虑到加载整个AssetBundle 中一个资源的情况)
+
 
 
         public override void InitialLoader()
@@ -105,6 +108,7 @@ namespace GameFrameWork
                     assetBundleLoader.OnCompleteLoad(assetBundleLoader.IsError, assetBundleLoader.Description, assetBundleLoader.ResultObj, true);  //如果当前加载器已经完成加载 则手动触发事件
                 return assetBundleLoader;  //如果已经存在 且当前加载器还在加载中，则只需要等待加载完成则回调用回调
             }
+            assetBundleLoader.m_AssetFileName = assetFileName;
             ApplicationMgr.Instance.StartCoroutine(assetBundleLoader.LoadAssetBundleASync(url,  assetFileName, assetBundleLoader));
             return assetBundleLoader;
         }
@@ -324,7 +328,7 @@ namespace GameFrameWork
                 //Debug.LogError("无法获取指定类型的加载器 " + typeof(WWWLoader));
                 return;
             }
-            assetBundleLoader.ReduceReference(isForceDelete);
+            assetBundleLoader.ReduceReference(assetBundleLoader, isForceDelete);
         }
         #endregion
 
@@ -346,7 +350,12 @@ namespace GameFrameWork
         }
 
 
+        protected override void ForceBreakLoaderProcess()
+        {
+            if (IsCompleted) return;
 
+            ApplicationMgr.Instance.StopCoroutine(LoadAssetBundleASync(m_ResourcesUrl, m_AssetFileName, this));
+        }
 
     }
 }

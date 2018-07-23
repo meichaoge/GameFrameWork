@@ -3,13 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace GameFrameWork
+namespace GameFrameWork.ResourcesLoader
 {
     /// <summary>
     /// 这个基类定义那些会在程序运行期间频繁加载和卸载的资源(图片/声音等)
     /// 这里每个加载器记录了加载的资源被哪个物体拥有，且在该物体上加载了一个脚本LoaderResourceHandlerTag
     /// </summary>
-    public class ApplicationLoader_Alone : ApplicationLayerBaseLoader
+    public   abstract class ApplicationLoader_Alone : ApplicationLayerBaseLoader
     {
         /// <summary>
         /// 记录这个资源被那个物体引用的关系 (确保一个资源只能被一个物体拥有一次引用)
@@ -67,16 +67,17 @@ namespace GameFrameWork
         #endregion
 
         #region 引用计数维护
-        protected override void AddReference(GameObject requestTarget, string url)
+        protected override void AddReference(Transform requestTarget, string url)
         {
             if (TryAddRecord(requestTarget, url))
                 base.AddReference(requestTarget, url);  //如果没有被记录过则添加引用计数
         }
 
-        protected override void ReduceReference(Type loaderType, bool isForcesDelete)
+
+        public override void ReduceReference(BaseAbstracResourceLoader loader, bool isForcesDelete)
         {
             if (TryDeleteRecord(m_RequesterTarget))
-                base.ReduceReference(loaderType, isForcesDelete);  //如果没有被记录过则添加引用计数
+                base.ReduceReference(loader, isForcesDelete); //如果没有被记录过则添加引用计数
         }
 
         #endregion
@@ -87,11 +88,10 @@ namespace GameFrameWork
         /// </summary>
         /// <param name="requestTarget"></param>
         /// <param name="url"></param>
-        protected virtual void TryLoadAsset(object requestTarget, string url)
+        protected virtual void TryLoadAsset(Transform requestTarget, string url)
         {
-            GameObject go = requestTarget as GameObject;
-            if (go == null) return;
-            LoaderResourceHandlerTag tag = go.GetAddComponent<LoaderResourceHandlerTag>();
+            if (requestTarget == null) return;
+            LoaderResourceHandlerTag tag = requestTarget.GetAddComponent<LoaderResourceHandlerTag>();
             tag.TryLoadAsset(url, this);
         }
 
@@ -100,13 +100,13 @@ namespace GameFrameWork
         /// 默认规则是资源再整个过程中是不变的 ，每个资源只能被一个物体拥有一次
         /// 会在加载的物体上挂载对应的Tag脚本以及记录资源信息
         /// </summary>
-        /// <param name="requestTarget"></param>
+        /// <param name="requestTarget">如果挂载的物体为null 则不考虑 返回true</param>
         /// <returns></returns>
-        protected virtual bool TryAddRecord(object requestTarget, string url)
+        protected virtual bool TryAddRecord(Transform requestTarget, string url)
         {
             m_RequesterTarget = requestTarget;
             if (requestTarget == null)
-                return false;
+                return true;
             TryLoadAsset(requestTarget, url); //2018/07/16 加入资源标识
 
             int hashcode = requestTarget.GetHashCode();
@@ -152,7 +152,7 @@ namespace GameFrameWork
                 if (item.Value.m_RequsterInfor == null)
                 {
                     m_DeleteLoaderInfor.Add(item.Key);
-                    item.Value.m_Loader.ReduceReference(false);
+                    item.Value.m_Loader.ReduceReference(item.Value.m_Loader, false);
                 }
             }
 

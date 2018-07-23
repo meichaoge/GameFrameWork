@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
-namespace GameFrameWork
+namespace GameFrameWork.ResourcesLoader
 {
 
     /// <summary>
@@ -148,12 +148,17 @@ namespace GameFrameWork
                 //Debug.LogError("无法获取指定类型的加载器 " + typeof(ByteLoader));
                 return;
             }
-            byteLoader.ReduceReference(isForceDelete);
+            byteLoader.ReduceReference(byteLoader, isForceDelete);
 
         }
         #endregion
 
-
+        protected override void ForceBreakLoaderProcess()
+        {
+            if (IsCompleted) return;
+            if (fileStream != null)
+                fileStream.Close();
+        }
 
         public override void Dispose()
         {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-namespace GameFrameWork
+namespace GameFrameWork.ResourcesLoader
 {
     /// <summary>
     /// 资源加载模式(同步/异步)

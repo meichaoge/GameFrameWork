@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using GameFrameWork;
+using GameFrameWork.ResourcesLoader;
 
 public class Test_LoadSprite : MonoBehaviour
 {
@@ -18,7 +19,12 @@ public class Test_LoadSprite : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.A))
         {
-            SpriteLoader loader = SpriteLoader.LoadAsset(m_Image.gameObject, m_Url, OnComplete);
+            SpriteLoader loader = SpriteLoader.LoadAsset(m_Image.transform, m_Url, OnComplete);
+        }
+
+        if (Input.GetKeyDown(KeyCode.B))
+        {
+            ResourcesMgr.Instance.LoadSprite(m_Image, m_Url, null);
         }
     }
 

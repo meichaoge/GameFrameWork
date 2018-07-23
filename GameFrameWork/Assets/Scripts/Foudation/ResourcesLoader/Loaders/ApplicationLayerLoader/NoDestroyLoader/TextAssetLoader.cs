@@ -1,10 +1,11 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 
 
-namespace GameFrameWork
+namespace GameFrameWork.ResourcesLoader
 {
     /// <summary>
     /// 加载配置文件 以string 形式返回结果 (加载完成不会主动卸载)
@@ -76,9 +77,16 @@ namespace GameFrameWork
         #endregion
 
 
+
+        protected override void ForceBreakLoaderProcess()
+        {
+            if (IsCompleted) return;
+            ApplicationMgr.Instance.StopCoroutine(LoadTextAsset(m_ResourcesUrl));
+        }
+
         protected override void OnCompleteLoad(bool isError, string description, object result, bool iscomplete, float process = 1)
         {
-       
+
             if (result.GetType() == typeof(byte[]))
             {
                 ResultObj = Encoding.UTF8.GetString(result as byte[]);

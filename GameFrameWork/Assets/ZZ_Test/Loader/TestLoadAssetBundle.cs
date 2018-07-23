@@ -1,4 +1,5 @@
 ﻿using GameFrameWork;
+using GameFrameWork.ResourcesLoader;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;

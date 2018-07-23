@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-namespace GameFrameWork
+namespace GameFrameWork.ResourcesLoader
 {
     /// <summary>
     /// 预制体加载器 (加载预制体返回预制体资源GameObject)
@@ -18,7 +18,7 @@ namespace GameFrameWork
         /// <param name="url"></param>
         /// <param name="completeHandler"></param>
         /// <returns></returns>
-        public static PrefabLoader LoadAsset(GameObject requestTarget, string url, System.Action<BaseAbstracResourceLoader> completeHandler)
+        public static PrefabLoader LoadAsset(Transform requestTarget, string url, System.Action<BaseAbstracResourceLoader> completeHandler)
         {
             bool isContainLoaders = false;
             PrefabLoader prefabloader = ResourcesLoaderMgr.GetOrCreateLoaderInstance<PrefabLoader>(url, ref isContainLoaders);
@@ -63,7 +63,7 @@ namespace GameFrameWork
             if (requestTarget == null)
                 requestTarget = prefabloader.m_RequesterTarget;
 
-            prefabloader.ReduceReference(false);
+            prefabloader.ReduceReference(prefabloader, false);
         }
         #endregion
 
@@ -72,9 +72,14 @@ namespace GameFrameWork
         {
             ResultObj = result as GameObject;
             base.OnCompleteLoad(isError, description, ResultObj, iscomplete, process);
-
         }
 
+
+        protected override void ForceBreakLoaderProcess()
+        {
+            if (IsCompleted) return;
+            ApplicationMgr.Instance.StopCoroutine(LoadPrefabAsset(m_ResourcesUrl));
+        }
 
     }
 }

@@ -1,4 +1,5 @@
 ﻿using GameFrameWork;
+using GameFrameWork.ResourcesLoader;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -15,7 +16,16 @@ public class Test_LoadPrefab : MonoBehaviour {
 	void Update () {
         if (Input.GetKeyDown(KeyCode.A))
         {
-            PrefabLoader loader = PrefabLoader.LoadAsset(gameObject, m_Url, OnComplete);
+            PrefabLoader loader = PrefabLoader.LoadAsset(transform, m_Url, OnComplete);
+            loader.ReduceReference(loader, false);
+        }
+
+        if (Input.GetKeyDown(KeyCode.B))
+        {
+            ResourcesMgr.Instance.Instantiate(m_Url, transform, (obj) => {
+                Debug.Log("生成成功");
+
+            }, true);
         }
     }
 

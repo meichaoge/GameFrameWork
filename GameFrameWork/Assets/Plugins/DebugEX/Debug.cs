@@ -14,40 +14,70 @@
 
 //public static class Debug
 //{
-//    /// <summary>
-//    /// 日志输出级别与DebugVersionEnum 配合使用
-//    /// </summary>
-//    public enum LogLevel
+//	/// <summary>
+//	/// 日志输出级别与DebugVersionEnum 配合使用
+//	/// </summary>
+//	public enum LogLevel
 //    {
 //        Log = 0,
 //        Warning,
 //        Assert,
 //        Infor,
-//        Exception,
+
+//#if UNITY_EDITOR
+//		EditorLog,  
+//#endif
+
+//		Exception,
 //        Error,
 
 //        None             //无日志级别
 //    }
 
-//    /// <summary>
-//    /// 日志输出控制 (Release 版本时候很多Debug 不会输出)
-//    /// </summary>
-//    public enum DebugVersionEnum
-//    {
-//        Debug,  //测试版本
-//        Release, //正式版本
-//    }
+//	/// <summary>
+//	/// 日志输出控制 (Release 版本时候很多Debug 不会输出)
+//	/// </summary>
+//	public enum DebugVersionEnum
+//	{
+//		Debug,  //测试版本
+//		Release, //正式版本
+//	}
 
 
-//    public static LogLevel S_LogLevel = LogLevel.Log;  //当前使用的日记级别
-//    public static DebugVersionEnum S_DebugVersion = DebugVersionEnum.Debug;  //当前日志输出级别
+//	public static LogLevel S_LogLevel = LogLevel.Log;  //当前使用的日记级别
+//	public static DebugVersionEnum S_DebugVersion= DebugVersionEnum.Debug;  //当前日志输出级别
 
 
-//    public static string m_InforColor = "#5EAB15FF"; //Infor 级别的日志颜色
+//	public static string m_InforColor = "#5EAB15FF"; //Infor 级别的日志颜色
+//	public static string m_EditorOnlyColor = "#37D1D8F8";  //只在UnityEditor 下的日志颜色
+
+//	/// <summary>
+//	/// 编辑器下输出日志
+//	/// </summary>
+//	/// <param name="message"></param>
+//	public static void LogEditorInfor(object message)
+//	{
+//#if UNITY_EDITOR
+//		message = string.Format("[EditorOnly] <color={0}> {1}</color>", m_EditorOnlyColor, message);
+//		UnityEngine.Debug.Log(message);
+//#endif
+//	}
+
+//	/// <summary>
+//	/// 编辑器下输出日志
+//	/// </summary>
+//	/// <param name="message"></param>
+//	/// <param name="context"></param>
+//	public static void LogEditorInfor(object message, UnityEngine.Object context)
+//	{
+//#if UNITY_EDITOR
+//		message = string.Format("[EditorOnly] <color={0}> {1}</color>", m_EditorOnlyColor, message);
+//		UnityEngine.Debug.Log(message, context);
+//#endif
+//	}
 
 
-
-//    [Conditional("UNITY_ASSERTIONS")]
+//	[Conditional("UNITY_ASSERTIONS")]
 //    public static void Assert(bool condition)
 //    {
 //        if (S_LogLevel > LogLevel.Assert) return;
@@ -220,19 +250,19 @@
 //        UnityEngine.Debug.LogWarningFormat(context, format, args);
 //    }
 
-//    #region Unity 编辑器下的绘制
+//#region Unity 编辑器下的绘制
 
 //    public static void DrawLine(Vector3 start, Vector3 end, Color color)
 //    {
 //#if UNITY_EDITOR
-//        UnityEngine.Debug.DrawLine(start, end, color);
+//        UnityEngine.Debug.DrawLine(start,end,color);
 //#endif
 //    }
 
 //    public static void DrawLine(Vector3 start, Vector3 end, Color color, float duration)
 //    {
 //#if UNITY_EDITOR
-//        UnityEngine.Debug.DrawLine(start, end, color, duration);
+//        UnityEngine.Debug.DrawLine(start,end,color,duration);
 //#endif
 //    }
 
@@ -240,43 +270,43 @@
 //    public static void DrawLine(Vector3 start, Vector3 end)
 //    {
 //#if UNITY_EDITOR
-//        UnityEngine.Debug.DrawLine(start, end);
+//        UnityEngine.Debug.DrawLine(start,end);
 //#endif
 //    }
 
 //    public static void DrawLine(Vector3 start, Vector3 end, Color color, float duration = 0f, bool depthTest = true)
 //    {
 //#if UNITY_EDITOR
-//        UnityEngine.Debug.DrawLine(start, end, color, duration, depthTest);
+//        UnityEngine.Debug.DrawLine(start,end,color,duration,depthTest);
 //#endif
 //    }
 
 //    public static void DrawRay(Vector3 start, Vector3 dir, Color color, float duration = 0f, bool depthTest = true)
 //    {
 //#if UNITY_EDITOR
-//        UnityEngine.Debug.DrawRay(start, dir, color, duration, depthTest);
+//        UnityEngine.Debug.DrawRay(start,dir,color,duration,depthTest);
 //#endif
 //    }
 //    public static void DrawRay(Vector3 start, Vector3 dir)
 //    {
 //#if UNITY_EDITOR
-//        UnityEngine.Debug.DrawRay(start, dir);
+//        UnityEngine.Debug.DrawRay(start,dir);
 //#endif
 //    }
 //    public static void DrawRay(Vector3 start, Vector3 dir, Color color)
 //    {
 //#if UNITY_EDITOR
-//        UnityEngine.Debug.DrawRay(start, dir, color);
+//        UnityEngine.Debug.DrawRay(start,dir,color);
 //#endif
 //    }
 
 //    public static void DrawRay(Vector3 start, Vector3 dir, Color color, float duration)
 //    {
 //#if UNITY_EDITOR
-//        UnityEngine.Debug.DrawRay(start, dir, color, duration);
+//        UnityEngine.Debug.DrawRay(start,dir,color,duration);
 //#endif
 //    }
-//    #endregion
+//#endregion
 
 
 //}

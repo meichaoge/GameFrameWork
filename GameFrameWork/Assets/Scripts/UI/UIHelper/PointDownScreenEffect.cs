@@ -2,13 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-
 namespace GameFrameWork
 {
     /// <summary>
     /// 屏幕点击特效(会生成一个特效 然后使用内部的循环机制保证不会一直创建销毁)
     /// </summary>
-    public class ClickScreenEffect : MonoBehaviour
+    public class PointDownScreenEffect : MonoBehaviour
     {
         /// <summary>
         /// 记录特效对象和存在的时间
@@ -30,7 +29,6 @@ namespace GameFrameWork
         public float m_MaxAliveTime = 0.5f;  //每个特效存在时间
 
         private Vector3 m_MouseCanvasPostion; //点击时候鼠标的位置 转换到中心点再屏幕正中心的坐标
-
 
 
         void Update()

@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace GameFrameWork
+namespace GameFrameWork.ResourcesLoader
 {
 
     /// <summary>
@@ -48,14 +48,6 @@ namespace GameFrameWork
         /// 使用完成当到达一个时间点时候回被销毁 （Value中的 Queue 按照时间是先入先出）
         /// </summary>
         public static Dictionary<Type, Queue<BaseAbstracResourceLoader>> S_UnUseLoader = new Dictionary<Type, Queue<BaseAbstracResourceLoader>>();
-
-        //#region  创建初始化
-        //public static void InitialResourcesMgr()
-        //{
-
-        //}
-        //#endregion
-
 
 
         #region 删除加载器  添加到待删除队列中
@@ -113,32 +105,6 @@ namespace GameFrameWork
 
         #endregion
 
-        //#region 获取一个指定类型的加载器 避免创建资源
-        ///// <summary>
-        ///// 尝试循环利用待删除的加载器 如果不存在则创建
-        ///// </summary>
-        ///// <typeparam name="T"></typeparam>
-        ///// <returns></returns>
-        //public static T RecycleUnUseLoader<T>() where T : BaseAbstracResourceLoader,new()
-        //{
-        //    Queue<BaseAbstracResourceLoader> typeOfLoaders = null;
-        //    T result = null;
-        //    if (S_UnUseLoader.TryGetValue(typeof(T), out typeOfLoaders))
-        //    {
-        //        if (typeOfLoaders.Count > 0)
-        //        {
-        //            result = (T)typeOfLoaders.Dequeue();
-        //            result.ResetLoader();
-        //        }
-        //    }
-
-        //    if (result == null)
-        //    {
-        //        result =new T() ;
-        //    }
-        //    return result;
-        //}
-        //#endregion
 
         #region 检测是否需要释放加载器资源
         public static void Tick()

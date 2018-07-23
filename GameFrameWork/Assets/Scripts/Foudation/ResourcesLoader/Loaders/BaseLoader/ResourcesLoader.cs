@@ -1,10 +1,11 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 
 
-namespace GameFrameWork
+namespace GameFrameWork.ResourcesLoader
 {
     /// <summary>
     /// 仅仅加载Resources资源目录下的资源
@@ -81,10 +82,16 @@ namespace GameFrameWork
         {
             ResourcesLoader resourcesLoader = ResourcesLoaderMgr.GetExitLoaderInstance<ResourcesLoader>(url);
             if (resourcesLoader == null) return;
-            resourcesLoader.ReduceReference(isForceDelete);
+            resourcesLoader.ReduceReference(resourcesLoader, isForceDelete);
         }
         #endregion  
 
+
+        protected override void ForceBreakLoaderProcess()
+        {
+            if (IsCompleted) return;
+            ApplicationMgr.Instance.StartCoroutine(LoadAssetAsync(m_ResourcesUrl, this));
+        }
 
 
         public override void Dispose()

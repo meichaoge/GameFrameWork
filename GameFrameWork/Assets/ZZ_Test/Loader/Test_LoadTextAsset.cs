@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using GameFrameWork;
 using UnityEngine.UI;
+using GameFrameWork.ResourcesLoader;
 
 public class Test_LoadTextAsset : MonoBehaviour
 {
@@ -20,6 +21,11 @@ public class Test_LoadTextAsset : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.A))
         {
             TextAssetLoader loader = TextAssetLoader.LoadAsset(  m_Url, OnComplete);
+        }
+
+        if (Input.GetKeyDown(KeyCode.B))
+        {
+            ResourcesMgr.Instance.LoadFile(m_Url, (result) => { m_ShowText.text = result; });
         }
     }
 

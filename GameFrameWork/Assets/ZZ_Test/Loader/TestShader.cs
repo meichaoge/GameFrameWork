@@ -1,4 +1,5 @@
 ﻿using GameFrameWork;
+using GameFrameWork.ResourcesLoader;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -18,7 +19,7 @@ public class TestShader : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.A))
         {
-            ShaderLoader.LoadAsset(go, m_Url, CompleteLoadHandler);
+            ShaderLoader.LoadAsset( m_Url, CompleteLoadHandler);
         }
 
         if (Input.GetKeyDown(KeyCode.D))

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-namespace GameFrameWork
+namespace GameFrameWork.ResourcesLoader
 {
     /// <summary>
     ///  Sprite2D加载器，加载已经制作成Prefab 的Sprite
@@ -19,7 +19,7 @@ namespace GameFrameWork
         /// <param name="url"></param>
         /// <param name="completeHandler"></param>
         /// <returns></returns>
-        public static SpriteLoader LoadAsset(GameObject requestTarget, string url, System.Action<BaseAbstracResourceLoader> completeHandler)
+        public static SpriteLoader LoadAsset(Transform requestTarget, string url, System.Action<BaseAbstracResourceLoader> completeHandler)
         {
             bool isContainLoaders = false;
             SpriteLoader spriteLoader = ResourcesLoaderMgr.GetOrCreateLoaderInstance<SpriteLoader>(url, ref isContainLoaders);
@@ -53,6 +53,11 @@ namespace GameFrameWork
         #endregion
 
         #region 卸载资源
+        /// <summary>
+        /// 卸载资源
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="requestTarget"></param>
         public static void UnLoadAsset(string url, object requestTarget = null)
         {
             SpriteLoader spriteLoader = ResourcesLoaderMgr.GetExitLoaderInstance<SpriteLoader>(url);
@@ -64,7 +69,7 @@ namespace GameFrameWork
             if (requestTarget == null)
                 requestTarget = spriteLoader.m_RequesterTarget;
 
-            spriteLoader.ReduceReference(false);
+            spriteLoader.ReduceReference(spriteLoader, false);
         }
         #endregion
 
@@ -83,6 +88,13 @@ namespace GameFrameWork
             base.OnCompleteLoad(isError, description, ResultObj, iscomplete, process);
 
         }
+
+        protected override void ForceBreakLoaderProcess()
+        {
+            if (IsCompleted) return;
+            ApplicationMgr.Instance.StopCoroutine(LoadSpriteAsset(m_ResourcesUrl));
+        }
+
 
     }
 }

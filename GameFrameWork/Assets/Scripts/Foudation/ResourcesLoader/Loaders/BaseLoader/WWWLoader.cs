@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-namespace GameFrameWork
+namespace GameFrameWork.ResourcesLoader
 {
 
     /// <summary>
@@ -12,11 +12,12 @@ namespace GameFrameWork
     /// </summary>
     public class WWWLoader : BaseAbstracResourceLoader
     {
-
         /// <summary>
         /// 标识加载的路径是否存在
         /// </summary>
         public bool IsPathExit { get; private set; }
+
+        protected string m_TopPath;  //url 目录前面的绝对目录
 
 
         public override void InitialLoader()
@@ -29,7 +30,7 @@ namespace GameFrameWork
         /// <summary>
         /// WWW 方式异步加载资源
         /// </summary>
-        /// <param name="topPath">目录前的绝对目录</param>
+        /// <param name="topPath">资源相对目录前的绝对目录</param>
         /// <param name="url">资源相对目录</param>
         /// <param name="onCompleteAct"></param>
         /// <returns></returns>
@@ -46,6 +47,7 @@ namespace GameFrameWork
                     wwwLoader.OnCompleteLoad(wwwLoader.IsError, wwwLoader.Description, wwwLoader.ResultObj, true);  //如果当前加载器已经完成加载 则手动触发事件
                 return wwwLoader;  //如果已经存在 且当前加载器还在加载中，则只需要等待加载完成则回调用回调
             }
+            wwwLoader. m_TopPath = topPath;
             ApplicationMgr.Instance.StartCoroutine(wwwLoader.LoadAssetAsync(topPath, url, wwwLoader));
             return wwwLoader;
         }
@@ -97,21 +99,16 @@ namespace GameFrameWork
                 //Debug.LogError("无法获取指定类型的加载器 " + typeof(WWWLoader));
                 return;
             }
-            wwwLoader.ReduceReference(isForceDelete);
+            wwwLoader.ReduceReference(wwwLoader, isForceDelete);
         }
         #endregion
 
-        //public override void ReduceReference()
-        //{
-        //    base.ReduceReference();
-        //    if (ReferCount <= 0)
-        //    {
-        //        ResourcesLoaderMgr.DeleteLoader<WWWLoader>(m_ResourcesUrl, false);
-        //    }//引用计数为0时候开始回收资源
-        //}
+        protected override void ForceBreakLoaderProcess()
+        {
+            if (IsCompleted) return;
 
-
-
+            ApplicationMgr.Instance.StopCoroutine(LoadAssetAsync(m_TopPath, m_ResourcesUrl,this));
+        }
 
         public override void Dispose()
         {
