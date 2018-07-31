@@ -56,6 +56,25 @@ namespace GameFrameWork.ResourcesLoader
         /// </summary>
         public string m_ResourcesUrl { get; protected set; }
 
+
+        protected string m_ResourseFileName = "";
+        /// <summary>
+        /// 加载的资源的文件名
+        /// </summary>
+        protected string ResourseFileName
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(m_ResourseFileName))
+                    m_ResourseFileName = System.IO.Path.GetFileNameWithoutExtension(m_ResourcesUrl);
+                return m_ResourseFileName;
+            }
+        }
+        /// <summary>
+        /// 异步使用 StartCoroutine 启动协程时候赋值，StopCoroutine 时候传入参数(Unity 这里有坑）
+        /// </summary>
+        protected Coroutine m_LoadAssetCoroutine=null;
+
         /// <summary>
         /// 加载器失效时候的时间
         /// </summary>
@@ -163,7 +182,7 @@ namespace GameFrameWork.ResourcesLoader
         /// <param name="description"></param>
         /// <param name="result"></param>
         /// <param name="process"></param>
-        protected virtual void OnCompleteLoad(bool isError, string description, object result, bool iscomplete, float process = 1)
+        public virtual void OnCompleteLoad(bool isError, string description, object result, bool iscomplete, float process = 1)
         {
             IsCompleted = iscomplete;
             IsError = isError;
@@ -177,7 +196,6 @@ namespace GameFrameWork.ResourcesLoader
 //            else
 //                Debug.LogInfor(Description);
 //#endif
-
 
             foreach (var item in m_OnCompleteAct)
             {
@@ -193,7 +211,6 @@ namespace GameFrameWork.ResourcesLoader
         ///强制结束加载进程
         /// </summary>
         protected abstract void ForceBreakLoaderProcess();
-   
 
         public virtual void Dispose()
         {

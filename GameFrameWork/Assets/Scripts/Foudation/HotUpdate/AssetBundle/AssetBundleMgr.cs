@@ -33,8 +33,6 @@ namespace GameFrameWork
         }//主AssetBundle 资源
 
 
-
-
         #region  加载 AssetBundleManifest
         /// <summary>
         /// 加载 AssetBundleManifest 资源
@@ -134,6 +132,10 @@ namespace GameFrameWork
 
         #endregion
 
+
+        #region  检测本地AssetBundle 资源版本并更新资源接口
+
+        #endregion
 
 
     }

@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.SceneManagement;
 
 namespace GameFrameWork
 {
@@ -25,11 +25,19 @@ namespace GameFrameWork
         /// <returns></returns>
         public void Instantiate(string url, Transform parent, System.Action<GameObject> callback, bool isActivate = true, bool isResetTransProperty = true)
         {
+            if(string.IsNullOrEmpty(url))
+            {
+                if (callback != null)
+                    callback(null);
+                return;
+            }
+
+
             PrefabLoader.LoadAsset(parent, url, (loader) =>
             {
                 #region  加载成功后的处理逻辑
-
-                if (loader.IsCompleted && loader.IsError)
+                ResourcesLoadTraceMgr.Instance.RecordTraceResourceInfor(loader);
+                if (loader == null || (loader.IsCompleted && loader.IsError))
                 {
                     Debug.LogError("Instantiate  GameObject Fail,Not Exit At Path= " + url);
                     if (callback != null)
@@ -78,10 +86,19 @@ namespace GameFrameWork
                 return;
             }
 
+            if (string.IsNullOrEmpty(url))
+            {
+                if (callback != null)
+                    callback(null);
+                return;
+            }
+
+
             SpriteLoader.LoadAsset(targetImag.transform, url, (loader) =>
             {
                 #region  加载成功后的处理逻辑
-                if (loader.IsCompleted && loader.IsError)
+                ResourcesLoadTraceMgr.Instance.RecordTraceResourceInfor(loader);
+                if (loader == null || (loader.IsCompleted && loader.IsError))
                 {
                     Debug.LogError("LoadSprite   Fail,Not Exit At Path= " + url);
                     if (callback != null)
@@ -103,10 +120,18 @@ namespace GameFrameWork
         /// <param name="callback"></param>
         public void LoadFile(string url, System.Action<string> callback)
         {
+            if (string.IsNullOrEmpty(url))
+            {
+                if (callback != null)
+                    callback("");
+                return;
+            }
+
             TextAssetLoader.LoadAsset(url, (loader) =>
            {
-                #region  加载成功后的处理逻辑
-                if (loader.IsCompleted && loader.IsError)
+               ResourcesLoadTraceMgr.Instance.RecordTraceResourceInfor(loader);
+               #region  加载成功后的处理逻辑
+               if (loader == null || (loader.IsCompleted && loader.IsError))
                {
                    Debug.LogError("LoadFile   Fail,Not Exit At Path= " + url);
                    if (callback != null)
@@ -114,10 +139,10 @@ namespace GameFrameWork
                    return;
                } //加载资源出错
 
-                if (callback != null)
+               if (callback != null)
                    callback.Invoke(loader.ResultObj.ToString());
-                #endregion
-            });
+               #endregion
+           });
         }
 
         /// <summary>
@@ -127,12 +152,20 @@ namespace GameFrameWork
         /// <param name="callback"></param>
         public void LoadFont(string url, System.Action<Font> callback)
         {
+            if (string.IsNullOrEmpty(url))
+            {
+                if (callback != null)
+                    callback(null);
+                return;
+            }
+
             FontLoader.LoadAsset(url, (loader) =>
             {
+                ResourcesLoadTraceMgr.Instance.RecordTraceResourceInfor(loader);
                 #region  加载成功后的处理逻辑
-                if (loader.IsCompleted && loader.IsError)
+                if (loader == null || (loader.IsCompleted && loader.IsError))
                 {
-                    Debug.LogError("LoadAsset   Fail,Not Exit At Path= " + url);
+                    Debug.LogError("LoadFont   Fail,Not Exit At Path= " + url);
                     if (callback != null)
                         callback.Invoke(null);
                     return;
@@ -143,6 +176,85 @@ namespace GameFrameWork
                 #endregion
             });
         }
+        /// <summary>
+        /// 加载材质球
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="target"></param>
+        /// <param name="callback"></param>
+        public void LoadMaterial(string url, Transform target, System.Action<Material> callback)
+        {
+            if (string.IsNullOrEmpty(url))
+            {
+                if (callback != null)
+                    callback(null);
+                return;
+            }
+            MaterialLoader.LoadAsset(target, url, (loader) =>
+            {
+                ResourcesLoadTraceMgr.Instance.RecordTraceResourceInfor(loader);
+                #region  加载成功后的处理逻辑
+                if (loader == null || (loader.IsCompleted && loader.IsError))
+                {
+                    Debug.LogError("LoadMaterial   Fail,Not Exit At Path= " + url);
+                    if (callback != null)
+                        callback.Invoke(null);
+                    return;
+                } //加载资源出错
+
+
+                Material mat = loader.ResultObj as Material;
+
+                if (callback != null)
+                    callback.Invoke(mat);
+                #endregion
+            });
+        }
+
+        /// <summary>
+        /// 加载场景
+        /// </summary>
+        /// <param name="sceneName"></param>
+        /// <param name="callback"></param>
+        public void LoadScene(string url,bool isSignal, System.Action callback)
+        {
+            if (string.IsNullOrEmpty(url))
+            {
+                if (callback != null)
+                    callback();
+                return;
+            }
+
+            SceneLoader.LoadScene( url, (loader) =>
+            {
+               // ResourcesLoadTraceMgr.Instance.RecordTraceResourceInfor(loader);
+                #region  加载成功后的处理逻辑
+                if (loader == null || (loader.IsCompleted && loader.IsError))
+                {
+                    Debug.LogError("LoadMaterial   Fail,Not Exit At Path= " + url);
+                    if (callback != null)
+                        callback.Invoke();
+                    return;
+                } //加载资源出错
+                string sceneName = System.IO.Path.GetFileNameWithoutExtension(url);
+                LoadSceneMode loadModel = LoadSceneMode.Single;
+                if(isSignal==false)
+                    loadModel = LoadSceneMode.Additive;
+                //      AsyncOperation loadAsync= SceneManager.LoadSceneAsync(sceneName, loadModel);
+                //***协成调用  LoadSceneAsync
+
+                if (callback != null)
+                    callback.Invoke();
+                #endregion
+            });
+        }
+
+        private IEnumerator LoadSceneAsync(string sceneName, LoadSceneMode loadModel)
+        {
+            yield return null;
+        }
+
+
 
         #endregion
 

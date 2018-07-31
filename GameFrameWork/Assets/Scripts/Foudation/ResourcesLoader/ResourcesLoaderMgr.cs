@@ -59,7 +59,7 @@ namespace GameFrameWork.ResourcesLoader
         public static void DeleteLoader(Type loaderType, string url, bool isForceDelete) //where T : BaseAbstracResourceLoader
         {
 
-            BaseAbstracResourceLoader loader = DeleteExitLoaderInstance(loaderType,url);
+            BaseAbstracResourceLoader loader = DeleteExitLoaderInstance(loaderType, url);
             if (loader == null)
                 return;
 
@@ -98,7 +98,7 @@ namespace GameFrameWork.ResourcesLoader
             }
             loader.ReleaseLoader();
             allUnUseLoadersOfType.Enqueue(loader);  //释放资源加载器资源并加入队列中
-               //  Debug.Log("回收加载器  " + typeof(T) + "::" + url + "  count=" + allUnUseLoadersOfType.Count);
+                                                    //  Debug.Log("回收加载器  " + typeof(T) + "::" + url + "  count=" + allUnUseLoadersOfType.Count);
         }
 
 
@@ -186,7 +186,8 @@ namespace GameFrameWork.ResourcesLoader
         /// <returns></returns>
         public static T GetOrCreateLoaderInstance<T>(string url, ref bool isLoaderExit) where T : BaseAbstracResourceLoader, new()
         {
-            url = string.Format(@"{0}", url);
+            //Debug.LogEditorInfor("GetOrCreateLoaderInstance  url=" + url+"  type="+typeof(T));
+            //       url = string.Format(@"{0}", url);
             T resultLoader = null;
             isLoaderExit = false;
             Dictionary<string, BaseAbstracResourceLoader> typeOfLoaders = null;
@@ -244,7 +245,7 @@ namespace GameFrameWork.ResourcesLoader
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="url"></param>
-        public static BaseAbstracResourceLoader DeleteExitLoaderInstance(Type loaderType,string url) 
+        public static BaseAbstracResourceLoader DeleteExitLoaderInstance(Type loaderType, string url)
         {
             BaseAbstracResourceLoader resultLoader = null;
             url = string.Format(@"{0}", url);
@@ -255,7 +256,7 @@ namespace GameFrameWork.ResourcesLoader
             if (typeOfLoaders.ContainsKey(url) == false)
                 return null;
 
-            resultLoader =typeOfLoaders[url];
+            resultLoader = typeOfLoaders[url];
             typeOfLoaders.Remove(url);
             return resultLoader;
         }

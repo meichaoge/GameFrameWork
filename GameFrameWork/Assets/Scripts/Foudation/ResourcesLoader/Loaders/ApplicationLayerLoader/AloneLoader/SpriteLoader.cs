@@ -21,6 +21,12 @@ namespace GameFrameWork.ResourcesLoader
         /// <returns></returns>
         public static SpriteLoader LoadAsset(Transform requestTarget, string url, System.Action<BaseAbstracResourceLoader> completeHandler)
         {
+            if (string.IsNullOrEmpty(url))
+            {
+                Debug.LogError(string.Format("Url Can't Be Null , TypeLoader={0}", typeof(SpriteLoader)));
+                return null;
+            }
+
             bool isContainLoaders = false;
             SpriteLoader spriteLoader = ResourcesLoaderMgr.GetOrCreateLoaderInstance<SpriteLoader>(url, ref isContainLoaders);
             spriteLoader.m_OnCompleteAct.Add(completeHandler);
@@ -35,7 +41,7 @@ namespace GameFrameWork.ResourcesLoader
             }
 
 
-            ApplicationMgr.Instance.StartCoroutine(spriteLoader.LoadSpriteAsset(url));
+            spriteLoader.m_LoadAssetCoroutine = ApplicationMgr.Instance.StartCoroutine(spriteLoader.LoadSpriteAsset(url));
             return spriteLoader;
         }
 
@@ -44,7 +50,7 @@ namespace GameFrameWork.ResourcesLoader
         {
             m_ResourcesUrl = url;
             m_BridgeLoader = BridgeLoader.LoadAsset(url, null);
-            if (m_BridgeLoader.IsCompleted == false)
+            while (m_BridgeLoader.IsCompleted == false)
                 yield return null;
 
             OnCompleteLoad(m_BridgeLoader.IsError, m_BridgeLoader.Description, m_BridgeLoader.ResultObj, m_BridgeLoader.IsCompleted);
@@ -74,7 +80,7 @@ namespace GameFrameWork.ResourcesLoader
         #endregion
 
 
-        protected override void OnCompleteLoad(bool isError, string description, object result, bool iscomplete, float process = 1)
+        public override void OnCompleteLoad(bool isError, string description, object result, bool iscomplete, float process = 1)
         {
             //  Debug.LogInfor("AAAAAAA>>>> " + (result as GameObject).GetComponent<SpriteRenderer>());
             Type resultType = result.GetType();
@@ -92,7 +98,8 @@ namespace GameFrameWork.ResourcesLoader
         protected override void ForceBreakLoaderProcess()
         {
             if (IsCompleted) return;
-            ApplicationMgr.Instance.StopCoroutine(LoadSpriteAsset(m_ResourcesUrl));
+            if (m_LoadAssetCoroutine != null)
+                ApplicationMgr.Instance.StopCoroutine(m_LoadAssetCoroutine);
         }
 
 

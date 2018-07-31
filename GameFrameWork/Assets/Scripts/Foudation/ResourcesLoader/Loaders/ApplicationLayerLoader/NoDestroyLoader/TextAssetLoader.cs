@@ -22,6 +22,11 @@ namespace GameFrameWork.ResourcesLoader
         /// <returns></returns>
         public static TextAssetLoader LoadAsset(string url, System.Action<BaseAbstracResourceLoader> completeHandler)
         {
+            if (string.IsNullOrEmpty(url))
+            {
+                Debug.LogError(string.Format("Url Can't Be Null , TypeLoader={0}",typeof(TextAsset)));
+                return null;
+            }
             bool isContainLoaders = false;
             TextAssetLoader textAssetLoader = ResourcesLoaderMgr.GetOrCreateLoaderInstance<TextAssetLoader>(url, ref isContainLoaders);
             textAssetLoader.m_OnCompleteAct.Add(completeHandler);
@@ -36,7 +41,7 @@ namespace GameFrameWork.ResourcesLoader
             }
             else
             {
-                ApplicationMgr.Instance.StartCoroutine(textAssetLoader.LoadTextAsset(url));
+                textAssetLoader. m_LoadAssetCoroutine= ApplicationMgr.Instance.StartCoroutine(textAssetLoader.LoadTextAsset(url));
                 return textAssetLoader;
             }
         }
@@ -46,7 +51,7 @@ namespace GameFrameWork.ResourcesLoader
         {
             m_ResourcesUrl = url;
             m_BridgeLoader = BridgeLoader.LoadAsset(url, null);
-            if (m_BridgeLoader.IsCompleted == false)
+            while (m_BridgeLoader.IsCompleted == false)
                 yield return null;
 
             OnCompleteLoad(m_BridgeLoader.IsError, m_BridgeLoader.Description, m_BridgeLoader.ResultObj, m_BridgeLoader.IsCompleted);
@@ -81,10 +86,11 @@ namespace GameFrameWork.ResourcesLoader
         protected override void ForceBreakLoaderProcess()
         {
             if (IsCompleted) return;
-            ApplicationMgr.Instance.StopCoroutine(LoadTextAsset(m_ResourcesUrl));
+            if(m_LoadAssetCoroutine!=null)
+            ApplicationMgr.Instance.StopCoroutine(m_LoadAssetCoroutine);
         }
 
-        protected override void OnCompleteLoad(bool isError, string description, object result, bool iscomplete, float process = 1)
+        public override void OnCompleteLoad(bool isError, string description, object result, bool iscomplete, float process = 1)
         {
 
             if (result.GetType() == typeof(byte[]))

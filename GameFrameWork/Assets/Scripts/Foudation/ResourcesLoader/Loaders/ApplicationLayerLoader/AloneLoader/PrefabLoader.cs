@@ -20,6 +20,14 @@ namespace GameFrameWork.ResourcesLoader
         /// <returns></returns>
         public static PrefabLoader LoadAsset(Transform requestTarget, string url, System.Action<BaseAbstracResourceLoader> completeHandler)
         {
+            if (string.IsNullOrEmpty(url))
+            {
+                Debug.LogError(string.Format("Url Can't Be Null , TypeLoader={0}" ,typeof(PrefabLoader)));
+                if (completeHandler != null)
+                    completeHandler(null);
+                return null;
+            }
+
             bool isContainLoaders = false;
             PrefabLoader prefabloader = ResourcesLoaderMgr.GetOrCreateLoaderInstance<PrefabLoader>(url, ref isContainLoaders);
             prefabloader.m_OnCompleteAct.Add(completeHandler);
@@ -34,7 +42,7 @@ namespace GameFrameWork.ResourcesLoader
             }
 
 
-            ApplicationMgr.Instance.StartCoroutine(prefabloader.LoadPrefabAsset(url));
+            prefabloader. m_LoadAssetCoroutine = ApplicationMgr.Instance.StartCoroutine(prefabloader.LoadPrefabAsset(url));
             return prefabloader;
         }
 
@@ -43,8 +51,10 @@ namespace GameFrameWork.ResourcesLoader
         {
             m_ResourcesUrl = url;
             m_BridgeLoader = BridgeLoader.LoadAsset(url, null);
-            if (m_BridgeLoader.IsCompleted == false)
+            while (m_BridgeLoader.IsCompleted == false)
                 yield return null;
+
+            yield return new WaitForSeconds(1);
 
             OnCompleteLoad(m_BridgeLoader.IsError, m_BridgeLoader.Description, m_BridgeLoader.ResultObj, m_BridgeLoader.IsCompleted);
             yield break;
@@ -68,7 +78,7 @@ namespace GameFrameWork.ResourcesLoader
         #endregion
 
 
-        protected override void OnCompleteLoad(bool isError, string description, object result, bool iscomplete, float process = 1)
+        public override void OnCompleteLoad(bool isError, string description, object result, bool iscomplete, float process = 1)
         {
             ResultObj = result as GameObject;
             base.OnCompleteLoad(isError, description, ResultObj, iscomplete, process);
@@ -78,7 +88,8 @@ namespace GameFrameWork.ResourcesLoader
         protected override void ForceBreakLoaderProcess()
         {
             if (IsCompleted) return;
-            ApplicationMgr.Instance.StopCoroutine(LoadPrefabAsset(m_ResourcesUrl));
+            if(m_LoadAssetCoroutine!=null)
+            ApplicationMgr.Instance.StopCoroutine(m_LoadAssetCoroutine);            //(LoadPrefabAsset(m_ResourcesUrl));
         }
 
     }

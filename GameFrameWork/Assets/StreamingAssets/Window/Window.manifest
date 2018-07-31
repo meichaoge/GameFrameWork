@@ -1,26 +1,42 @@
 ManifestFileVersion: 0
-CRC: 3989060452
+CRC: 2693752341
 AssetBundleManifest:
   AssetBundleInfos:
     Info_0:
-      Name: sprite/testpanel/icon_hongdian.unity3d
+      Name: configure/configure.unity3d
       Dependencies: {}
     Info_1:
-      Name: sprite/testpanel/icon_jinbi.unity3d
+      Name: font/font.unity3d
       Dependencies: {}
     Info_2:
-      Name: sprite/testpanel/selficon.unity3d
+      Name: prefabs/effect/ui/ui_dianji_lx.unity3d
       Dependencies: {}
     Info_3:
-      Name: testasset/111/test_asset/test_asset.unity3d
+      Name: sprite/testpanel/icon_hongdian.unity3d
       Dependencies: {}
     Info_4:
-      Name: testasset/testasset.unity3d
+      Name: sprite/testpanel/icon_jinbi.unity3d
       Dependencies: {}
     Info_5:
+      Name: sprite/testpanel/selficon.unity3d
+      Dependencies: {}
+    Info_6:
+      Name: testasset/111/test_asset/test_asset.unity3d
+      Dependencies: {}
+    Info_7:
+      Name: testasset/testasset.unity3d
+      Dependencies: {}
+    Info_8:
       Name: testmaterial/testmaterial.unity3d
       Dependencies:
         Dependency_0: testshader/testshader.unity3d
-    Info_6:
+    Info_9:
+      Name: testprefab/login/uiloginview.unity3d
+      Dependencies:
+        Dependency_0: font/font.unity3d
+    Info_10:
+      Name: testprefab/main/uimainview.unity3d
+      Dependencies: {}
+    Info_11:
       Name: testshader/testshader.unity3d
       Dependencies: {}

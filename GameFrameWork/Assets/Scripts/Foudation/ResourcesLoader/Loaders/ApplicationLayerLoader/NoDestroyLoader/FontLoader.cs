@@ -24,6 +24,11 @@ namespace GameFrameWork.ResourcesLoader
         /// <param name="loadAssetPath">加载资源路径模式(外部/Resources/StreamAsset ) default=ResourcesPath</param>
         public static FontLoader LoadAsset( string url, System.Action<BaseAbstracResourceLoader> completeHandler)
         {
+            if (string.IsNullOrEmpty(url))
+            {
+                Debug.LogError(string.Format("Url Can't Be Null , TypeLoader={0}" , typeof(FontLoader)));
+                return null;
+            }
             bool isContainLoaders = false;
             FontLoader fontLoader = ResourcesLoaderMgr.GetOrCreateLoaderInstance<FontLoader>(url, ref isContainLoaders);
             fontLoader.m_OnCompleteAct.Add(completeHandler);
@@ -37,7 +42,7 @@ namespace GameFrameWork.ResourcesLoader
             }
 
 
-            ApplicationMgr.Instance.StartCoroutine(fontLoader.LoadFontAsset(url));
+            fontLoader. m_LoadAssetCoroutine= ApplicationMgr.Instance.StartCoroutine(fontLoader.LoadFontAsset(url));
             return fontLoader;
         }
 
@@ -46,7 +51,7 @@ namespace GameFrameWork.ResourcesLoader
         {
             m_ResourcesUrl = url;
             m_BridgeLoader = BridgeLoader.LoadAsset(url, null);
-            if (m_BridgeLoader.IsCompleted == false)
+            while (m_BridgeLoader.IsCompleted == false)
                 yield return null;
 
             OnCompleteLoad(m_BridgeLoader.IsError, m_BridgeLoader.Description, m_BridgeLoader.ResultObj, m_BridgeLoader.IsCompleted);
@@ -55,10 +60,11 @@ namespace GameFrameWork.ResourcesLoader
         #endregion
 
 
-        protected override void OnCompleteLoad(bool isError, string description, object result, bool iscomplete, float process = 1)
+        public override void OnCompleteLoad(bool isError, string description, object result, bool iscomplete, float process = 1)
         {
-            base.OnCompleteLoad(isError, description, result, iscomplete, process);
             ResultObj = result as Font;
+            base.OnCompleteLoad(isError, description, ResultObj, iscomplete, process);
+        
             if (m_BridgeLoader != null)
                 ResourcesLoaderMgr.DeleteExitLoaderInstance(typeof(BridgeLoader), m_ResourcesUrl);
         }
@@ -70,7 +76,8 @@ namespace GameFrameWork.ResourcesLoader
         protected override void ForceBreakLoaderProcess()
         {
             if (IsCompleted) return;
-            ApplicationMgr.Instance.StopCoroutine(LoadFontAsset(m_ResourcesUrl));
+            if(m_LoadAssetCoroutine!=null)
+            ApplicationMgr.Instance.StopCoroutine(m_LoadAssetCoroutine);
 
         }
 

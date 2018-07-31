@@ -87,7 +87,6 @@ namespace GameFrameWork
         public static string S_AssetBundleBuildRecordConfigureName { get { return "_AssetBundleInfor.txt"; } }
         #endregion
 
-
         #region 各个平台名称
         public const string AndroidPlatform = "Android";
         public const string WindowsPlatform = "Window";
@@ -119,5 +118,15 @@ namespace GameFrameWork
         /// Asset的名字
         /// </summary>
         public static string S_ResourcesName { get { return "Resources"; } }
+
+        /// <summary>
+        ///默认的材质球名称
+        /// </summary>
+        public const string S_DefaultMaterialName = "Default-Material (Instance)";  
+
+
+
+
+
     }
 }
