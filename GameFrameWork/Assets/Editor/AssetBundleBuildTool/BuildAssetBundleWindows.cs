@@ -105,6 +105,7 @@ namespace GameFrameWork.EditorExpand
             GUILayout.Space(10);
             if (GUILayout.Button(new GUIContent("开始打包"), GUILayout.Width(150), GUILayout.Height(50)))
             {
+                S_BuildAssetBundleWindows.Close();
                 BuildAssetBundleTool.BegingPackAssetBundle(LoalBuildTarget2UnityEngine(m_BuildTarget), S_BuildAssetBundleWindows);
             }
             GUILayout.EndVertical();

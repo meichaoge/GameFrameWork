@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
+using System;
+using System.Linq;
 
 namespace GameFrameWork
 {
@@ -22,6 +24,48 @@ namespace GameFrameWork
 
             return GetAddComponent<T>(target.gameObject);
         }
+
+        /// <summary>
+        /// 重置 TransForm 位置属性
+        /// </summary>
+        /// <param name="target"></param>
+        public static void ResetTransProperty(this Transform target)
+        {
+            target.ResetTransProperty(Vector3.zero, Vector3.one, Quaternion.identity);
+        }
+        /// <summary>
+        /// / 重置 TransForm 位置属性
+        /// </summary>
+        /// <param name="target"></param>
+        /// <param name="transpos"></param>
+        public static void ResetTransProperty(this Transform target, Vector3 transpos)
+        {
+            target.ResetTransProperty(transpos, Vector3.one, Quaternion.identity);
+        }
+        /// <summary>
+        /// / 重置 TransForm 位置属性
+        /// </summary>
+        /// <param name="target"></param>
+        /// <param name="transpos"></param>
+        /// <param name="localScale"></param>
+        public static void ResetTransProperty(this Transform target, Vector3 transpos, Vector3 localScale)
+        {
+            target.ResetTransProperty(transpos, localScale, Quaternion.identity);
+        }
+        /// <summary>
+        /// / 重置 TransForm 位置属性
+        /// </summary>
+        /// <param name="target"></param>
+        /// <param name="transpos"></param>
+        /// <param name="localScale"></param>
+        /// <param name="rataion"></param>
+        public static void ResetTransProperty(this Transform target, Vector3 transpos, Vector3 localScale, Quaternion rataion)
+        {
+            target.localPosition = transpos;
+            target.localScale = localScale;
+            target.rotation = rataion;
+        }
+
         #endregion
 
         #region  GameObject 扩展
@@ -40,9 +84,47 @@ namespace GameFrameWork
         }
         #endregion
 
+        #region Rectransform 扩展
+
+        /// <summary>
+        /// 重置 RectTransform 位置属性
+        /// </summary>
+        /// <param name="target"></param>
+        public static void ResetRectTransProperty(this RectTransform target)
+        {
+            target.ResetRectTransProperty(Vector2.zero, target.sizeDelta);
+        }
+        /// <summary>
+        ///  重置 RectTransform 位置属性
+        /// </summary>
+        /// <param name="target"></param>
+        /// <param name="anchorPos"></param>
+        public static void ResetRectTransProperty(this RectTransform target, Vector2 anchorPos)
+        {
+            target.ResetRectTransProperty(anchorPos, target.sizeDelta);
+        }
+        //public static void ResetRectTransProperty(this RectTransform target, Vector2 anchorPos, Vector2 size)
+        //{
+        //    target.ResetRectTransProperty(anchorPos, size);
+        //}
+        /// <summary>
+        ///  重置 RectTransform 位置属性
+        /// </summary>
+        /// <param name="target"></param>
+        /// <param name="anchorPos"></param>
+        /// <param name="size"></param>
+        public static void ResetRectTransProperty(this RectTransform target, Vector2 anchorPos, Vector2 size)
+        {
+            target.anchoredPosition = anchorPos;
+            target.sizeDelta = size;
+        }
+
+        #endregion
+
         #region  String(包括IO/Path ) 扩展
         /// <summary>
         /// 获取参数路径的父级目录名
+        /// 示例(.../aa/bb/cc.text)=>bb
         /// </summary>
         /// <param name="filePath"></param>
         /// <returns></returns>
@@ -51,7 +133,7 @@ namespace GameFrameWork
             if (string.IsNullOrEmpty(filePath))
                 return "";
 
-            string directoryPath = System.IO.Path.GetDirectoryName(filePath);
+            string directoryPath = System.IO.Path.GetDirectoryName(filePath); //(.../aa/bb/cc.text)=>.../aa/bb
             if (string.IsNullOrEmpty(directoryPath))
                 return "";
             directoryPath = System.IO.Path.GetFileNameWithoutExtension(directoryPath);
@@ -60,6 +142,7 @@ namespace GameFrameWork
 
         /// <summary>
         /// 获取不带文件扩展名的文件路径(与  System.IO.Path.GetFileNameWithoutExtension() 不同，这里只是过滤了扩展名，并不是截取了文件名)
+        ///  示例(.../aa/bb/cc.text)=>.../aa/bb/cc
         /// </summary>
         /// <param name="filePath"></param>
         /// <returns></returns>
@@ -70,6 +153,30 @@ namespace GameFrameWork
             if (index == -1) return filePath;
             return filePath.Substring(0, index);
         }
+
+        /// <summary>
+        /// 获取指定文件路径上只包含当前文件父目录和文件名的路径
+        /// 示例 (..../aa/bb.txt)=>(aa/bb.txt)
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns></returns>
+        public static string GetFilePathWithOneDirectory(this string filePath)
+        {
+            if (string.IsNullOrEmpty(filePath)) return "";
+            string _fileName;  //the realname
+            string[] ur = filePath.Split('/');
+            if (ur.Length > 0)
+            {
+                if (ur.Length > 1)
+                    _fileName = ur[ur.Length - 2] + "/" + ur[ur.Length - 1];
+                else
+                    _fileName = ur[ur.Length - 1];
+            }
+            else
+                _fileName = filePath;
+            return _fileName;
+        }
+
 
         #endregion
 
@@ -125,7 +232,23 @@ namespace GameFrameWork
         }
         #endregion
 
-
+        #region Stack 扩展
+        /// <summary>
+        /// 从Stack  中批量删除满足条件的元素
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="stackSources"></param>
+        /// <param name="condition">要删除的元素满足的条件</param>
+        /// <returns></returns>
+        public static Stack<T> DeleteElements<T>(this Stack<T> stackSources, Func<T, bool> condition)
+        {
+            var allItems = stackSources.Where<T>(condition);  //找出所有满足条件的项
+            var allRemainItems = stackSources.Except<T>(allItems);   //从源数据中去除查找出来的项
+            allRemainItems = allRemainItems.Reverse<T>(); //翻转结果 
+            Stack<T> result = new Stack<T>(allRemainItems);  //获取堆 (这里相当于foreach 循环压栈操作)
+            return result;
+        }
+        #endregion
 
     }
 }

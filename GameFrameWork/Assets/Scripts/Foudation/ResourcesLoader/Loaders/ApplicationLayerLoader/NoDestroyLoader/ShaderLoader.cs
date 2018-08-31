@@ -49,7 +49,7 @@ namespace GameFrameWork.ResourcesLoader
         private IEnumerator LoadShaderAsset(string url)
         {
             m_ResourcesUrl = url;
-            m_BridgeLoader = BridgeLoader.LoadAsset(url, null);
+            m_BridgeLoader = BridgeLoader.LoadAsset(url, null,false);
             while (m_BridgeLoader.IsCompleted == false)
                 yield return null;
 
@@ -65,7 +65,7 @@ namespace GameFrameWork.ResourcesLoader
             base.OnCompleteLoad(isError, description, result, iscomplete, process);
             ResultObj = result as Shader;
             if (m_BridgeLoader != null)
-                ResourcesLoaderMgr.DeleteExitLoaderInstance(typeof(BridgeLoader),m_ResourcesUrl);
+                ResourcesLoaderMgr.DeleteLoader(typeof(BridgeLoader),m_ResourcesUrl,false);
         }
 
         protected override void ForceBreakLoaderProcess()

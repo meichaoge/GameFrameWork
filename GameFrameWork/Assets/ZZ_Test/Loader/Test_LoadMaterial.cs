@@ -11,11 +11,11 @@ public class Test_LoadMaterial : MonoBehaviour
     void Start()
     {
         Debug.Log("   m_Go.GetComponent<Renderer>()=" + m_Go.GetComponent<Renderer>().material.name);
-
+#if UNITY_EDITOR
         //***测试获取材质球属性字段
         GameObjectRenderPropertyInfor propertyInfor = ShaderUtility.Instance.GetMaterialShaderProperty(m_Go.GetComponent<Renderer>());
         Debug.Log(propertyInfor);
-
+#endif
     }
 
     // Update is called once per frame

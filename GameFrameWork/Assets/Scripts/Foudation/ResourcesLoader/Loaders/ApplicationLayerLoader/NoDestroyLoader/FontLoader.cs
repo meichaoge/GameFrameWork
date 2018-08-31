@@ -50,7 +50,7 @@ namespace GameFrameWork.ResourcesLoader
         private IEnumerator LoadFontAsset(string url)
         {
             m_ResourcesUrl = url;
-            m_BridgeLoader = BridgeLoader.LoadAsset(url, null);
+            m_BridgeLoader = BridgeLoader.LoadAsset(url, null,false);
             while (m_BridgeLoader.IsCompleted == false)
                 yield return null;
 
@@ -66,7 +66,7 @@ namespace GameFrameWork.ResourcesLoader
             base.OnCompleteLoad(isError, description, ResultObj, iscomplete, process);
         
             if (m_BridgeLoader != null)
-                ResourcesLoaderMgr.DeleteExitLoaderInstance(typeof(BridgeLoader), m_ResourcesUrl);
+                ResourcesLoaderMgr.DeleteLoader(typeof(BridgeLoader), m_ResourcesUrl,false);
         }
 
 

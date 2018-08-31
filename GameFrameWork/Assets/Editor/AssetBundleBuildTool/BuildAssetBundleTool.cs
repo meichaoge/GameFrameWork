@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using GameFrameWork.HotUpdate;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
@@ -92,7 +93,7 @@ namespace GameFrameWork.EditorExpand
         /// </summary>
         private static void SearchAllSubDirectorys(string resourcePath)
         {
-            Debug.Log("GetAllFileAndSetAssetBundleName Path:  " + resourcePath);
+            //Debug.Log("GetAllFileAndSetAssetBundleName Path:  " + resourcePath);
             string[] _SubDire = Directory.GetDirectories(resourcePath); //获得所有的子文件夹
             foreach (var item in _SubDire)
                 SearchAllSubDirectorys(item);
@@ -124,8 +125,8 @@ namespace GameFrameWork.EditorExpand
             string filePathRelativeResource = fileAssetPath.Substring(index+ ConstDefine.S_ResourcesName.Length+1);//相对于Resource的路径
             //相对于Resource路径下不带扩展名的文件名
             string filePathRelativeResourceWithoutExtension = filePathRelativeResource.Substring(0, filePathRelativeResource.IndexOf(Path.GetExtension(filePathRelativeResource)));
-            Debug.Log("fileAssetPath=" + fileAssetPath + "   filePathRelativeResource=" + filePathRelativeResource);
-            Debug.Log("filePathRelativeResourceWithNoExtension=" + filePathRelativeResourceWithoutExtension);
+  //          Debug.Log("fileAssetPath=" + fileAssetPath + "   filePathRelativeResource=" + filePathRelativeResource);
+  //          Debug.Log("filePathRelativeResourceWithNoExtension=" + filePathRelativeResourceWithoutExtension);
 
             string assetName = "";
             string extensionName = Path.GetExtension(filePath);
@@ -141,7 +142,7 @@ namespace GameFrameWork.EditorExpand
                 assetName = string.Format("{0}/{1}{2}", fileDirec, _fileName, ConstDefine.AssetBundleExtensionName).Replace(@"\", "/");
                 //                 (fileDirec + "/" + _fileName).Replace(@"\", "/") + ConstDefine.AssetBundleExtensionName; 
             }
-            Debug.Log("当前文件夹路径是 " + filePath + " 当前文件AssetName= " + assetName);
+   //         Debug.Log("当前文件夹路径是 " + filePath + " 当前文件AssetName= " + assetName);
 
             //AssetImporter.GetAtPath()  获取 Assets目录下资源必须带后缀名
             AssetImporter _impoter = AssetImporter.GetAtPath(fileAssetPath);   //**** Assets/Resources/AssetBundle_Path/Obj/obj1.prefab
@@ -238,7 +239,8 @@ namespace GameFrameWork.EditorExpand
         private static void RecordPackAbundleMainifestInfor(string fileName)
         {
             string PlatformABundlePath = S_AssetBundleOutPath + "/" + fileName;
-
+            //if(System.IO.File.Exists(PlatformABundlePath))
+            //    System.IO.File.Create()
             //当AssetBundle
             AssetBundleRecordeInfor _infor = new AssetBundleRecordeInfor();
             System.IO.FileInfo fileInfor = new System.IO.FileInfo(PlatformABundlePath);

@@ -68,20 +68,20 @@ namespace GameFrameWork.EditorExpand
             {"UI.RawImage", new TagInfor(EmObjType.Component, "RawImage", "raw")},
             {"UI.Button", new TagInfor(EmObjType.Component, "Button", "btn")},
             {"UI.Toggle", new TagInfor(EmObjType.Component, "Toggle", "tgl")},
-            {"UI.Slider", new TagInfor(EmObjType.Component, "Slider", "sld")},
-            {"UI.Scrollbar", new TagInfor(EmObjType.Component, "Scrollbar", "scb")},
+            //{"UI.Slider", new TagInfor(EmObjType.Component, "Slider", "sld")},
+            //{"UI.Scrollbar", new TagInfor(EmObjType.Component, "Scrollbar", "scb")},
             {"UI.Dropdown", new TagInfor(EmObjType.Component, "Dropdown", "drop")},
             {"UI.InputField", new TagInfor(EmObjType.Component, "InputField", "input")},
             {"UI.Canvas", new TagInfor(EmObjType.Component, "Canvas", "cav")},
-            {"UI.ScrollRect", new TagInfor(EmObjType.Component, "ScrollRect", "scr")},
+       //     {"UI.ScrollRect", new TagInfor(EmObjType.Component, "ScrollRect", "scr")},
             {"UnityEngine.GameObject", new TagInfor(EmObjType.Gameobject, "GameObject", "go")},
             {"UnityEngine.Transform", new TagInfor(EmObjType.Transform, "Transform", "tf")},
             {"UnityEngine.RectTransform", new TagInfor(EmObjType.RectTransform, "RectTransform", "rtf")},
             {"UnityEngine.ParticleSystem", new TagInfor(EmObjType.Component, "ParticleSystem", "pts")},
             {"TMPro.TextMeshProUGUI", new TagInfor(EmObjType.Component, "TMPro.TextMeshProUGUI", "txt")},
-            {"UICacheItemMark", new TagInfor(EmObjType.Component, "UICacheItemMark", "")},
+        //    {"UICacheItemMark", new TagInfor(EmObjType.Component, "UICacheItemMark", "")},
              {"AudioSource", new TagInfor(EmObjType.Component, "AudioSource", "Aud")},
-            {"ScrollRectEx", new TagInfor(EmObjType.Component, "ScrollRectEx", "scroll")},
+          //  {"ScrollRectEx", new TagInfor(EmObjType.Component, "ScrollRectEx", "scroll")},
                {"TMPro.TMP_Dropdown", new TagInfor(EmObjType.Component, "TMPro.TMP_Dropdown", "DropdownPro")},
         };
 
@@ -141,21 +141,6 @@ namespace GameFrameWork.EditorExpand
                     string path = go.transform.GetPath(goSelected.transform);
                     string value = string.Format(tagObj.tplText, objName, propertyName, path);
                     sbInitView.Append(value);
-                    //对UICacheItemMark组件进行额外处理
-                    //if (go.tag == "UICacheItemMark")
-                    //{
-                    //    UICacheItemMark cacheItem = go.GetComponent<UICacheItemMark>();
-                    //    if (cacheItem == null)
-                    //        continue;
-                    //    string[] componentNames = cacheItem.m_ComponentNames;
-                    //    foreach (string componentName in componentNames)
-                    //    {
-                    //        value = string.Format("\t\t\t{0}.onLoad += () => {{ {2} = {0}.GetAttachComponent<{1}>(); }};\n",
-                    //            propertyName, componentName, GetPropertyName(propertyName));
-                    //        sbInitView.Append(value);
-                    //    }
-                    //}
-
                     uiParameter.Append("private " + objName + " m_" + propertyName + " ;\n");
                     viewTouiParameter.Append("m_" + propertyName + "=" + propertyName + ";\n");
                 }
@@ -171,7 +156,7 @@ namespace GameFrameWork.EditorExpand
             strTpl = Regex.Replace(strTpl, " #INITVIEWTOPARAMETER#", viewTouiParameter.ToString());
 
             strTpl = Regex.Replace(strTpl, "#CLASSNAME#", className);
-            Debug.Log(className);
+            //Debug.Log(className);
             strTpl = Regex.Replace(strTpl, "#INITVIEW#", strInitView);
             Debug.Log(strInitView);
 
@@ -223,20 +208,6 @@ namespace GameFrameWork.EditorExpand
                     string path = go.transform.GetPath(goSelected.transform);
                     string value = string.Format(tagObj.tplText, objName, propertyName, path);
                     sbInitView.Append(value);
-                    //对UICacheItemMark组件进行额外处理
-                    //if (go.tag == "UICacheItemMark")
-                    //{
-                    //    UICacheItemMark cacheItem = go.GetComponent<UICacheItemMark>();
-                    //    if (cacheItem == null)
-                    //        continue;
-                    //    string[] componentNames = cacheItem.m_ComponentNames;
-                    //    foreach (string componentName in componentNames)
-                    //    {
-                    //        value = string.Format("\t\t\t{0}.onLoad += () => {{ {2} = {0}.GetAttachComponent<{1}>(); }};\n",
-                    //            propertyName, componentName, GetPropertyName(propertyName));
-                    //        sbInitView.Append(value);
-                    //    }
-                    //}
                 }
             }
 

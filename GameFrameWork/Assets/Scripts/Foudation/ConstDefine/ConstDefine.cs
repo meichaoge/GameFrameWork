@@ -108,7 +108,21 @@ namespace GameFrameWork
         }
         #endregion
 
-
+        #region  网络下载的资源
+        private static string _DownLoadAssetTopPath;
+        /// <summary>
+        /// 使用下载器下载的 资源的默认路径
+        /// </summary>
+        public static string S_DownLoadAssetTopPath
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(_DownLoadAssetTopPath))
+                    _DownLoadAssetTopPath = S_PersistentDataPath + "DownloadAsset/";
+                return _DownLoadAssetTopPath;
+            }
+        }
+        #endregion
 
         /// <summary>
         /// Asset的名字

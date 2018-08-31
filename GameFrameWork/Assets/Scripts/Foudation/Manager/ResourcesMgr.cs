@@ -25,7 +25,7 @@ namespace GameFrameWork
         /// <returns></returns>
         public void Instantiate(string url, Transform parent, System.Action<GameObject> callback, bool isActivate = true, bool isResetTransProperty = true)
         {
-            if(string.IsNullOrEmpty(url))
+            if (string.IsNullOrEmpty(url))
             {
                 if (callback != null)
                     callback(null);
@@ -56,12 +56,19 @@ namespace GameFrameWork
                     prefabGo.SetActive(false);  //临时改变预制体资源的可见性 返回前恢复
                 GameObject go = GameObject.Instantiate(prefabGo, parent);
                 go.name = prefabGo.name;
-                if (isResetTransProperty)
+
+                if(isResetTransProperty)
                 {
-                    go.transform.localPosition = Vector3.zero;
-                    go.transform.localRotation = Quaternion.identity;
-                    go.transform.localScale = Vector3.one;
+                    if(go.transform is RectTransform)
+                    {
+                        (go.transform as RectTransform).ResetRectTransProperty();
+                    }
+                    else
+                    {
+                        go.transform.ResetTransProperty();
+                    }
                 }
+
                 if (isActivate == false)
                     prefabGo.SetActive(true);  //恢复可见性
 
@@ -212,11 +219,12 @@ namespace GameFrameWork
         }
 
         /// <summary>
-        /// 加载场景
+        /// 根据场景资源路径加载场景(可能是AssetBundle 中的场景)
         /// </summary>
-        /// <param name="sceneName"></param>
+        /// <param name="url"></param>
+        /// <param name="loadModel">加载模式</param>
         /// <param name="callback"></param>
-        public void LoadScene(string url,bool isSignal, System.Action callback)
+        public void LoadScene(string url, LoadSceneMode loadModel, System.Action callback)
         {
             if (string.IsNullOrEmpty(url))
             {
@@ -225,33 +233,29 @@ namespace GameFrameWork
                 return;
             }
 
-            SceneLoader.LoadScene( url, (loader) =>
-            {
+            SceneLoader.LoadScene(url, (loader) =>
+           {
                // ResourcesLoadTraceMgr.Instance.RecordTraceResourceInfor(loader);
-                #region  加载成功后的处理逻辑
-                if (loader == null || (loader.IsCompleted && loader.IsError))
-                {
-                    Debug.LogError("LoadMaterial   Fail,Not Exit At Path= " + url);
-                    if (callback != null)
-                        callback.Invoke();
-                    return;
-                } //加载资源出错
-                string sceneName = System.IO.Path.GetFileNameWithoutExtension(url);
-                LoadSceneMode loadModel = LoadSceneMode.Single;
-                if(isSignal==false)
-                    loadModel = LoadSceneMode.Additive;
-                //      AsyncOperation loadAsync= SceneManager.LoadSceneAsync(sceneName, loadModel);
-                //***协成调用  LoadSceneAsync
-
-                if (callback != null)
-                    callback.Invoke();
-                #endregion
-            });
+               #region  加载成功后的处理逻辑
+               if (loader == null || (loader.IsCompleted && loader.IsError))
+               {
+                   Debug.LogError("LoadMaterial   Fail,Not Exit At Path= " + url);
+                   if (callback != null)
+                       callback.Invoke();
+                   return;
+               } //加载资源出错
+               string sceneName = System.IO.Path.GetFileNameWithoutExtension(url);
+               ApplicationMgr.Instance.StartCoroutine(LoadSceneAsync(sceneName, loadModel, callback));
+               #endregion
+           });
         }
-
-        private IEnumerator LoadSceneAsync(string sceneName, LoadSceneMode loadModel)
+        private IEnumerator LoadSceneAsync(string sceneName, LoadSceneMode loadModel, System.Action callback)
         {
-            yield return null;
+            AsyncOperation loadAsync = SceneManager.LoadSceneAsync(sceneName, loadModel);
+            while (loadAsync != null && loadAsync.isDone == false)
+                yield return null;
+            if (callback != null)
+                callback.Invoke();
         }
 
 

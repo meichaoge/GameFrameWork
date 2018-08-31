@@ -1,0 +1,14 @@
+ManifestFileVersion: 0
+CRC: 2629364691
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: c100725bd0de047d70df70357ba1c76c
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 31d6cfe0d16ae931b73c59d7e0c089c0
+HashAppended: 0
+ClassTypes: []
+Assets:
+- Assets/Resources/Scene/ApplicationEntry.unity
+Dependencies: []

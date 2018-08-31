@@ -1,0 +1,14 @@
+ManifestFileVersion: 0
+CRC: 3049460359
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 3cf6af2449388f283de31271bcdd9b9b
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 31d6cfe0d16ae931b73c59d7e0c089c0
+HashAppended: 0
+ClassTypes: []
+Assets:
+- Assets/Resources/Scene/StartUp.unity
+Dependencies: []

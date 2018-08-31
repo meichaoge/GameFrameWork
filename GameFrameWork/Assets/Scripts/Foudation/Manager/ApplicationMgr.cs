@@ -1,17 +1,19 @@
-﻿using GameFrameWork.ResourcesLoader;
+﻿using GameFrameWork.HotUpdate;
+using GameFrameWork.ResourcesLoader;
+using GameFrameWork.UGUI;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace GameFrameWork
 {
-
 
     /// <summary>
     /// 整个应用程序的主管理器 负责管理其他模块
     /// </summary>
     [RequireComponent(typeof(ApplicationConfig))]
-    public class ApplicationMgr : Singleton_Mono<ApplicationMgr>
+    public class ApplicationMgr : Singleton_Mono_NotDestroy<ApplicationMgr>
     {
 
         private ApplicationConfig m_ApplicationConfig;
@@ -29,17 +31,21 @@ namespace GameFrameWork
 #endif
             m_ApplicationConfig = transform.GetAddComponent<ApplicationConfig>();
 
-            Debug.S_LogLevel = m_ApplicationConfig. m_LogLevel;  //设置日志输出级别
+            Debug.S_LogLevel = m_ApplicationConfig.m_LogLevel;  //设置日志输出级别
 
             TimeTickUtility.Instance.StartUpTimer();
             base.Awake();
             Debug.LogInfor("ApplicationMgr Start...");
-       
+
             //TODO 其他一些操作
+            AppSceneManager.Instance.OnApplicationStart();
         }
 
         private void Start()
         {
+            UIManager.Instance.CreateUI<UIAssetUpdateView>(UIResourcesPath.UIAssetUpdateViewPath, UIManager.Instance.PageParentTrans, (obj) => {
+                UIManager.Instance.OpenPage(obj);
+            }, false, true, "");
 
         }
 

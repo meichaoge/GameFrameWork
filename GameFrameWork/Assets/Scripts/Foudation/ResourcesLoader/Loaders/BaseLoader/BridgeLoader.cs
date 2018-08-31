@@ -11,6 +11,8 @@ namespace GameFrameWork.ResourcesLoader
     public class BridgeLoader : BaseAbstracResourceLoader
     {
         protected BaseAbstracResourceLoader m_ConnectLoader = null;  //当前资源加载器使用的实际加载器
+        protected bool m_IsLoadSceneAsset = false;  //标识是否是加载场景资源
+
 
         #region  加载资源
         /// <summary>
@@ -18,18 +20,20 @@ namespace GameFrameWork.ResourcesLoader
         /// </summary>
         /// <param name="url"></param>
         /// <param name="onCompleteAct"></param>
+        /// <param name="isloadSceneAsset"> 如果加载的是场景资源 则这里必须为true  否则为false</param>
         /// <returns></returns>
-        public static BridgeLoader LoadAsset(string url, System.Action<BaseAbstracResourceLoader> onCompleteAct)
+        public static BridgeLoader LoadAsset(string url, System.Action<BaseAbstracResourceLoader> onCompleteAct, bool isloadSceneAsset )
         {
             if(string.IsNullOrEmpty(url))
             {
                 Debug.LogError(string.Format("Url Can't Be Null , TypeLoader={0}", typeof(BridgeLoader)));
                 return null;
             }
+           
             bool isLoaderExit = false;
             BridgeLoader bridgeLoader = ResourcesLoaderMgr.GetOrCreateLoaderInstance<BridgeLoader>(url, ref isLoaderExit);
             bridgeLoader.m_OnCompleteAct.Add(onCompleteAct);
-
+            bridgeLoader. m_IsLoadSceneAsset = isloadSceneAsset;
 
             if (isLoaderExit)
             {
@@ -38,7 +42,7 @@ namespace GameFrameWork.ResourcesLoader
                 return bridgeLoader;  //如果已经存在 且当前加载器还在加载中，则只需要等待加载完成则回调用回调
             }
 
-            ApplicationMgr.Instance.StartCoroutine(bridgeLoader.LoadAssetByPriority(url, bridgeLoader));
+            ApplicationMgr.Instance.StartCoroutine(bridgeLoader.LoadAssetByPriority(url, bridgeLoader, isloadSceneAsset));
             ApplicationMgr.Instance.StartCoroutine(bridgeLoader.LoadAsset(url, bridgeLoader));
             return bridgeLoader;
         }
@@ -50,7 +54,7 @@ namespace GameFrameWork.ResourcesLoader
         /// <param name="url"></param>
         /// <param name="isloadScene"> 如果加载的是场景 则这里必须填true ,否则false</param>
         /// <returns></returns>
-        private IEnumerator LoadAssetByPriority(string url, BridgeLoader bridgeLoader,bool isloadScene=false)
+        private IEnumerator LoadAssetByPriority(string url, BridgeLoader bridgeLoader,bool isloadSceneAsset)
         {
             LoadAssetPathEnum curLoadAssetPathEnum = ApplicationConfig.Instance.GetFirstPriortyAssetPathEnum();  //加载的优先级
             do
@@ -66,13 +70,13 @@ namespace GameFrameWork.ResourcesLoader
 
                         Debug.Log("加载外部资源，且以AssetBundle 加载");
                         if (assetBundleExitState == AssetBundleExitState.SinglePrefab)
-                            bridgeLoader.m_ConnectLoader = AssetBundleLoader.LoadAssetBundleAsset(url.ToLower(), fileName, null, isloadScene);  //单独预制体
+                            bridgeLoader.m_ConnectLoader = AssetBundleLoader.LoadAssetBundleAsset(url.ToLower(), fileName, null, isloadSceneAsset);  //单独预制体
                         else
-                            bridgeLoader.m_ConnectLoader = AssetBundleLoader.LoadAssetBundleAsset(newUrl, fileName, null, isloadScene);   //整体打包的资源
+                            bridgeLoader.m_ConnectLoader = AssetBundleLoader.LoadAssetBundleAsset(newUrl, fileName, null, isloadSceneAsset);   //整体打包的资源
                     }
                     else
                     {
-                        if(isloadScene==false)
+                        if(isloadSceneAsset == false)
                         {
                             Debug.Log("优先加载外部资源,但是不是AssetBundle 资源，则以Byte[] 尝试 加载");
                             bridgeLoader.m_ConnectLoader = ByteLoader.LoadAsset(url, null);
@@ -85,7 +89,7 @@ namespace GameFrameWork.ResourcesLoader
                 }
                 else if (curLoadAssetPathEnum == LoadAssetPathEnum.ResourcesPath)
                 {
-                    bridgeLoader.m_ConnectLoader = ResourcesLoader.LoadResourcesAsset(url, null, isloadScene);
+                    bridgeLoader.m_ConnectLoader = ResourcesLoader.LoadResourcesAsset(url, null, isloadSceneAsset);
                 }
 
                 while (bridgeLoader.m_ConnectLoader.IsCompleted == false)
@@ -133,8 +137,6 @@ namespace GameFrameWork.ResourcesLoader
         #endregion
 
 
-
-
         #region 资源卸载
         public static void UnLoadAsset(string url, bool isForceDelete=false)
         {
@@ -163,7 +165,7 @@ namespace GameFrameWork.ResourcesLoader
         {
             if (m_ConnectLoader.IsCompleted) return;
 
-            ApplicationMgr.Instance.StopCoroutine(LoadAssetByPriority(m_ResourcesUrl, this));
+            ApplicationMgr.Instance.StopCoroutine(LoadAssetByPriority(m_ResourcesUrl, this, m_IsLoadSceneAsset));
             ApplicationMgr.Instance.StopCoroutine(LoadAsset(m_ResourcesUrl, this));
         }
 

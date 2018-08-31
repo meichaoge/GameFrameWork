@@ -1,12 +1,12 @@
 ManifestFileVersion: 0
-CRC: 4139231204
+CRC: 2679153752
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 319d332c5bab01a82780368e1404b718
+    Hash: db4e7b177fbde86cb4284d25dcc549fc
   TypeTreeHash:
     serializedVersion: 2
-    Hash: b6dcca26fbbcde50675d3fd2d1d8827d
+    Hash: 2c0c81e54f05ae9af976d6fb4620967a
 HashAppended: 0
 ClassTypes:
 - Class: 1
@@ -36,4 +36,5 @@ ClassTypes:
 Assets:
 - Assets/Resources/TestPrefab/Login/UILoginView.prefab
 Dependencies:
-- E:/My_WorkSpace/GameFrameWork/Assets/StreamingAssets/Window/font/font.unity3d
+- E:/My_WorkSpace/GameFrameWork/Assets/StreamingAssets/Window/fonts & materials/fonts
+  & materials.unity3d

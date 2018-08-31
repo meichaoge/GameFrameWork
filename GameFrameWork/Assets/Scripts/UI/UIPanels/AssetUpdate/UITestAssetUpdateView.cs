@@ -20,7 +20,6 @@ namespace GameFrameWork.UGUI
         public Image m_ProcessImg;
 
         public int TotalSize = 0;  //总共需要下载的数量
-
         public bool m_IsBegingDownLoad = false;
         private float m_LastRecordTime;
         private int m_DownLoadSizeRecordThisSecond = 0;
@@ -43,7 +42,7 @@ namespace GameFrameWork.UGUI
             m_TotalDownloadedSize = 0;
         }
 
-
+     
         /// <summary>
         /// 设置显示的状态 
         /// </summary>

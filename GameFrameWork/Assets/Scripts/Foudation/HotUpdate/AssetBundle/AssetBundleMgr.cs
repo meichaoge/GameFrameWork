@@ -4,7 +4,7 @@ using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
-namespace GameFrameWork
+namespace GameFrameWork.HotUpdate
 {
 
     /// <summary>
@@ -58,6 +58,15 @@ namespace GameFrameWork
         /// </summary>
         /// <returns></returns>
         public string GetAssetBundlePlatformName()
+        {
+            return GetHotAssetBuildPlatformName(Application.platform);
+        }
+
+        /// <summary>
+        /// 根据指定挡圈生成资源
+        /// </summary>
+        /// <returns></returns>
+        public string GetHotAssetBuildPlatformName()
         {
             return GetHotAssetBuildPlatformName(Application.platform);
         }

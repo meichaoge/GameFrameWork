@@ -18,7 +18,7 @@ namespace GameFrameWork.ResourcesLoader
     /// <summary>
     /// 资源加载器管理器
     /// </summary>
-    public class ResourcesLoaderMgr
+    public class ResourcesLoaderMgr : Singleton_Static<ResourcesLoaderMgr>
     {
         /// <summary>
         /// 资源加载器检测是否需要GC 回收的时间间隔
@@ -39,7 +39,6 @@ namespace GameFrameWork.ResourcesLoader
         private static float lastCheckTime = 0; //上一次GC检测时间
 
 
-
         /// <summary>
         /// 保存所有类型的加载器
         /// </summary>
@@ -58,8 +57,7 @@ namespace GameFrameWork.ResourcesLoader
         /// <param name="loader">Loader.</param>
         public static void DeleteLoader(Type loaderType, string url, bool isForceDelete) //where T : BaseAbstracResourceLoader
         {
-
-            BaseAbstracResourceLoader loader = DeleteExitLoaderInstance(loaderType, url);
+            BaseAbstracResourceLoader loader = DeleteExitLoaderInstanceFromRecord(loaderType, url);
             if (loader == null)
                 return;
 
@@ -101,6 +99,26 @@ namespace GameFrameWork.ResourcesLoader
                                                     //  Debug.Log("回收加载器  " + typeof(T) + "::" + url + "  count=" + allUnUseLoadersOfType.Count);
         }
 
+        /// <summary>
+        /// 如果存在 则删除指定类型的加载器(只删除正在使用的加载器记录 不清理资源)
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="url"></param>
+        private static BaseAbstracResourceLoader DeleteExitLoaderInstanceFromRecord(Type loaderType, string url)
+        {
+            BaseAbstracResourceLoader resultLoader = null;
+            url = string.Format(@"{0}", url);
+            Dictionary<string, BaseAbstracResourceLoader> typeOfLoaders = null;
+            if (S_AllTypeLoader.TryGetValue(loaderType, out typeOfLoaders) == false)
+                return null;
+
+            if (typeOfLoaders.ContainsKey(url) == false)
+                return null;
+
+            resultLoader = typeOfLoaders[url];
+            typeOfLoaders.Remove(url);
+            return resultLoader;
+        }
 
 
         #endregion
@@ -240,26 +258,6 @@ namespace GameFrameWork.ResourcesLoader
             return null;
         }
 
-        /// <summary>
-        /// 如果存在 则删除指定类型的加载器
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="url"></param>
-        public static BaseAbstracResourceLoader DeleteExitLoaderInstance(Type loaderType, string url)
-        {
-            BaseAbstracResourceLoader resultLoader = null;
-            url = string.Format(@"{0}", url);
-            Dictionary<string, BaseAbstracResourceLoader> typeOfLoaders = null;
-            if (S_AllTypeLoader.TryGetValue(loaderType, out typeOfLoaders) == false)
-                return null;
-
-            if (typeOfLoaders.ContainsKey(url) == false)
-                return null;
-
-            resultLoader = typeOfLoaders[url];
-            typeOfLoaders.Remove(url);
-            return resultLoader;
-        }
 
         #endregion
 

@@ -39,7 +39,10 @@ namespace GameFrameWork
                 return S_Instance;
             }
         }
-
+        public static T GetInstance()
+        {
+            return Instance;
+        }
 
 
         /// <summary>

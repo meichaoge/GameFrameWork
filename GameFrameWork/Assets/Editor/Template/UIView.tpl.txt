@@ -3,9 +3,9 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace GameFrameWork
+namespace GameFrameWork.UGUI
 {
-    public class #CLASSNAME# : UIViewBase
+    public class #CLASSNAME# : UIBaseView
   {
        #region UI
       #UIPARAMETER#

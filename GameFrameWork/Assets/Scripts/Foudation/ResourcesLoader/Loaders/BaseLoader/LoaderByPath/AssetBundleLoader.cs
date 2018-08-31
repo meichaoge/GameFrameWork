@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GameFrameWork.HotUpdate;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -114,9 +115,9 @@ namespace GameFrameWork.ResourcesLoader
         /// <param name="url">相对于AseetBundle 资源存放路径的路径 (如果是打包成整个预制体则是整个预制体的路径)</param>
         /// <param name="assetFileName">实际加载AssetBundle 时候的文件名称(考虑到加载整个AssetBundle 中一个资源的情况)</param>
         /// <param name="onCompleteAct">加载完成回调</param>
-        ///  <param name="isloadScene"> 如果加载的是场景 则这里必须填true ,否则false</param>
+        ///  <param name="isloadSceneAsset"> 如果加载的是场景 则这里必须填true ,否则false</param>
         /// <returns></returns>
-        public static AssetBundleLoader LoadAssetBundleAsset(string url, string assetFileName, System.Action<BaseAbstracResourceLoader> onCompleteAct, bool isloadScene = false)
+        public static AssetBundleLoader LoadAssetBundleAsset(string url, string assetFileName, System.Action<BaseAbstracResourceLoader> onCompleteAct, bool isloadSceneAsset)
         {
             if (string.IsNullOrEmpty(url))
             {
@@ -135,7 +136,7 @@ namespace GameFrameWork.ResourcesLoader
                 return assetBundleLoader;  //如果已经存在 且当前加载器还在加载中，则只需要等待加载完成则回调用回调
             }
             assetBundleLoader.m_AssetFileName = assetFileName;
-            assetBundleLoader.m_LoadAssetCoroutine = ApplicationMgr.Instance.StartCoroutine(assetBundleLoader.LoadAssetBundleASync(url, assetFileName, isloadScene));
+            assetBundleLoader.m_LoadAssetCoroutine = ApplicationMgr.Instance.StartCoroutine(assetBundleLoader.LoadAssetBundleASync(url, assetFileName, isloadSceneAsset));
             return assetBundleLoader;
         }
 
@@ -198,7 +199,7 @@ namespace GameFrameWork.ResourcesLoader
         /// 异步加载资源 (这里处理的是最外层的AssetBundle ,当前资源依赖的AssetBundle 处理在LoadDepdenceAssetBundleAsync)
         /// </summary>
         /// <param name="url"></param>
-        protected IEnumerator LoadAssetBundleASync(string url, string assetFileName, bool isloadScene = false)
+        protected IEnumerator LoadAssetBundleASync(string url, string assetFileName, bool isloadScene )
         {
             m_ResourcesUrl = url;
             if (System.IO.Path.GetExtension(m_ResourcesUrl) != ConstDefine.AssetBundleExtensionName)

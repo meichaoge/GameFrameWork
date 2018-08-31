@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-namespace GameFrameWork
+namespace GameFrameWork.HotUpdate
 {
     /// <summary>
     /// 记录的某一个需要热更新的资源的信息 基类

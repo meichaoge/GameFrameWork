@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-namespace GameFrameWork
+namespace GameFrameWork.HotUpdate
 {
     /// <summary>
     /// 打包记录每一个AssetBundle 记录的信息

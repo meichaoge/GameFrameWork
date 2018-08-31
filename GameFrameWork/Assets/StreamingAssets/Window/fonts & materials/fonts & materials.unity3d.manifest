@@ -1,0 +1,25 @@
+ManifestFileVersion: 0
+CRC: 409859841
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 8221ca79b6dfc1366d0d41980c8c78c9
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 007be97d342d89736165b403eb38efa7
+HashAppended: 0
+ClassTypes:
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 48
+  Script: {instanceID: 0}
+- Class: 128
+  Script: {instanceID: 0}
+Assets:
+- Assets/Resources/Fonts & Materials/FZLTHJW_Outline_Black.mat
+- Assets/Resources/Fonts & Materials/FZLTHJW.TTF
+Dependencies:
+- E:/My_WorkSpace/GameFrameWork/Assets/StreamingAssets/Window/fonts & materials/fzlthjw
+  sdf.unity3d

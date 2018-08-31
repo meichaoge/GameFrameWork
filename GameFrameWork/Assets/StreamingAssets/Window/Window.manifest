@@ -1,42 +1,59 @@
 ManifestFileVersion: 0
-CRC: 2693752341
+CRC: 1773797947
 AssetBundleManifest:
   AssetBundleInfos:
     Info_0:
       Name: configure/configure.unity3d
       Dependencies: {}
     Info_1:
-      Name: font/font.unity3d
+      Name: fonts & materials/fzlthjw sdf.unity3d
       Dependencies: {}
     Info_2:
+      Name: fonts & materials/fonts & materials.unity3d
+      Dependencies:
+        Dependency_0: fonts & materials/fzlthjw sdf.unity3d
+    Info_3:
       Name: prefabs/effect/ui/ui_dianji_lx.unity3d
       Dependencies: {}
-    Info_3:
-      Name: sprite/testpanel/icon_hongdian.unity3d
-      Dependencies: {}
     Info_4:
-      Name: sprite/testpanel/icon_jinbi.unity3d
-      Dependencies: {}
+      Name: prefabs/ui/assetupdate/uiassetupdatepanel.unity3d
+      Dependencies:
+        Dependency_0: fonts & materials/fzlthjw sdf.unity3d
     Info_5:
-      Name: sprite/testpanel/selficon.unity3d
+      Name: scene/applicationentry.unity3d
       Dependencies: {}
     Info_6:
-      Name: testasset/111/test_asset/test_asset.unity3d
+      Name: scene/startup.unity3d
       Dependencies: {}
     Info_7:
-      Name: testasset/testasset.unity3d
+      Name: scene/test_scene.unity3d
       Dependencies: {}
     Info_8:
+      Name: sprite/testpanel/icon_hongdian.unity3d
+      Dependencies: {}
+    Info_9:
+      Name: sprite/testpanel/icon_jinbi.unity3d
+      Dependencies: {}
+    Info_10:
+      Name: sprite/testpanel/selficon.unity3d
+      Dependencies: {}
+    Info_11:
+      Name: testasset/111/test_asset/test_asset.unity3d
+      Dependencies: {}
+    Info_12:
+      Name: testasset/testasset.unity3d
+      Dependencies: {}
+    Info_13:
       Name: testmaterial/testmaterial.unity3d
       Dependencies:
         Dependency_0: testshader/testshader.unity3d
-    Info_9:
+    Info_14:
       Name: testprefab/login/uiloginview.unity3d
       Dependencies:
-        Dependency_0: font/font.unity3d
-    Info_10:
+        Dependency_0: fonts & materials/fonts & materials.unity3d
+    Info_15:
       Name: testprefab/main/uimainview.unity3d
       Dependencies: {}
-    Info_11:
+    Info_16:
       Name: testshader/testshader.unity3d
       Dependencies: {}

@@ -20,12 +20,16 @@ namespace GameFrameWork
         {
             get
             {
-                if (m_Instance == null)
-                    Debug.LogError("Not Initialed yield");
+                //if (m_Instance == null)
+                //    Debug.LogError("Not Initialed yield"+typeof(T));
                 return m_Instance;
             }
         }
 
+        public static T GetInstance()
+        {
+            return Instance;
+        }
 
 #if UNITY_EDITOR
         /// <summary>
@@ -39,6 +43,7 @@ namespace GameFrameWork
                 Debug.LogError("There are Already Exit " + typeof(T));
             }
         }
+
 #endif
 
         /// <summary>

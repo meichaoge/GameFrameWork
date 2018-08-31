@@ -53,7 +53,7 @@ namespace GameFrameWork.ResourcesLoader
         private IEnumerator LoadTextureAsset(string url)
         {
             m_ResourcesUrl = url;
-            m_BridgeLoader = BridgeLoader.LoadAsset(url, null);
+            m_BridgeLoader = BridgeLoader.LoadAsset(url, null,false);
             while (m_BridgeLoader.IsCompleted == false)
                 yield return null;
 
