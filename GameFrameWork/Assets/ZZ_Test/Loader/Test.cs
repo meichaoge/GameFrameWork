@@ -7,6 +7,7 @@ using UnityEngine;
 
 public class Test : MonoBehaviour
 {
+    public LoadAssetModel m_LoadAssetModel = LoadAssetModel.Async;
     public string url;
     // Use this for initialization
     void Start()
@@ -20,7 +21,7 @@ public class Test : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.A))
         {
-            ByteLoader.LoadAsset(url, CompleteLoadHandler);
+            ByteLoader.LoadAsset(url, m_LoadAssetModel,CompleteLoadHandler );
         }
 
         if (Input.GetKeyDown(KeyCode.D))

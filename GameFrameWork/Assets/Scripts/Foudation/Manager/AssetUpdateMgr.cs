@@ -1,4 +1,5 @@
 ﻿using GameFrameWork.HotUpdate;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -12,6 +13,7 @@ namespace GameFrameWork
     {
         //管理不同种类资源更新
         private Dictionary<HotAssetEnum, AssetUpdateManagerBase> m_AllAssetUpdateManagers = new Dictionary<HotAssetEnum, AssetUpdateManagerBase>();
+
 
         #region 回调事件
         private System.Action m_OnBeginUpdateAssetAct = null;
@@ -28,11 +30,13 @@ namespace GameFrameWork
         /// </summary>
         public bool IsUpdatingAsset { get; private set; }
 
-        /// <summary>
-        /// 标识是否完成加载
-        /// </summary>
-        public bool IsCompleteUpdateAsset { get; private set; }
 
+        /// <summary>
+        /// 标识是否完成更新资源
+        /// </summary>
+        public static bool S_IsCompleteUpdateAsset {  get;  private set;}
+
+        
         /// <summary>
         /// 标识是否完成资源MD5 检测
         /// </summary>
@@ -52,14 +56,15 @@ namespace GameFrameWork
         protected override void InitialSingleton()
         {
             base.InitialSingleton();
-            IsUpdatingAsset= IsCompleteUpdateAsset = IsUpdateError = false;
+            IsUpdatingAsset  = IsUpdateError = false;
+            S_IsCompleteUpdateAsset = false;
 
             var assetEnum = System.Enum.GetValues(typeof(HotAssetEnum));
-           foreach (var item in assetEnum)
-           {
+            foreach (var item in assetEnum)
+            {
                 HotAssetEnum hotAsset = (HotAssetEnum)System.Enum.Parse(typeof(HotAssetEnum), item.ToString());
                 m_AllAssetUpdateManagers.Add(hotAsset, AssetUpdateManagerFactory.CreateUpdateMgr(hotAsset));
-           }
+            }
         }
 
 
@@ -70,23 +75,23 @@ namespace GameFrameWork
         /// <param name="BeginUpdateAssetcallback"></param>
         /// <param name="CompleteUpdateAssetcallback"></param>
         /// <param name="UpdateErrorAssetcallback"></param>
-        public void BeginAssetUpdate(System.Action BeginUpdateAssetcallback, System.Action CompleteUpdateAssetcallback, 
-            System.Action<string> UpdateErrorAssetcallback,System.Action<int> CompleteCheckAssetState)
+        public void BeginAssetUpdate(System.Action BeginUpdateAssetcallback, System.Action CompleteUpdateAssetcallback,
+            System.Action<string> UpdateErrorAssetcallback, System.Action<int> CompleteCheckAssetState)
         {
+            if (S_IsCompleteUpdateAsset) return;
             m_OnBeginUpdateAssetAct = BeginUpdateAssetcallback;
             m_OnCompleteUpdateAssetAct = CompleteUpdateAssetcallback;
             m_OnUpdateErrorAssetAct = UpdateErrorAssetcallback;
             m_CompleteCheckAssetState = CompleteCheckAssetState;
             if (m_OnBeginUpdateAssetAct != null)
                 m_OnBeginUpdateAssetAct.Invoke();
-            ApplicationMgr.Instance.StartCoroutine(CheckAssetProcess());
+            EventCenter.Instance.StartCoroutine(CheckAssetProcess());
 
         }
 
 
         private IEnumerator CheckAssetProcess()
         {
-         
             foreach (var assetUpdateManager in m_AllAssetUpdateManagers)
             {
                 CurAssetUpdateManager = assetUpdateManager.Value;
@@ -99,7 +104,7 @@ namespace GameFrameWork
                 CurAssetUpdateManager.m_OnUpdateFailAct = m_OnUpdateErrorAssetAct;
                 CurAssetUpdateManager.BeginAssetUpdateProcess(serverAddressInfor);
 
-           
+
                 while (CurAssetUpdateManager.m_IsCompleteMD5 == false)
                     yield return null;
                 TotalNeedDownloadAsset += CurAssetUpdateManager.TotalNeedDownLoadCount;
@@ -109,27 +114,41 @@ namespace GameFrameWork
             if (m_CompleteCheckAssetState != null)
                 m_CompleteCheckAssetState.Invoke(TotalNeedDownloadAsset);
 
-            ApplicationMgr.Instance.StartCoroutine(UpdateAssetProcess());
+
         }
 
 
 
-        private IEnumerator UpdateAssetProcess()
+        /// <summary>
+        /// 检测完资源状态后需要调用这个接口开始更新
+        /// </summary>
+        public void BeginDownloadAsset(float delayTime, Action<string, int> donwnloadCallback)
         {
-            if (TotalNeedDownloadAsset != 0)
-                yield return new WaitForSeconds(0.2f);
+            if (S_IsCompleteUpdateAsset) return;
+            EventCenter.Instance.StartCoroutine(UpdateAssetProcess(delayTime, donwnloadCallback));
+        }
+
+
+
+        private IEnumerator UpdateAssetProcess(float delayTime, Action<string, int> donwnloadCallback)
+        {
+            if (TotalNeedDownloadAsset == 0)
+                yield break;
+
+            if (delayTime >= 0)
+                yield return new WaitForSeconds(delayTime);
             foreach (var assetUpdateManager in m_AllAssetUpdateManagers)
-           {
+            {
                 CurAssetUpdateManager = assetUpdateManager.Value;
 
                 if (CurAssetUpdateManager == null)
                 {
-               //     m_AlreadyCompleteUpdateMager++;
+                    //     m_AlreadyCompleteUpdateMager++;
                     continue;
                 }
                 HotAssetServerAddressInfor serverAddressInfor = ApplicationConfig.Instance.GetHotAssetServerAddressInforByType(assetUpdateManager.Key);
                 CurAssetUpdateManager.m_OnUpdateFailAct = m_OnUpdateErrorAssetAct;
-                CurAssetUpdateManager.BeginUpdateAsset();
+                CurAssetUpdateManager.BeginUpdateAsset(donwnloadCallback,null);
 
                 while (CurAssetUpdateManager.m_IsCompleteUpdate == false)
                 {
@@ -140,7 +159,7 @@ namespace GameFrameWork
 
             }
 
-            IsCompleteUpdateAsset = true;
+            S_IsCompleteUpdateAsset = true;
             if (m_OnCompleteUpdateAssetAct != null)
                 m_OnCompleteUpdateAssetAct.Invoke();
         }

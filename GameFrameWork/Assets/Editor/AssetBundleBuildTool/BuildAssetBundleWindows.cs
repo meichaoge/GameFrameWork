@@ -49,7 +49,6 @@ namespace GameFrameWork.EditorExpand
 
         private void OnGUI()
         {
-            EditorGUILayout.BeginVertical();
             #region 显示打包平台的枚举项
             GUILayout.Space(10);
             m_BuildTarget = (EditorBuildTarget)EditorGUILayout.EnumPopup("打包目标平台", m_BuildTarget, GUILayout.Width(350));
@@ -101,7 +100,7 @@ namespace GameFrameWork.EditorExpand
             #endregion
 
             #region  显示打包按钮
-            GUILayout.BeginHorizontal();
+           GUILayout.BeginHorizontal();
             GUILayout.Space(10);
             if (GUILayout.Button(new GUIContent("开始打包"), GUILayout.Width(150), GUILayout.Height(50)))
             {
@@ -110,8 +109,6 @@ namespace GameFrameWork.EditorExpand
             }
             GUILayout.EndVertical();
             #endregion
-
-            EditorGUILayout.EndVertical();
         }
 
 
@@ -338,7 +335,9 @@ namespace GameFrameWork.EditorExpand
 
         public  void OnCompleteBuildAssetBundle()
         {
-            EditorUtility.DisplayDialog("打包AssetBundle ","打包完成，AssetBundle 保存在"+ConstDefine.S_AssetBundleTopPath,"已知晓");
+            string message = string.Format("打包完成，AssetBundle 保存在{0} \n AssetBundle 生成的文件保存在{1}", ConstDefine.S_AssetBundleTopPath, ConstDefine.S_AssetBundleTopPath);
+
+            EditorUtility.DisplayDialog("打包AssetBundle ", message, "已知晓");
             if (S_BuildAssetBundleWindows != null)
                 S_BuildAssetBundleWindows.Close();
         }

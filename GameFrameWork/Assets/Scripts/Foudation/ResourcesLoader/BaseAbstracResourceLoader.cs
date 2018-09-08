@@ -9,7 +9,7 @@ namespace GameFrameWork.ResourcesLoader
     /// <summary>
     /// 所有其他资源加载器的父类
     /// </summary>
-    public abstract class BaseAbstracResourceLoader : IAsyncOperate, IDisposable
+    public abstract class BaseAbstracResourceLoader : IAssetLoader, IDisposable
     {
         public bool IsCompleted { get; protected set; }
         public bool IsError { get; protected set; }
@@ -91,10 +91,18 @@ namespace GameFrameWork.ResourcesLoader
         protected readonly HashSet<System.Action<BaseAbstracResourceLoader>> m_OnCompleteAct = new HashSet<System.Action<BaseAbstracResourceLoader>>(); //加载完成回调
 
 
+        /// <summary>
+        /// 资源加载的模式 
+        /// </summary>
+        public LoadAssetModel  LoadassetModel { get; protected set; }
+
+
+
 
         protected BaseAbstracResourceLoader()
         {
             ResetLoader(0); //创建  时候引用计数为0
+            LoadassetModel = LoadAssetModel.None;
         }
 
         /// <summary>

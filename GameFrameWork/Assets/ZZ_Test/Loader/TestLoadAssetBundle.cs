@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class TestLoadAssetBundle : MonoBehaviour {
+    public LoadAssetModel m_LoadAssetModel = LoadAssetModel.Async;
     public string URL;
 	// Use this for initialization
 	void Start () {
@@ -15,7 +16,7 @@ public class TestLoadAssetBundle : MonoBehaviour {
 	void Update () {
 		if(Input.GetKeyDown(KeyCode.A))
         {
-            AssetBundleLoader.LoadAssetBundleAsset(URL, System.IO.Path.GetFileNameWithoutExtension(URL),CompleteLoad,true);
+            AssetBundleLoader.LoadAssetBundleAsset(URL, System.IO.Path.GetFileNameWithoutExtension(URL), m_LoadAssetModel, CompleteLoad,true);
         }
 	}
 

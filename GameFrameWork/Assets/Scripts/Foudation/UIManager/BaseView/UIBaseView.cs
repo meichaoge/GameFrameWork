@@ -23,6 +23,14 @@ namespace GameFrameWork.UGUI
     public abstract class UIBaseView : MonoBehaviour
     {
 
+        public RectTransform rectransform
+        {
+            get
+            {
+                return transform as RectTransform;
+            }
+        }
+
         #region 界面属性定义
         [Header("窗口类型  必须设置")]
         [SerializeField]
@@ -36,6 +44,7 @@ namespace GameFrameWork.UGUI
         [Header("是否在界面隐藏是销毁  必须设置")]
         [SerializeField]
         protected bool m_AutoDestroyOnDiable = false;
+
         #endregion
 
         #region 事件
@@ -64,7 +73,7 @@ namespace GameFrameWork.UGUI
         }
         protected virtual void Start()
         {
-
+            LoadUIConfigString();
         }
 
         protected virtual void OnEnable()
@@ -82,15 +91,24 @@ namespace GameFrameWork.UGUI
             UIManager.Instance.UnRecordView(this);
         }
 
-        protected virtual void Update()
-        {
-
-        }
+        protected virtual void Update()  {  }
 
         #endregion
 
 
         #region 扩展接口
+        /// <summary>
+        /// 加载当前视图相关的语言配置 (在Start() 中调用  相关赋值操作请滞后)
+        /// </summary>
+        protected virtual void LoadUIConfigString()
+        {
+
+        }
+
+
+
+
+
         /// <summary>
         /// 外部调用 显示窗口
         /// </summary>
@@ -181,7 +199,7 @@ namespace GameFrameWork.UGUI
         /// <summary>
         /// / 外部调用 关闭窗口
         /// </summary>
-        public virtual void HideWindow()
+        public virtual void HideWindow(params object[] parameter)
         {
 
         }
@@ -189,7 +207,7 @@ namespace GameFrameWork.UGUI
         /// /子类重写这个方法实现 协程关闭界面
         /// </summary>
         /// <returns></returns>
-        protected virtual IEnumerator OnHideWindow()
+        protected virtual IEnumerator OnHideWindow(params object[] parameter)
         {
             yield return null;
         }

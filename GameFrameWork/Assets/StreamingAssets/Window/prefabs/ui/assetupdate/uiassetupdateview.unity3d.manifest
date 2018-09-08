@@ -1,0 +1,40 @@
+ManifestFileVersion: 0
+CRC: 2100759077
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: b24d91e8d0db513424b7bc980ac13753
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: df2ac007c78f9c1f20fd4d981040b02e
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 114
+  Script: {fileID: 1392445389, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+- Class: 114
+  Script: {fileID: -765806418, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+- Class: 114
+  Script: {fileID: 1453722849, guid: 89f0137620f6af44b9ba852b4190e64e, type: 3}
+- Class: 114
+  Script: {fileID: -667331979, guid: 89f0137620f6af44b9ba852b4190e64e, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 6db2fa2c0e4e0c840a2b54ff52b5380e, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+- Class: 213
+  Script: {instanceID: 0}
+- Class: 222
+  Script: {instanceID: 0}
+- Class: 224
+  Script: {instanceID: 0}
+Assets:
+- Assets/Resources/Prefabs/UI/AssetUpdate/UIAssetUpdateView.prefab
+Dependencies:
+- E:/My_WorkSpace/GameFrameWork/Assets/StreamingAssets/Window/fonts & materials/fzlthjw
+  sdf.unity3d

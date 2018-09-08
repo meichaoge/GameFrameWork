@@ -36,13 +36,12 @@ namespace GameFrameWork.EditorExpand
         /// </summary>
         private static void PackAssetBundle()
         {
-            S_HotAssetBaseRecordInfor.m_AllAssetRecordsDic.Clear();  //清理本地记录的数据
+            S_HotAssetBaseRecordInfor.AllAssetRecordsDic.Clear();  //清理本地记录的数据
             S_AllFileNeedBuildAssetBundleRecord.Clear();
             ClearAllPreviousAssetBundleName();
             GetAndSetNeedPackAssetName(ConstDefine.S_ResourcesPath);
             CallAPIBuildAssetBundle();  //生成AssetBundle
-            AssetDatabase.Refresh();
-
+            AssetDatabase.Refresh(); 
             CopyAndMoveAssetBundleAsset();
             CreateAssetBundleDepends(); //创建依赖关系字典
             SaveAllDepdenceToLocalFile();
@@ -207,12 +206,12 @@ namespace GameFrameWork.EditorExpand
                 System.IO.FileInfo fileInfor = new System.IO.FileInfo(path);
                 _infor.m_ByteSize = (int)fileInfor.Length;
                 _infor.m_DependeceAssetNamePath.AddRange(depences);
-                if (S_HotAssetBaseRecordInfor.m_AllAssetRecordsDic.ContainsKey(item))
+                if (S_HotAssetBaseRecordInfor.AllAssetRecordsDic.ContainsKey(item))
                 {
                     Debug.LogError("重复的AssetBundleName=" + item);
                     break;
                 }
-                S_HotAssetBaseRecordInfor.m_AllAssetRecordsDic.Add(item, _infor);  //记录当前的 AssetBundle 资源
+                S_HotAssetBaseRecordInfor.AllAssetRecordsDic.Add(item, _infor);  //记录当前的 AssetBundle 资源
                 #endregion
 
                 #region 记录当前文件 .meta信息
@@ -220,12 +219,12 @@ namespace GameFrameWork.EditorExpand
                 _metaInfor.m_MD5Code = MD5Helper.GetFileMD5(path + ".meta");
                 FileInfo mataFileInfor = new System.IO.FileInfo(path + ".meta");
                 _metaInfor.m_ByteSize = (int)mataFileInfor.Length;
-                if (S_HotAssetBaseRecordInfor.m_AllAssetRecordsDic.ContainsKey(item + ".meta"))
+                if (S_HotAssetBaseRecordInfor.AllAssetRecordsDic.ContainsKey(item + ".meta"))
                 {
                     Debug.LogError("重复的AssetBundleName=" + item + ".meta");
                     break;
                 }
-                S_HotAssetBaseRecordInfor.m_AllAssetRecordsDic.Add(item + ".meta", _metaInfor);  //记录当前的 AssetBundle 资源
+                S_HotAssetBaseRecordInfor.AllAssetRecordsDic.Add(item + ".meta", _metaInfor);  //记录当前的 AssetBundle 资源
                 #endregion
 
             }
@@ -240,13 +239,13 @@ namespace GameFrameWork.EditorExpand
         {
             string PlatformABundlePath = S_AssetBundleOutPath + "/" + fileName;
             //if(System.IO.File.Exists(PlatformABundlePath))
-            //    System.IO.File.Create()
+            //    System.IO.File.Create() 
             //当AssetBundle
             AssetBundleRecordeInfor _infor = new AssetBundleRecordeInfor();
             System.IO.FileInfo fileInfor = new System.IO.FileInfo(PlatformABundlePath);
             _infor.m_ByteSize = (int)fileInfor.Length;
             _infor.m_MD5Code = MD5Helper.GetFileMD5(PlatformABundlePath);
-            S_HotAssetBaseRecordInfor.m_AllAssetRecordsDic.Add(fileName, _infor);
+            S_HotAssetBaseRecordInfor.AllAssetRecordsDic.Add(fileName, _infor);
 
 
             //.meta
@@ -254,7 +253,7 @@ namespace GameFrameWork.EditorExpand
             System.IO.FileInfo metaFileInfor = new System.IO.FileInfo(PlatformABundlePath + ".meta");
             _metaInfor.m_ByteSize = (int)metaFileInfor.Length;
             _metaInfor.m_MD5Code = MD5Helper.GetFileMD5(PlatformABundlePath + ".meta");
-            S_HotAssetBaseRecordInfor.m_AllAssetRecordsDic.Add(fileName + ".meta", _metaInfor);
+            S_HotAssetBaseRecordInfor.AllAssetRecordsDic.Add(fileName + ".meta", _metaInfor);
         }
 
 
@@ -264,14 +263,19 @@ namespace GameFrameWork.EditorExpand
         private static void SaveAllDepdenceToLocalFile()
         {
             string msg = LitJson.JsonMapper.ToJson(S_HotAssetBaseRecordInfor);
-            string configRecordPath = string.Format("{0}{1}", ConstDefine.S_AssetBundleTopPath, AssetBundleMgr.Instance.GetHotAssetBuildPlatformName(S_CurrentBuildTarget)+
-                ConstDefine.S_AssetBundleBuildRecordConfigureName);//        Application.streamingAssetsPath + "/" + GetPlatformPath(CurrentBuildTarget) + ConstDefine.ABundleConfigFileName;
+            string configRecordPath = string.Format("{0}{1}", ConstDefine.S_AssetBundleTopPath,
+                AssetBundleMgr.Instance.GetHotAssetBuildPlatformName(S_CurrentBuildTarget)+ ConstDefine.S_AssetBundleBuildRecordConfigureName);
+
+            string directoryPath = System.IO.Path.GetDirectoryName(configRecordPath);
+            if (System.IO.Directory.Exists(directoryPath) == false)
+                System.IO.Directory.CreateDirectory(directoryPath);
+
             if (System.IO.File.Exists(configRecordPath))
             {
                 System.IO.File.Delete(configRecordPath);
             }
             System.IO.File.WriteAllText(configRecordPath, msg);
-
+            Debug.LogInfor("SaveAllDepdenceToLocalFile " + configRecordPath);
         }
 
     }

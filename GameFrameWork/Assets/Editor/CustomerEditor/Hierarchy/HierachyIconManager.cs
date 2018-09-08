@@ -147,8 +147,17 @@ namespace GameFrameWork.EditorExpand
                 index += 1;
                 Rect rectIcon = GetRect(selectionRect, index,20,60);
                 GUIStyle st = new GUIStyle();
-                st.normal.textColor = ColorDefine.Instance.GoldenColor;
+                st.normal.textColor = Define_Color.GoldenColor;
                 GUI.Label(rectIcon, "[AppMgr]", st);
+            }
+
+            if (go.GetComponent<EventCenter>() != null)
+            {
+                index += 1;
+                Rect rectIcon = GetRect(selectionRect, index, 20, 80);
+                GUIStyle st = new GUIStyle();
+                st.normal.textColor = Define_Color.GoldenColor;
+                GUI.Label(rectIcon, "[EventCenter]", st);
             }
 
             // 绘制Label来覆盖原有的名字

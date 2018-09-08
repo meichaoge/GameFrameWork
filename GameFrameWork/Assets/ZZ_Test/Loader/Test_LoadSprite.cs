@@ -7,6 +7,7 @@ using GameFrameWork.ResourcesLoader;
 
 public class Test_LoadSprite : MonoBehaviour
 {
+    public LoadAssetModel m_LoadAssetModel = LoadAssetModel.Async;
     public Image m_Image;
     public string m_Url;
     // Use this for initialization
@@ -19,18 +20,20 @@ public class Test_LoadSprite : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.A))
         {
-            SpriteLoader loader = SpriteLoader.LoadAsset(m_Image.transform, m_Url, OnComplete);
+            Debug.LogInfor("Time=" + Time.realtimeSinceStartup+"Frame="+EventCenter.Instance.CurFrameCount);
+            SpriteLoader loader = SpriteLoader.LoadAsset(m_Image.transform, m_Url, m_LoadAssetModel, OnComplete);
         }
 
         if (Input.GetKeyDown(KeyCode.B))
         {
-            ResourcesMgr.Instance.LoadSprite(m_Image, m_Url, null);
+            ResourcesMgr.Instance.LoadSprite(m_Url, m_Image, m_LoadAssetModel, null);
         }
     }
 
 
     void OnComplete(BaseAbstracResourceLoader loader)
     {
+        Debug.LogInfor("Time=" + Time.realtimeSinceStartup + "Frame=" + EventCenter.Instance.CurFrameCount);
         //GameObject go = GameObject.Instantiate<GameObject>(loader.ResultObj as GameObject);
         //Debug.LogInfor("" + loader.ResultObj.GetType());
         m_Image.sprite = loader.ResultObj as Sprite;

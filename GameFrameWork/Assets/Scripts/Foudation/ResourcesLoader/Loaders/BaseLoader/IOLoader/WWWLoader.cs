@@ -8,7 +8,7 @@ namespace GameFrameWork.ResourcesLoader
 {
 
     /// <summary>
-    /// 以WWW方式加载资源
+    /// 以WWW方式加载资源(只支持异步加载)
     /// </summary>
     public class WWWLoader : BaseAbstracResourceLoader
     {
@@ -24,6 +24,7 @@ namespace GameFrameWork.ResourcesLoader
         {
             base.InitialLoader();
             IsPathExit = true;
+            LoadassetModel = LoadAssetModel.Async;
         }
 
         #region  加载资源
@@ -34,8 +35,13 @@ namespace GameFrameWork.ResourcesLoader
         /// <param name="url">资源相对目录</param>
         /// <param name="onCompleteAct"></param>
         /// <returns></returns>
-        public static WWWLoader WWWLoadAsset(string topPath, string url, System.Action<BaseAbstracResourceLoader> onCompleteAct)
+        public static WWWLoader WWWLoadAsset(string topPath, LoadAssetModel loadModel, string url, System.Action<BaseAbstracResourceLoader> onCompleteAct)
         {
+            if(loadModel!= LoadAssetModel.Async)
+            {
+                Debug.LogError("WWWLoader  只支持异步加载资源");
+                return null;
+            }
             if (string.IsNullOrEmpty(url))
             {
                 Debug.LogError(string.Format("Url Can't Be Null , TypeLoader={0}", typeof(WWWLoader)));
@@ -55,7 +61,7 @@ namespace GameFrameWork.ResourcesLoader
                 return wwwLoader;  //如果已经存在 且当前加载器还在加载中，则只需要等待加载完成则回调用回调
             }
             wwwLoader. m_TopPath = topPath;
-            wwwLoader. m_LoadAssetCoroutine = ApplicationMgr.Instance.StartCoroutine(wwwLoader.LoadAssetAsync(topPath, url, wwwLoader));
+            wwwLoader. m_LoadAssetCoroutine = EventCenter.Instance.StartCoroutine(wwwLoader.LoadAssetAsync(topPath, url, wwwLoader));
             return wwwLoader;
         }
 
@@ -113,8 +119,13 @@ namespace GameFrameWork.ResourcesLoader
         protected override void ForceBreakLoaderProcess()
         {
             if (IsCompleted) return;
-            if(m_LoadAssetCoroutine!=null)
-            ApplicationMgr.Instance.StopCoroutine(m_LoadAssetCoroutine);
+            if (LoadassetModel != LoadAssetModel.Async)
+            {
+                Debug.LogError("非异步加载方式不需要强制结束 " + LoadassetModel);
+                return;
+            }
+            if (m_LoadAssetCoroutine!=null)
+            EventCenter.Instance.StopCoroutine(m_LoadAssetCoroutine);
         }
 
         public override void Dispose()

@@ -1,0 +1,8 @@
+{
+  "CheckingLocalAssetState": "正在检测本地资源....",
+  "CheckLocalAssetVersion": "正在获取本地资源版本...",
+  "UpdateAssteComplete": "下载完成",
+  "AssetUpdateSuccess": "资源更新完成",
+  "BegineDownLoadAsset": "准备更新资源",
+  "LocalAssetIsTheLastVersion": "资源是最新版本"
+}

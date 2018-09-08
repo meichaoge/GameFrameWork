@@ -3,14 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-namespace GameFrameWork.ResourcesLoader
+namespace GameFrameWork
 {
     /// <summary>
     /// 资源加载模式(同步/异步)
     /// </summary>
     public enum LoadAssetModel
     {
-        ///    Sync, //同步加载 当前帧返回
+        None = 0,  //无定义的默认值
+        Sync, //同步加载 当前帧返回
         Async, //协程异步加载
     }
 
@@ -58,7 +59,7 @@ namespace GameFrameWork.ResourcesLoader
         String,
         AudioClip,
         Texture2D,
-        AssetBundle, 
+        AssetBundle,
     }
 
     ///// <summary>

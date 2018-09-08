@@ -16,13 +16,11 @@ namespace GameFrameWork.HotUpdate
         {
             base.InitialedUpdateMgr();
             HotAssetManagerEnum = HotAssetEnum.AssetBundleAsset;
-            m_LocalAssetConfigurePath = ConstDefine.S_AssetBundleTopPath;
+            m_LocalAssetConfigurePath ="";
             m_LocalAssetConfigureFileName = string.Format("{0}_{1}", AssetBundleMgr.Instance.GetHotAssetBuildPlatformName(), "AssetBundleInfor.txt");
 
             Debug.LogInfor("InitialedUpdateMgr HotAssetManagerEnum=" + m_LocalAssetConfigurePath);
             Debug.LogInfor("InitialedUpdateMgr m_LocalAssetConfigureFileName=" + m_LocalAssetConfigureFileName);
-
-
 
         }
 
@@ -31,8 +29,16 @@ namespace GameFrameWork.HotUpdate
 
         protected override void GetLocalAssetRecordInfor(string assetText)
         {
-             base.GetLocalAssetRecordInfor(assetText);
-         //   m_LocalAssetRecord = JsonMapper.ToObject<HotAssetBaseRecordInfor>(assetText);
+            if (string.IsNullOrEmpty(assetText))
+            {
+                m_LocalAssetRecord = null;
+                Debug.Log("本地配置不存在 ");
+            }
+            else
+            {
+                m_LocalAssetRecord = JsonMapper.ToObject<HotAssetBaseRecordInfor>(assetText);
+            }
+            Debug.Log("m_LocalAssetRecord " + m_LocalAssetRecord);
         }
 
 
@@ -41,7 +47,6 @@ namespace GameFrameWork.HotUpdate
         {
             //  base.GetServerAssetRecordInfor(assetText);
             m_ServerAssetRecord = JsonMapper.ToObject<HotAssetBaseRecordInfor>(assetText);
-            //Debug.Log("GetServerAssetRecordInfor " + m_ServerAssetRecord.m_Version);
             //foreach (var item in m_ServerAssetRecord.m_AllAssetRecordsDic)
             //{
             //    Debug.Log("" + item.Value.m_MD5Code + "  ;;;" + item.Value.m_ByteSize+"\n");
@@ -50,8 +55,7 @@ namespace GameFrameWork.HotUpdate
 
         protected override string GetAssetDownLoadPath(string assetName)
         {
-            string path= string.Format("{0}{1}/{2}", m_ServerAssetConfInfor.m_ServerAssetPath, AssetBundleMgr.Instance.GetHotAssetBuildPlatformName(), assetName);
-          //  Debug.Log("path=" + path);
+            string path = string.Format("{0}{1}/{2}", m_ServerAssetConfInfor.m_ServerAssetPath, AssetBundleMgr.Instance.GetHotAssetBuildPlatformName(), assetName);
             return path;
         }
 
@@ -66,7 +70,6 @@ namespace GameFrameWork.HotUpdate
                 return "";
             }
 
-            //Debug.Log(url.Substring(index + abundleDwonPath.Length));
             return url.Substring(index + abundleDwonPath.Length);
         }
 

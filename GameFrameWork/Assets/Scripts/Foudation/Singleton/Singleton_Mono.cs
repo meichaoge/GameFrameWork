@@ -37,11 +37,19 @@ namespace GameFrameWork
         /// </summary>
         protected virtual void Reset()
         {
-            if (GameObject.FindObjectsOfType<T>().Length > 1)
+            try
             {
-                GameObject.DestroyImmediate(gameObject.GetComponent<T>());
-                Debug.LogError("There are Already Exit " + typeof(T));
+                if (GameObject.FindObjectsOfType<T>().Length > 1)
+                {
+                    GameObject.DestroyImmediate(gameObject.GetComponent<T>());
+                    Debug.LogError("There are Already Exit " + typeof(T));
+                }
             }
+            catch (System.Exception ex)
+            {
+                Debug.LogError(ex.ToString());
+            }
+
         }
 
 #endif
@@ -58,27 +66,39 @@ namespace GameFrameWork
         {
             if (m_Instance != null && isIgnoreCheck)
                 return m_Instance;
-
-            lock (obj)
+#if UNITY_EDITOR
+            try
             {
-                var result = GameObject.FindObjectsOfType<T>();
-                if (result.Length == 0)
+#endif
+                lock (obj)
                 {
-                    //   Debug.LogError("MonoSingleton ... Not Initialed :" + typeof(T));
-                    m_Instance = new GameObject(typeof(T).Name).AddComponent<T>();  //测试发现当运行时如果报错，下一次运行会生成多个对象
+                    var result = GameObject.FindObjectsOfType<T>();
+                    if (result.Length == 0)
+                    {
+                        //   Debug.LogError("MonoSingleton ... Not Initialed :" + typeof(T));
+                        m_Instance = new GameObject(typeof(T).Name).AddComponent<T>();  //测试发现当运行时如果报错，下一次运行会生成多个对象
+                    }
+                    else if (result.Length == 1)
+                    {
+                        m_Instance = result[0];
+                    }
+                    else
+                    {
+                        m_Instance = result[result.Length - 1];  //Keep the First Initialed one  Be The Avalable
+                        Debug.LogError("There are " + result.Length + " " + typeof(T));
+                        for (int dex = 0; dex < result.Length - 1; ++dex)
+                            GameObject.DestroyImmediate(result[dex]);
+                    }
                 }
-                else if (result.Length == 1)
-                {
-                    m_Instance = result[0];
-                }
-                else
-                {
-                    m_Instance = result[result.Length - 1];  //Keep the First Initialed one  Be The Avalable
-                    Debug.LogError("There are " + result.Length + " " + typeof(T));
-                    for (int dex = 0; dex < result.Length - 1; ++dex)
-                        GameObject.DestroyImmediate(result[dex]);
-                }
+
+#if UNITY_EDITOR
             }
+            catch (System.Exception ex)
+            {
+                Debug.LogError("GetInstance >> " + ex.ToString());
+            }
+#endif
+
             return m_Instance;
         }
 
@@ -87,8 +107,8 @@ namespace GameFrameWork
             m_Instance = null;
             obj = null;
         }
-      
 
-     
+
+
     }
 }

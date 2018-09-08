@@ -7,6 +7,7 @@ using GameFrameWork.ResourcesLoader;
 
 public class Test_LoadTextAsset : MonoBehaviour
 {
+    public LoadAssetModel m_LoadAssetModel = LoadAssetModel.Async;
     public Text m_ShowText;
     public string m_Url;
     // Use this for initialization
@@ -20,12 +21,13 @@ public class Test_LoadTextAsset : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.A))
         {
-            TextAssetLoader loader = TextAssetLoader.LoadAsset(  m_Url, OnComplete);
+            Debug.LogInfor("Time=" + Time.realtimeSinceStartup + "Frame=" + EventCenter.Instance.CurFrameCount);
+            TextAssetLoader loader = TextAssetLoader.LoadAsset(  m_Url, m_LoadAssetModel, OnComplete);
         }
 
         if (Input.GetKeyDown(KeyCode.B))
         {
-            ResourcesMgr.Instance.LoadFile(m_Url, (result) => { m_ShowText.text = result; });
+            ResourcesMgr.Instance.LoadFile(m_Url, m_LoadAssetModel,(result) => { m_ShowText.text = result; });
         }
     }
 
@@ -38,6 +40,7 @@ public class Test_LoadTextAsset : MonoBehaviour
     /// <param name="loader"></param>
     void OnComplete(BaseAbstracResourceLoader loader)
     {
+        Debug.LogInfor("Time=" + Time.realtimeSinceStartup + "Frame=" + EventCenter.Instance.CurFrameCount);
         //GameObject go = GameObject.Instantiate<GameObject>(loader.ResultObj as GameObject);
         //Debug.LogInfor("" + loader.ResultObj.GetType());
         m_ShowText.text = loader.ResultObj.ToString();

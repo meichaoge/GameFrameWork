@@ -58,7 +58,7 @@ namespace GameFrameWork
                     materialInfor.AddPropertyItemInfor(propertyItemInfor.m_PropertyIndex, propertyItemInfor);
 
                     //**** 使用 mat.GetXXX()  接口根据不同的 ShaderPropertyType 返回一个值
-                    Debug.LogEditorInfor(propertyItemInfor.ToString());
+           //         Debug.LogEditorInfor(propertyItemInfor.ToString());
                 }
 
                 #endregion

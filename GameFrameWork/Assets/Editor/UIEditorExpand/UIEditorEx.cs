@@ -81,7 +81,7 @@ namespace GameFrameWork.EditorExpand
             {"TMPro.TextMeshProUGUI", new TagInfor(EmObjType.Component, "TMPro.TextMeshProUGUI", "txt")},
         //    {"UICacheItemMark", new TagInfor(EmObjType.Component, "UICacheItemMark", "")},
              {"AudioSource", new TagInfor(EmObjType.Component, "AudioSource", "Aud")},
-          //  {"ScrollRectEx", new TagInfor(EmObjType.Component, "ScrollRectEx", "scroll")},
+              {"TMPro.TMP_InputField", new TagInfor(EmObjType.Component, "TMPro.TMP_InputField", "InputFieldPro")},
                {"TMPro.TMP_Dropdown", new TagInfor(EmObjType.Component, "TMPro.TMP_Dropdown", "DropdownPro")},
         };
 

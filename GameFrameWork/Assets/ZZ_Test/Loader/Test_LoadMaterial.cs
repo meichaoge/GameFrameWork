@@ -1,10 +1,12 @@
 ﻿using GameFrameWork;
+using GameFrameWork.ResourcesLoader;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Test_LoadMaterial : MonoBehaviour
 {
+    public LoadAssetModel m_LoadAssetModel = LoadAssetModel.Async;
     public GameObject m_Go;
     public string m_URL;
     // Use this for initialization
@@ -23,10 +25,17 @@ public class Test_LoadMaterial : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.A))
         {
-            ResourcesMgr.Instance.LoadMaterial(m_URL, m_Go.transform, (matrial) =>
-            {
-                m_Go.GetComponent<Renderer>().material = matrial;
-            });
+            Debug.LogInfor("Time=" + Time.realtimeSinceStartup + "Frame=" + EventCenter.Instance.CurFrameCount);
+            ResourcesMgr.Instance.LoadMaterial(m_URL, m_Go.transform, m_LoadAssetModel, OnComplete);
         }
     }
+
+    void OnComplete(Material mat)
+    {
+        Debug.LogInfor("Time=" + Time.realtimeSinceStartup + "Frame=" + EventCenter.Instance.CurFrameCount);
+        m_Go.GetComponent<Renderer>().material = mat;
+    }
+
+
+
 }

@@ -169,7 +169,7 @@ namespace GameFrameWork
                 if (onCompleteUnLoadSceneAct != null)
                     onCompleteUnLoadSceneAct.Invoke();
 
-                ResourcesLoader.SceneLoader.LoadScene(S_SceneDirectory + sceneName, (loader) =>
+                ResourcesLoader.SceneLoader.LoadScene(S_SceneDirectory + sceneName, LoadAssetModel.Async, (loader) =>
                 {
                     if (loader == null || loader.IsCompleted == false || loader.IsError)
                     {
@@ -178,7 +178,7 @@ namespace GameFrameWork
                             callback(false);
                         return;
                     }
-                    ApplicationMgr.Instance.StartCoroutine(InstantiateScene(sceneName, LoadSceneMode.Additive, callback));
+                    EventCenter.Instance.StartCoroutine(InstantiateScene(sceneName, LoadSceneMode.Additive, callback));
                 });
             });  //先卸载资源然后 再加载新的场景
 
@@ -251,7 +251,7 @@ namespace GameFrameWork
                 m_CurLoadedScene.RemoveAt(allNeedRemoveSceneIndex[dex]);
            }
 
-            ApplicationMgr.Instance.StartCoroutine(UnLoadScenes(allNeedUnLoadScene, onCompleteUnLoadAct));
+            EventCenter.Instance.StartCoroutine(UnLoadScenes(allNeedUnLoadScene, onCompleteUnLoadAct));
         }
 
        /// <summary>

@@ -7,7 +7,7 @@ namespace GameFrameWork
     /// <summary>
     /// 材质球关联的Shader 中属性字段的信息
     /// </summary>
-    public class MaterialPropertyItem : MonoBehaviour
+    public class MaterialPropertyItem 
     {
         public string m_PropertyName;
         public int m_PropertyIndex;  //属性索引

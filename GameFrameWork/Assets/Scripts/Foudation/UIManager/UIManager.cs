@@ -9,77 +9,15 @@ namespace GameFrameWork
     /// <summary>
     /// 管理整个项目中的所有UI界面(不需要销毁)
     /// </summary>
-    public class UIManager : Singleton_Mono_NotDestroy<UIManager>
+    public class UIManager : Singleton_Static<UIManager>
     {
-        #region  引用
-        [SerializeField]
-        private Camera m_UICamera;  //UI相机
-        /// <summary>
-        /// UI相机
-        /// </summary>
-        public Camera UICamera
-        {
-            get
-            {
-                if (m_UICamera == null)
-                    m_UICamera = Camera.main;
-                return m_UICamera;
-            }
-        }
-
-        [SerializeField]
-        private Transform m_PageParentTrans;
-        /// <summary>
-        /// 所有的Page 都应该在这个下面
-        /// </summary>
-        public Transform PageParentTrans
-        {
-            get
-            {
-                if (m_PageParentTrans == null)
-                    m_PageParentTrans = transform.GetChild(0);
-                return m_PageParentTrans;
-            }
-        }
-
-        [SerializeField]
-        private Transform m_PopupParentTrans;
-        /// <summary>
-        /// 所有的PopUP 都应该在这个下面
-        /// </summary>
-        public Transform PopupParentTrans
-        {
-            get
-            {
-                if (m_PopupParentTrans == null)
-                    m_PopupParentTrans = transform.GetChild(1);
-                return m_PopupParentTrans;
-            }
-        }
-
-        [SerializeField]
-        private Transform m_TipsParentTrans;
-        /// <summary>
-        /// 所有的Tips 都应该在这个下面
-        /// </summary>
-        public Transform TipsParentTrans
-        {
-            get
-            {
-                if (m_TipsParentTrans == null)
-                    m_TipsParentTrans = transform.GetChild(2);
-                return m_TipsParentTrans;
-            }
-        }
-
-        #endregion
 
         //***这里不使用Stack 栈是因为会存在操作栈中间元素的行为
         private List<UIBasePageView> m_AllRecordViewPage = new List<UIBasePageView>();  //按照打开的顺序记录了所有打开的页面UI
         private List<UIBasePopupView> m_AllRecordViewPopup = new List<UIBasePopupView>();  //按照打开的顺序记录了所有打开的弹窗UI
         private List<UIBaseTipView> m_AllRecordViewTips = new List<UIBaseTipView>();//按照打开的事件顺序记录了所有打开的飘窗提示UI
         private Dictionary<UIBasePageView, List<UIBasePopupView>> m_LowerPriorityPopupView = new Dictionary<UIBasePageView, List<UIBasePopupView>>(); //当前弹窗优先级不够导致暂时无法显示的界面
-
+        private Dictionary<Transform, List<UIBaseWidgetView>> m_AllWidgetView = new Dictionary<Transform, List<UIBaseWidgetView>>(); //当前显示的widget  
         private Dictionary<string, UIBaseView> m_AllExitView = new Dictionary<string, UIBaseView>(); //记录所有打开的UI(不包含组件类型的UI ,由所属的界面自己控制)
 
         #region 状态
@@ -178,6 +116,12 @@ namespace GameFrameWork
                 return;
             }
 #endif
+            if (m_AllRecordViewPage.Count == 1)
+            {
+                Debug.LogError("只剩下一个界面 无法关闭" + CurOpenPage.name);
+                return;
+            }
+
             CurOpenPage.HideWindow();
             CurOpenPage = m_AllRecordViewPage[m_AllRecordViewPage.Count - 1];
             CurOpenPage.ShowWindow(parameter);
@@ -502,7 +446,6 @@ namespace GameFrameWork
 
         #endregion
 
-
         #region Tips 类型的界面
         /// <summary>
         /// 打开弹窗 
@@ -555,6 +498,152 @@ namespace GameFrameWork
 
         #endregion
 
+        #region Widget类型界面
+        /// <summary>
+        /// 打开一个Widget 
+        /// </summary>
+        /// <param name="view"></param>
+        /// <param name="parentTrans"></param>
+        /// <param name="showTime"></param>
+        /// <param name="isSingleton"></param>
+        /// <param name="parameter"></param>
+        public void OpenWidget(UIBaseWidgetView view, Transform parentTrans, float showTime, bool isSingleton, params object[] parameter)
+        {
+            if (view == null)
+            {
+                Debug.LogError("OpenWidget Fail,The View Is Null");
+                return;
+            }
+
+#if UNITY_EDITOR
+            if (view.WindowType != WindowTypeEnum.Widget)
+            {
+                Debug.LogError("OpenWidget Fail,Not Page Window " + view.name);
+                return;
+            }
+#endif
+
+            if (parentTrans == null)
+                parentTrans = UIManagerHelper.Instance.UICanvasTrans;
+
+            if (m_AllWidgetView.ContainsKey(parentTrans))
+            {
+
+#if UNITY_EDITOR
+                foreach (var item in m_AllWidgetView[parentTrans])
+                {
+                    if (item == null)
+                        Debug.LogError("存在已经销毁的Widget  view=" + view + "  parentTrans=" + parentTrans);
+                }
+#endif
+                #region 当前Widget 存在
+                if (isSingleton)
+                {
+                    if (m_AllWidgetView[parentTrans].Count > 1)
+                    {
+                        Debug.LogError("OpenWidget  Fail,Not Singlton Widget" + view.name);
+                        return;
+                    }
+                    if (m_AllWidgetView[parentTrans].Count == 0)
+                        m_AllWidgetView[parentTrans].Add(view);
+
+                    ShowWidgetView(view, parentTrans, showTime, isSingleton);
+                }
+                else
+                {
+                    m_AllWidgetView[parentTrans].Add(view);
+                    ShowWidgetView(view, parentTrans, showTime, isSingleton);
+                }
+                #endregion
+            }
+            else
+            {
+                #region 当前Widget 第一次创建
+                List<UIBaseWidgetView> widgetViews = new List<UIBaseWidgetView>();
+                widgetViews.Add(view);
+                m_AllWidgetView.Add(parentTrans, widgetViews);
+
+                ShowWidgetView(view, parentTrans, showTime, isSingleton);
+                #endregion
+            }
+
+        }
+
+        /// <summary>
+        /// 显示Widget 
+        /// </summary>
+        /// <param name="view"></param>
+        /// <param name="parentTrans"></param>
+        /// <param name="showTime"></param>
+        /// <param name="isSingleton"></param>
+        /// <param name="parameter"></param>
+        private void ShowWidgetView(UIBaseWidgetView view, Transform parentTrans, float showTime, bool isSingleton, params object[] parameter)
+        {
+            view.rectransform.SetParent(parentTrans);
+            view.rectransform.ResetRectTransProperty();
+            if (view.IsOpen)
+                view.FlushWindow(parameter);
+            else
+                view.ShowWindow(parentTrans, showTime, isSingleton, parameter);
+        }
+
+
+        /// <summary>
+        /// 关闭打开的Widget  
+        /// </summary>
+        /// <param name="view"></param>
+        /// <param name="isDestroyWidget"></param>
+        public void CloseWidget(UIBaseWidgetView view,bool isDestroyWidget, params object[] parameter)
+        {
+            if(m_AllWidgetView.ContainsKey(view.BelongParent)==false)
+            {
+                Debug.LogError("CloseWidget Fail,Not Exit " + view.name);
+                return;
+            }
+
+            int Index = -1;
+            for (int dex=0;dex< m_AllWidgetView[view.BelongParent].Count;++dex)
+            {
+                if (m_AllWidgetView[view.BelongParent][dex]==view)
+                {
+                    Index = dex;
+                    break;
+                }
+            }
+
+            if (Index == -1)
+            {
+                Debug.LogError("CloseWidget Fail,Not Exit " + view.name);
+                return;
+            }
+
+            view.HideWindow(isDestroyWidget, parameter);
+            if (isDestroyWidget)
+            {
+                m_AllWidgetView[view.BelongParent].RemoveAt(Index);
+            }
+
+        }
+
+
+        /// <summary>
+        /// 关闭所有关联改物体的Widget
+        /// </summary>
+        /// <param name="targetTrans"></param>
+        public void CloseAttachWidget(Transform targetTrans, bool isDestroyWidget, params object[] parameter)
+        {
+            if (m_AllWidgetView.ContainsKey(targetTrans) == false) return;
+            for (int dex=0;dex< m_AllWidgetView[targetTrans].Count;++dex)
+            {
+                m_AllWidgetView[targetTrans][dex].HideWindow(isDestroyWidget, parameter);
+            }
+
+            if (isDestroyWidget)
+                m_AllWidgetView[targetTrans].Clear();
+        }
+
+        #endregion
+
         #endregion
 
         #region 创建/获取UI
@@ -574,7 +663,7 @@ namespace GameFrameWork
                 Debug.LogError("CreateUI Fail, View Path Is Not Avaliable");
                 return;
             }
-            ResourcesMgr.Instance.Instantiate(viewPath, parentTrans, (obj) =>
+            ResourcesMgr.Instance.Instantiate(viewPath, parentTrans, LoadAssetModel.Async, (obj) =>
             {
                 if (obj != null && string.IsNullOrEmpty(viewName) == false)
                     obj.name = viewName;

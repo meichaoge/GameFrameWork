@@ -23,7 +23,7 @@ namespace GameFrameWork
         /// <param name="isResetTransProperty">默认为tue 标识是否重置生成对象的Transform 属性</param>
         /// 
         /// <returns></returns>
-        public void Instantiate(string url, Transform parent, System.Action<GameObject> callback, bool isActivate = true, bool isResetTransProperty = true)
+        public void Instantiate(string url, Transform parent, LoadAssetModel loadModel, System.Action<GameObject> callback, bool isActivate = true, bool isResetTransProperty = true)
         {
             if (string.IsNullOrEmpty(url))
             {
@@ -33,47 +33,47 @@ namespace GameFrameWork
             }
 
 
-            PrefabLoader.LoadAsset(parent, url, (loader) =>
-            {
+            PrefabLoader.LoadAsset(parent, url, loadModel, (loader) =>
+             {
                 #region  加载成功后的处理逻辑
                 ResourcesLoadTraceMgr.Instance.RecordTraceResourceInfor(loader);
-                if (loader == null || (loader.IsCompleted && loader.IsError))
-                {
-                    Debug.LogError("Instantiate  GameObject Fail,Not Exit At Path= " + url);
-                    if (callback != null)
-                        callback.Invoke(null);
-                    return;
-                } //加载资源出错
+                 if (loader == null || loader.ResultObj == null || (loader.IsCompleted && loader.IsError))
+                 {
+                     Debug.LogError("Instantiate  GameObject Fail,Not Exit At Path= " + url);
+                     if (callback != null)
+                         callback.Invoke(null);
+                     return;
+                 } //加载资源出错
                 GameObject prefabGo = loader.ResultObj as GameObject;
-                if (prefabGo == null)
-                {
-                    Debug.LogError("Instantiate  GameObject Fail,Load Result Not GameObject Type " + loader.ResultObj.GetType());
-                    if (callback != null)
-                        callback.Invoke(null);
-                    return;
-                }
-                if (isActivate == false)
-                    prefabGo.SetActive(false);  //临时改变预制体资源的可见性 返回前恢复
+                 if (prefabGo == null)
+                 {
+                     Debug.LogError("Instantiate  GameObject Fail,Load Result Not GameObject Type " + loader.ResultObj.GetType());
+                     if (callback != null)
+                         callback.Invoke(null);
+                     return;
+                 }
+                 if (isActivate == false)
+                     prefabGo.SetActive(false);  //临时改变预制体资源的可见性 返回前恢复
                 GameObject go = GameObject.Instantiate(prefabGo, parent);
-                go.name = prefabGo.name;
+                 go.name = prefabGo.name;
 
-                if(isResetTransProperty)
-                {
-                    if(go.transform is RectTransform)
-                    {
-                        (go.transform as RectTransform).ResetRectTransProperty();
-                    }
-                    else
-                    {
-                        go.transform.ResetTransProperty();
-                    }
-                }
+                 if (isResetTransProperty)
+                 {
+                     if (go.transform is RectTransform)
+                     {
+                         (go.transform as RectTransform).ResetRectTransProperty();
+                     }
+                     else
+                     {
+                         go.transform.ResetTransProperty();
+                     }
+                 }
 
-                if (isActivate == false)
-                    prefabGo.SetActive(true);  //恢复可见性
+                 if (isActivate == false)
+                     prefabGo.SetActive(true);  //恢复可见性
 
                 if (callback != null)
-                    callback.Invoke(go);
+                     callback.Invoke(go);
 
                 #endregion
             });
@@ -85,7 +85,7 @@ namespace GameFrameWork
         /// <param name="targetImag"></param>
         /// <param name="url"></param>
         /// <param name="callback"></param>
-        public void LoadSprite(UnityEngine.UI.Image targetImag, string url, System.Action<Sprite> callback)
+        public void LoadSprite(string url, UnityEngine.UI.Image targetImag, LoadAssetModel loadModel, System.Action<Sprite> callback)
         {
             if (targetImag == null)
             {
@@ -101,21 +101,21 @@ namespace GameFrameWork
             }
 
 
-            SpriteLoader.LoadAsset(targetImag.transform, url, (loader) =>
-            {
+            SpriteLoader.LoadAsset(targetImag.transform, url, loadModel, (loader) =>
+             {
                 #region  加载成功后的处理逻辑
                 ResourcesLoadTraceMgr.Instance.RecordTraceResourceInfor(loader);
-                if (loader == null || (loader.IsCompleted && loader.IsError))
-                {
-                    Debug.LogError("LoadSprite   Fail,Not Exit At Path= " + url);
-                    if (callback != null)
-                        callback.Invoke(null);
-                    return;
-                } //加载资源出错
+                 if (loader == null || (loader.IsCompleted && loader.IsError))
+                 {
+                     Debug.LogError("LoadSprite   Fail,Not Exit At Path= " + url);
+                     if (callback != null)
+                         callback.Invoke(null);
+                     return;
+                 } //加载资源出错
 
                 targetImag.sprite = loader.ResultObj as Sprite;
-                if (callback != null)
-                    callback.Invoke(targetImag.sprite);
+                 if (callback != null)
+                     callback.Invoke(targetImag.sprite);
                 #endregion
             });
         }
@@ -125,7 +125,7 @@ namespace GameFrameWork
         /// </summary>
         /// <param name="url"></param>
         /// <param name="callback"></param>
-        public void LoadFile(string url, System.Action<string> callback)
+        public void LoadFile(string url, LoadAssetModel loadModel, System.Action<string> callback)
         {
             if (string.IsNullOrEmpty(url))
             {
@@ -134,30 +134,31 @@ namespace GameFrameWork
                 return;
             }
 
-            TextAssetLoader.LoadAsset(url, (loader) =>
-           {
-               ResourcesLoadTraceMgr.Instance.RecordTraceResourceInfor(loader);
+            TextAssetLoader.LoadAsset(url, loadModel, (loader) =>
+            {
+                ResourcesLoadTraceMgr.Instance.RecordTraceResourceInfor(loader);
                #region  加载成功后的处理逻辑
                if (loader == null || (loader.IsCompleted && loader.IsError))
-               {
-                   Debug.LogError("LoadFile   Fail,Not Exit At Path= " + url);
-                   if (callback != null)
-                       callback.Invoke(null);
-                   return;
-               } //加载资源出错
+                {
+                    Debug.LogInfor("LoadFile   Fail,Not Exit At Path= " + url);
+                    if (callback != null)
+                        callback.Invoke(null);
+                    return;
+                } //加载资源出错
 
                if (callback != null)
-                   callback.Invoke(loader.ResultObj.ToString());
+                    callback.Invoke(loader.ResultObj.ToString());
                #endregion
            });
         }
+
 
         /// <summary>
         /// 加载字体资源
         /// </summary>
         /// <param name="url"></param>
         /// <param name="callback"></param>
-        public void LoadFont(string url, System.Action<Font> callback)
+        public void LoadFont(string url, LoadAssetModel loadModel, System.Action<Font> callback)
         {
             if (string.IsNullOrEmpty(url))
             {
@@ -166,20 +167,20 @@ namespace GameFrameWork
                 return;
             }
 
-            FontLoader.LoadAsset(url, (loader) =>
-            {
-                ResourcesLoadTraceMgr.Instance.RecordTraceResourceInfor(loader);
+            FontLoader.LoadFontAsset(url, loadModel, (loader) =>
+             {
+                 ResourcesLoadTraceMgr.Instance.RecordTraceResourceInfor(loader);
                 #region  加载成功后的处理逻辑
                 if (loader == null || (loader.IsCompleted && loader.IsError))
-                {
-                    Debug.LogError("LoadFont   Fail,Not Exit At Path= " + url);
-                    if (callback != null)
-                        callback.Invoke(null);
-                    return;
-                } //加载资源出错
+                 {
+                     Debug.LogError("LoadFont   Fail,Not Exit At Path= " + url);
+                     if (callback != null)
+                         callback.Invoke(null);
+                     return;
+                 } //加载资源出错
 
                 if (callback != null)
-                    callback.Invoke(loader.ResultObj as Font);
+                     callback.Invoke(loader.ResultObj as Font);
                 #endregion
             });
         }
@@ -189,7 +190,7 @@ namespace GameFrameWork
         /// <param name="url"></param>
         /// <param name="target"></param>
         /// <param name="callback"></param>
-        public void LoadMaterial(string url, Transform target, System.Action<Material> callback)
+        public void LoadMaterial(string url, Transform target, LoadAssetModel loadModel, System.Action<Material> callback)
         {
             if (string.IsNullOrEmpty(url))
             {
@@ -197,26 +198,63 @@ namespace GameFrameWork
                     callback(null);
                 return;
             }
-            MaterialLoader.LoadAsset(target, url, (loader) =>
-            {
-                ResourcesLoadTraceMgr.Instance.RecordTraceResourceInfor(loader);
+            MaterialLoader.LoadAsset(target, url, loadModel, (loader) =>
+             {
+                 ResourcesLoadTraceMgr.Instance.RecordTraceResourceInfor(loader);
                 #region  加载成功后的处理逻辑
                 if (loader == null || (loader.IsCompleted && loader.IsError))
-                {
-                    Debug.LogError("LoadMaterial   Fail,Not Exit At Path= " + url);
-                    if (callback != null)
-                        callback.Invoke(null);
-                    return;
-                } //加载资源出错
+                 {
+                     Debug.LogError("LoadMaterial   Fail,Not Exit At Path= " + url);
+                     if (callback != null)
+                         callback.Invoke(null);
+                     return;
+                 } //加载资源出错
 
 
                 Material mat = loader.ResultObj as Material;
 
-                if (callback != null)
-                    callback.Invoke(mat);
+                 if (callback != null)
+                     callback.Invoke(mat);
                 #endregion
             });
         }
+
+        /// <summary>
+        /// 加载声音资源
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="parent"></param>
+        /// <param name="callback"></param>
+        public void LoadAudio(string url, Transform parent, LoadAssetModel loadModel, System.Action<AudioClip> callback)
+        {
+            if (string.IsNullOrEmpty(url))
+            {
+                if (callback != null)
+                    callback(null);
+                return;
+            }
+
+            AudioLoader.LoadAudioClip(parent, url, loadModel, (loader) =>
+             {
+                 ResourcesLoadTraceMgr.Instance.RecordTraceResourceInfor(loader);
+                #region  加载成功后的处理逻辑
+                if (loader == null || (loader.IsCompleted && loader.IsError))
+                 {
+                     Debug.LogError("LoadMaterial   Fail,Not Exit At Path= " + url);
+                     if (callback != null)
+                         callback.Invoke(null);
+                     return;
+                 } //加载资源出错
+
+
+                AudioClip clip = loader.ResultObj as AudioClip;
+
+                 if (callback != null)
+                     callback.Invoke(clip);
+                #endregion
+            });
+        }
+
 
         /// <summary>
         /// 根据场景资源路径加载场景(可能是AssetBundle 中的场景)
@@ -224,7 +262,7 @@ namespace GameFrameWork
         /// <param name="url"></param>
         /// <param name="loadModel">加载模式</param>
         /// <param name="callback"></param>
-        public void LoadScene(string url, LoadSceneMode loadModel, System.Action callback)
+        public void LoadScene(string url, LoadSceneMode loadModel, LoadAssetModel loadassetModel, System.Action callback)
         {
             if (string.IsNullOrEmpty(url))
             {
@@ -233,19 +271,19 @@ namespace GameFrameWork
                 return;
             }
 
-            SceneLoader.LoadScene(url, (loader) =>
-           {
+            SceneLoader.LoadScene(url, loadassetModel, (loader) =>
+            {
                // ResourcesLoadTraceMgr.Instance.RecordTraceResourceInfor(loader);
                #region  加载成功后的处理逻辑
                if (loader == null || (loader.IsCompleted && loader.IsError))
-               {
-                   Debug.LogError("LoadMaterial   Fail,Not Exit At Path= " + url);
-                   if (callback != null)
-                       callback.Invoke();
-                   return;
-               } //加载资源出错
+                {
+                    Debug.LogError("LoadMaterial   Fail,Not Exit At Path= " + url);
+                    if (callback != null)
+                        callback.Invoke();
+                    return;
+                } //加载资源出错
                string sceneName = System.IO.Path.GetFileNameWithoutExtension(url);
-               ApplicationMgr.Instance.StartCoroutine(LoadSceneAsync(sceneName, loadModel, callback));
+                EventCenter.Instance.StartCoroutine(LoadSceneAsync(sceneName, loadModel, callback));
                #endregion
            });
         }
@@ -257,7 +295,6 @@ namespace GameFrameWork
             if (callback != null)
                 callback.Invoke();
         }
-
 
 
         #endregion

@@ -1,0 +1,9 @@
+[
+  {
+    "ButtonAudio": 0,
+    "AudioPath": "Audio/UIAudio/MVT_Click_B",
+    "AudioName": "MVT_Click_B",
+    "Volume": "0.5",
+    "IsLoop": false
+  }
+]

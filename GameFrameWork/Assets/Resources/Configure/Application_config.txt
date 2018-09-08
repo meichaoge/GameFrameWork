@@ -1,3 +1,4 @@
 {
-
+  "LanguageType": 0,
+  "LogLevl": 0
 }

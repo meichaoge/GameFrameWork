@@ -40,17 +40,6 @@ namespace GameFrameWork.ResourcesLoader
 
         protected string m_AssetFileName = ""; //实际加载AssetBundle 时候的文件名称(考虑到加载整个AssetBundle 中一个资源的情况)
 
-        //   protected List<AssetBundleLoader> m_AllDependenceAssetLoader = new List<AssetBundleLoader>();  //当前AssetBundle 所有依赖的加载器
-        // protected Dictionary<AssetBundleLoader, Coroutine> m_AllDepdenceLoadAssetCoroutine = new Dictionary<AssetBundleLoader, Coroutine>(); //加载时候启动的协程
-
-        //public override void InitialLoader()
-        //{
-        //    base.InitialLoader();
-        //    if (AssetBundleMgr.Instance.S_AssetBundleManifest == null)
-        //    {
-        //        Debug.LogInfor("加载  AssetBundleManifest...");
-        //    }
-        //}
 
         /// <summary>
         /// 检测这个url 对应的资源是否存在 (会检测资源路径扩展名是否是。unity3d,)
@@ -86,28 +75,36 @@ namespace GameFrameWork.ResourcesLoader
             return AssetBundleExitState.None;
         }
 
-        ///// <summary>
-        ///// 处理释放资源和结束协程
-        ///// </summary>
-        //public override void ReleaseLoader()
-        //{
-        //    base.ReleaseLoader();
-        //    for (int dex = 0; dex < m_AllDependenceAssetLoader.Count; ++dex)
-        //    {
-        //        m_AllDependenceAssetLoader[dex].ReduceReference(m_AllDependenceAssetLoader[dex], false);
-        //    }
-        //    m_AllDependenceAssetLoader.Clear();
-
-        //    foreach (var item in m_AllDepdenceLoadAssetCoroutine)
-        //    {
-        //        ApplicationMgr.Instance.StopCoroutine(item.Value);
-        //    }
-        //    m_AllDepdenceLoadAssetCoroutine.Clear();
-        //}
-
-
 
         #region 加载AssetBundle 资源
+        /// <summary>
+        /// AssetBundle 加载资源
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="assetFileName"></param>
+        /// <param name="loadModel"></param>
+        /// <param name="onCompleteAct"></param>
+        /// <param name="isloadSceneAsset"></param>
+        /// <returns></returns>
+        public static AssetBundleLoader LoadAssetBundleAsset(string url, string assetFileName, LoadAssetModel loadModel, System.Action<BaseAbstracResourceLoader> onCompleteAct, bool isloadSceneAsset)
+        {
+            switch (loadModel)
+            {
+                case LoadAssetModel.None:
+                    Debug.LogError("异常的加载默认  LoadAssetModel.None 是默认的值 ，使用前请正确赋值");
+                    return null;
+                case LoadAssetModel.Sync:
+                    return LoadAssetBundleAssetAsync(url, assetFileName, onCompleteAct, isloadSceneAsset);
+                case LoadAssetModel.Async:
+                    return LoadAssetBundleAssetSync(url, assetFileName, onCompleteAct, isloadSceneAsset);
+                default:
+                    Debug.LogError("没有定义的加载类型 " + loadModel);
+                    return null;
+            }
+        }
+
+
+        #region 异步加载
 
         /// <summary>
         /// 加载AssetBundle 资源
@@ -117,7 +114,7 @@ namespace GameFrameWork.ResourcesLoader
         /// <param name="onCompleteAct">加载完成回调</param>
         ///  <param name="isloadSceneAsset"> 如果加载的是场景 则这里必须填true ,否则false</param>
         /// <returns></returns>
-        public static AssetBundleLoader LoadAssetBundleAsset(string url, string assetFileName, System.Action<BaseAbstracResourceLoader> onCompleteAct, bool isloadSceneAsset)
+        private static AssetBundleLoader LoadAssetBundleAssetAsync(string url, string assetFileName, System.Action<BaseAbstracResourceLoader> onCompleteAct, bool isloadSceneAsset)
         {
             if (string.IsNullOrEmpty(url))
             {
@@ -128,6 +125,7 @@ namespace GameFrameWork.ResourcesLoader
             bool isLoaderExit = false;
             AssetBundleLoader assetBundleLoader = ResourcesLoaderMgr.GetOrCreateLoaderInstance<AssetBundleLoader>(url, ref isLoaderExit);
             assetBundleLoader.m_OnCompleteAct.Add(onCompleteAct);
+            assetBundleLoader.LoadassetModel = LoadAssetModel.Async; //这里貌似没必要（由于异步加载时候同步加载必定完成了）
 
             if (isLoaderExit)
             {
@@ -136,70 +134,15 @@ namespace GameFrameWork.ResourcesLoader
                 return assetBundleLoader;  //如果已经存在 且当前加载器还在加载中，则只需要等待加载完成则回调用回调
             }
             assetBundleLoader.m_AssetFileName = assetFileName;
-            assetBundleLoader.m_LoadAssetCoroutine = ApplicationMgr.Instance.StartCoroutine(assetBundleLoader.LoadAssetBundleASync(url, assetFileName, isloadSceneAsset));
+            assetBundleLoader.m_LoadAssetCoroutine = EventCenter.Instance.StartCoroutine(assetBundleLoader.LoadAssetBundleASync(url, assetFileName, isloadSceneAsset));
             return assetBundleLoader;
-        }
-
-        /// <summary>
-        /// 同步加载资源
-        /// </summary>
-        /// <param name="url"></param>
-        protected void LoadAssetBundleSync(string url, AssetBundleLoader assetBundleLoader)
-        {
-            //string assetName = url;
-            //if (System.IO.Path.GetExtension(assetName) != ConstDefine.AssetBundleExtensionName)
-            //    assetName += ConstDefine.AssetBundleExtensionName;  //组合上扩展名
-
-            //string[] dependenceAssets = AssetBundleMgr.Instance.S_AssetBundleManifest.GetAllDependencies(url);  //获取所有的依赖文件
-            //List<AssetBundleLoader> allDependenceAssetLoader = new List<AssetBundleLoader>();  //所有依赖文件的加载器
-            //foreach (var item in dependenceAssets)
-            //{
-
-            //    bool isLoaderExit = false;
-            //    AssetBundleLoader subAssetBundleLoader = ResourcesLoaderMgr.GetLoaderInstance<AssetBundleLoader>(item, ref isLoaderExit);
-
-            //    if (isLoaderExit)
-            //    {
-            //        if (assetBundleLoader.IsCompleted)
-            //            assetBundleLoader.OnCompleteLoad(assetBundleLoader.IsError, assetBundleLoader.Description, assetBundleLoader.ResultObj);  //如果当前加载器已经完成加载 则手动触发事件
-            //        else
-            //        {
-            //            Debug.LogError("LoadAssetBundleSync  有相同URL 的资源正在异步加载。同步加载资源失败  TODO ");
-            //        }
-            //        return ;  //如果已经存在 且当前加载器还在加载中，则只需要等待加载完成则回调用回调
-            //    }
-
-            //    allDependenceAssetLoader.Add(assetBundleLoader));
-            //} //递归加载资源的依赖项
-
-            //for (int dex=0;dex< allDependenceAssetLoader.Count;++dex)
-            //{
-            //    if(allDependenceAssetLoader[dex].IsError)
-            //    {
-            //        Debug.LogError("LoadAssetBundleSync  Fail, 依赖的 AssetBundle 资源不存在 " + allDependenceAssetLoader[dex].m_ResourcesUrl);
-            //        OnCompleteLoad(false, string.Format("LoadAssetBundle Fail,AssetBundle Path=" + assetBundleLoader.m_ResourcesUrl), null);
-            //        return assetBundleLoader;
-            //    }
-            //} //判断依赖项是否加载完成
-
-            //ByteLoader byteLoader = ByteLoader.LoadAsset(S_AssetBundleTopPath + url, null, LoadAssetModel.Sync);  //加载资源
-            //if(byteLoader.IsError)
-            //{
-            //    OnCompleteLoad(false, string.Format("LoadAssetBundle Fail, AssetBundle Path=" + (S_AssetBundleTopPath + url)), null);
-            //    return null;
-            //}
-
-            //ResultObj = AssetBundle.LoadFromMemory(byteLoader.ResultBytes, 0); 
-            //OnCompleteLoad(ResultObj==null,string.Format("LoadAssetBundleSuccess "+assetName), ResultObj);
-            //Debug.LogInfor("加载AssetBundle  成功");
-            //return assetBundleLoader;
         }
 
         /// <summary>
         /// 异步加载资源 (这里处理的是最外层的AssetBundle ,当前资源依赖的AssetBundle 处理在LoadDepdenceAssetBundleAsync)
         /// </summary>
         /// <param name="url"></param>
-        protected IEnumerator LoadAssetBundleASync(string url, string assetFileName, bool isloadScene )
+        protected IEnumerator LoadAssetBundleASync(string url, string assetFileName, bool isloadScene)
         {
             m_ResourcesUrl = url;
             if (System.IO.Path.GetExtension(m_ResourcesUrl) != ConstDefine.AssetBundleExtensionName)
@@ -218,9 +161,7 @@ namespace GameFrameWork.ResourcesLoader
                     continue;  //已经存在了 则继续
                 }
                 allDependenceAssetLoader.Add(subAssetBundleLoader);
-              //  Coroutine corou = 
-                    ApplicationMgr.Instance.StartCoroutine(LoadDepdenceAssetBundleAsync(item, subAssetBundleLoader));
-            //    subAssetBundleLoader.m_AllDepdenceLoadAssetCoroutine.Add(subAssetBundleLoader, corou);  //记录依赖的资源
+                EventCenter.Instance.StartCoroutine(LoadDepdenceAssetBundleAsync(item, subAssetBundleLoader));
             } //递归加载资源的依赖项
 
 
@@ -228,9 +169,6 @@ namespace GameFrameWork.ResourcesLoader
             {
                 while (allDependenceAssetLoader[dex].IsCompleted == false)
                     yield return null;
-
-             //   allDependenceAssetLoader[dex].m_AllDepdenceLoadAssetCoroutine.Remove(allDependenceAssetLoader[dex]);  //加载完成移除协程
-
 
                 if (allDependenceAssetLoader[dex].IsError)
                 {
@@ -240,9 +178,9 @@ namespace GameFrameWork.ResourcesLoader
                 }
             } //判断依赖项是否加载完成
             #endregion
-            //Debug.Log("AAAAAAAAAAAA " + IsCompleted);
+
             #region WWWLoader 加载
-            WWWLoader wwwLoader = WWWLoader.WWWLoadAsset(S_AssetBundleTopPath, m_ResourcesUrl, null);
+            WWWLoader wwwLoader = WWWLoader.WWWLoadAsset(S_AssetBundleTopPath, LoadAssetModel.Async, m_ResourcesUrl, null);
             while (wwwLoader.IsCompleted == false)
                 yield return null;
 
@@ -289,9 +227,7 @@ namespace GameFrameWork.ResourcesLoader
                     continue;
                 }
                 allDependenceAssetLoader.Add(subAssetBundleLoader);
-              //  Coroutine corou = 
-                    ApplicationMgr.Instance.StartCoroutine(LoadDepdenceAssetBundleAsync(item, subAssetBundleLoader));
-           //     subAssetBundleLoader.m_AllDepdenceLoadAssetCoroutine.Add(subAssetBundleLoader, corou);  //记录依赖的资源
+                EventCenter.Instance.StartCoroutine(LoadDepdenceAssetBundleAsync(item, subAssetBundleLoader));
             } //递归加载资源的依赖项
 
 
@@ -299,8 +235,6 @@ namespace GameFrameWork.ResourcesLoader
             {
                 while (allDependenceAssetLoader[dex].IsCompleted == false)
                     yield return null;
-
-              //  allDependenceAssetLoader[dex].m_AllDepdenceLoadAssetCoroutine.Remove(allDependenceAssetLoader[dex]);  //加载完成移除协程
 
                 if (allDependenceAssetLoader[dex].IsError)
                 {
@@ -311,7 +245,7 @@ namespace GameFrameWork.ResourcesLoader
             } //判断依赖项是否加载完成
 
             #region WWWLoader 
-            WWWLoader wwwLoader = WWWLoader.WWWLoadAsset(S_AssetBundleTopPath, depdebceAssetBundleLoader.m_ResourcesUrl, null);
+            WWWLoader wwwLoader = WWWLoader.WWWLoadAsset(S_AssetBundleTopPath, LoadAssetModel.Async, depdebceAssetBundleLoader.m_ResourcesUrl, null);
             while (wwwLoader.IsCompleted == false)
                 yield return null;
 
@@ -321,8 +255,24 @@ namespace GameFrameWork.ResourcesLoader
                 WWWLoader.UnLoadAsset(wwwLoader.m_ResourcesUrl);
                 yield break;
             }
-
-            ResultObj = (wwwLoader.ResultObj as WWW).assetBundle;//.LoadAsset(System.IO.Path.GetFileNameWithoutExtension(assetName));  //AssetBundle 依赖的资源不需要加载后去调用LoadAsset
+            if (wwwLoader == null || wwwLoader.ResultObj == null || wwwLoader.ResultObj is WWW == false)
+            {
+                Debug.LogInfor("m_ResourcesUrl=" + m_ResourcesUrl);
+                Debug.Log("1111" + (wwwLoader.ResultObj).GetType() + "  url" + wwwLoader.m_ResourcesUrl);
+            }
+            if ((wwwLoader.ResultObj).GetType() == typeof(WWW))
+            {
+                ResultObj = (wwwLoader.ResultObj as WWW).assetBundle;
+            }
+            else if ((wwwLoader.ResultObj).GetType() == typeof(AssetBundle))
+            {
+                ResultObj = wwwLoader.ResultObj as AssetBundle;
+            }
+            else
+            {
+                ResultObj = null;
+            }
+            //   ResultObj = (wwwLoader.ResultObj as WWW).assetBundle;//.LoadAsset(System.IO.Path.GetFileNameWithoutExtension(assetName));  //AssetBundle 依赖的资源不需要加载后去调用LoadAsset
             wwwLoader.OnCompleteLoad(ResultObj == null, string.Format("[AssetBundleLoader] LoadAssetBundleSuccess " + depdebceAssetBundleLoader.m_ResourcesUrl), ResultObj, true);
             //       WWWLoader.UnLoadAsset(wwwLoader.m_ResourcesUrl);   //***注意这里不能卸载资源 否则下次加载AssetBundle 出问题
             #endregion
@@ -331,6 +281,158 @@ namespace GameFrameWork.ResourcesLoader
             //Debug.LogInfor("加载AssetBundle  成功");
             yield break;
         }
+        #endregion
+
+        #region 同步加载
+        /// <summary>
+        /// （同步加载）加载AssetBundle 资源
+        /// </summary>
+        /// <param name="url">相对于AseetBundle 资源存放路径的路径 (如果是打包成整个预制体则是整个预制体的路径)</param>
+        /// <param name="assetFileName">实际加载AssetBundle 时候的文件名称(考虑到加载整个AssetBundle 中一个资源的情况)</param>
+        /// <param name="onCompleteAct">加载完成回调</param>
+        ///  <param name="isloadSceneAsset"> 如果加载的是场景 则这里必须填true ,否则false</param>
+        /// <returns></returns>
+        private static AssetBundleLoader LoadAssetBundleAssetSync(string url, string assetFileName, System.Action<BaseAbstracResourceLoader> onCompleteAct, bool isloadSceneAsset)
+        {
+            if (string.IsNullOrEmpty(url))
+            {
+                Debug.LogError(string.Format("Url Can't Be Null , TypeLoader={0}", typeof(AssetBundleLoader)));
+                return null;
+            }
+            Debug.LogInfor("LoadAssetBundleAsset  url=" + url + "    assetFileName=" + assetFileName);
+            bool isLoaderExit = false;
+            AssetBundleLoader assetBundleLoader = ResourcesLoaderMgr.GetOrCreateLoaderInstance<AssetBundleLoader>(url, ref isLoaderExit);
+            assetBundleLoader.m_OnCompleteAct.Add(onCompleteAct);
+
+            if (isLoaderExit && assetBundleLoader.IsCompleted)
+            {
+                assetBundleLoader.LoadassetModel = LoadAssetModel.Sync;
+                assetBundleLoader.OnCompleteLoad(assetBundleLoader.IsError, assetBundleLoader.Description, assetBundleLoader.ResultObj, true);  //如果当前加载器已经完成加载 则手动触发事件
+                return assetBundleLoader;  //如果已经存在 且当前加载器还在加载中，则只需要等待加载完成则回调用回调
+            }
+            if (assetBundleLoader.LoadassetModel == LoadAssetModel.Async)
+            {
+                assetBundleLoader.ForceBreakLoaderProcess();
+            } //结束之前的加载进程
+
+            assetBundleLoader.LoadassetModel = LoadAssetModel.Sync;
+            assetBundleLoader.m_AssetFileName = assetFileName;
+            assetBundleLoader.m_LoadAssetCoroutine = null;
+            assetBundleLoader.LoadAssetBundleSync(url, assetFileName, isloadSceneAsset);
+            return assetBundleLoader;
+        }
+
+        /// <summary>
+        /// 同步加载资源 (这里处理的是最外层的AssetBundle ,当前资源依赖的AssetBundle 处理在LoadDepdenceAssetBundleAsync)
+        /// </summary>
+        /// <param name="url"></param>
+        protected void LoadAssetBundleSync(string url, string assetFileName, bool isloadScene)
+        {
+            m_ResourcesUrl = url;
+            if (System.IO.Path.GetExtension(m_ResourcesUrl) != ConstDefine.AssetBundleExtensionName)
+                m_ResourcesUrl += ConstDefine.AssetBundleExtensionName;  //组合上扩展名
+
+            #region  加载依赖的资源
+            string[] dependenceAssets = AssetBundleMgr.Instance.S_AssetBundleManifest.GetAllDependencies(m_ResourcesUrl);  //获取所有的依赖文件
+            List<AssetBundleLoader> allDependenceAssetLoader = new List<AssetBundleLoader>();  //所有依赖文件的加载器
+            foreach (var item in dependenceAssets)
+            {
+                bool isLoaderExit = false;
+                AssetBundleLoader subAssetBundleLoader = ResourcesLoaderMgr.GetOrCreateLoaderInstance<AssetBundleLoader>(item, ref isLoaderExit);
+                if (isLoaderExit && subAssetBundleLoader.IsCompleted)
+                {
+                    Debug.LogEditorInfor("LoadAssetBundleASync Exit ," + item);
+                    continue;  //已经存在了 则继续
+                }
+                allDependenceAssetLoader.Add(subAssetBundleLoader);
+                LoadDepdenceAssetBundleSync(item, subAssetBundleLoader);
+            } //递归加载资源的依赖项
+
+
+            for (int dex = 0; dex < allDependenceAssetLoader.Count; ++dex)
+            {
+                if (allDependenceAssetLoader[dex].IsError)
+                {
+                    Debug.LogError("[AssetBundleLoader] LoadAssetBundleSync  Fail, 依赖的 AssetBundle 资源不存在 " + allDependenceAssetLoader[dex].m_ResourcesUrl);
+                    OnCompleteLoad(false, string.Format("[AssetBundleLoader] LoadAssetBundle Fail,AssetBundle Path= {0}", allDependenceAssetLoader[dex].m_ResourcesUrl), null, true);
+                    break;
+                }
+            } //判断依赖项是否加载完成
+            #endregion
+
+
+            #region   AssetBundle  同步加载 
+            AssetBundle assetBundle = AssetBundle.LoadFromFile(S_AssetBundleTopPath + m_ResourcesUrl);
+            if (assetBundle == null)
+            {
+                ResultObj = null;
+                OnCompleteLoad(true, string.Format("同步加载本地AssetBundle 失败{0}", url), null, true, 1);
+                return;
+            }
+
+            if (isloadScene)
+                ResultObj = assetBundle;  //场景资源返回AssetBundle 使用不同的API加载
+            else
+                ResultObj = assetBundle.LoadAsset(System.IO.Path.GetFileNameWithoutExtension(assetFileName));  //
+            OnCompleteLoad(ResultObj == null, string.Format("[AssetBundleLoader] LoadAssetBundleSuccess  {0}", m_ResourcesUrl), ResultObj, true);
+            #endregion
+
+            Debug.LogInfor("加载AssetBundle  成功");
+        }
+
+        /// <summary>
+        /// (同步)加载当前AssetBundle 依赖的资源(注意 ： 这里加载成功之后不能直接生成)
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="assetBundleLoade"></param>
+        /// <returns></returns>
+        protected virtual void LoadDepdenceAssetBundleSync(string url, AssetBundleLoader depdebceAssetBundleLoader)
+        {
+            depdebceAssetBundleLoader.m_ResourcesUrl = url;
+            if (System.IO.Path.GetExtension(depdebceAssetBundleLoader.m_ResourcesUrl) != ConstDefine.AssetBundleExtensionName)
+                depdebceAssetBundleLoader.m_ResourcesUrl += ConstDefine.AssetBundleExtensionName;  //组合上扩展名
+
+            string[] dependenceAssets = AssetBundleMgr.Instance.S_AssetBundleManifest.GetAllDependencies(depdebceAssetBundleLoader.m_ResourcesUrl);  //获取所有的依赖文件
+            List<AssetBundleLoader> allDependenceAssetLoader = new List<AssetBundleLoader>();  //所有依赖文件的加载器
+            foreach (var item in dependenceAssets)
+            {
+                bool isLoaderExit = false;
+                AssetBundleLoader subAssetBundleLoader = ResourcesLoaderMgr.GetOrCreateLoaderInstance<AssetBundleLoader>(item, ref isLoaderExit);
+
+                if (isLoaderExit && subAssetBundleLoader.IsCompleted)
+                {
+                    Debug.LogEditorInfor("LoadDepdenceAssetBundleAsync Exit ," + item);
+                    continue;
+                }
+                allDependenceAssetLoader.Add(subAssetBundleLoader);
+                LoadDepdenceAssetBundleSync(item, subAssetBundleLoader);
+            } //递归加载资源的依赖项
+
+
+            for (int dex = 0; dex < allDependenceAssetLoader.Count; ++dex)
+            {
+                if (allDependenceAssetLoader[dex].IsError)
+                {
+                    Debug.LogError("[AssetBundleLoader] LoadAssetBundleSync  Fail, 依赖的 AssetBundle 资源不存在 " + allDependenceAssetLoader[dex].m_ResourcesUrl);
+                    OnCompleteLoadDepdenceAsset(allDependenceAssetLoader[dex], false, string.Format("[AssetBundleLoader] LoadAssetBundle Fail,AssetBundle Path={0}" + allDependenceAssetLoader[dex].m_ResourcesUrl), null, true);
+                    break;
+                }
+            } //判断依赖项是否加载完成
+
+            #region  AssetBundle 本地同步加载
+            AssetBundle assetBundle = AssetBundle.LoadFromFile(S_AssetBundleTopPath + depdebceAssetBundleLoader.m_ResourcesUrl);
+            if (assetBundle == null)
+            {
+                ResultObj = null;
+                OnCompleteLoad(true, string.Format("同步加载本地AssetBundle 失败{0}", url), null, true, 1);
+                return;
+            }
+            ResultObj = assetBundle;
+            depdebceAssetBundleLoader.OnCompleteLoad(false, string.Format("[AssetBundleLoader] Load DepdenceAssetBundel Success {0}", depdebceAssetBundleLoader.m_ResourcesUrl), depdebceAssetBundleLoader.ResultObj, true);
+
+            #endregion
+        }
+        #endregion
 
         #endregion
 
@@ -376,8 +478,14 @@ namespace GameFrameWork.ResourcesLoader
         protected override void ForceBreakLoaderProcess()
         {
             if (IsCompleted) return;
+            if (LoadassetModel != LoadAssetModel.Async)
+            {
+                Debug.LogError("非异步加载方式不需要强制结束 " + LoadassetModel);
+                return;
+            }
+
             if (m_LoadAssetCoroutine != null)
-                ApplicationMgr.Instance.StopCoroutine(m_LoadAssetCoroutine);
+                EventCenter.Instance.StopCoroutine(m_LoadAssetCoroutine);
 
             //foreach (var subLoader in m_AllDepdenceLoadAssetCoroutine)
             //{
@@ -385,22 +493,6 @@ namespace GameFrameWork.ResourcesLoader
             //}
 
         }
-
-        ///// <summary>
-        ///// 递归删除子依赖
-        ///// </summary>
-        ///// <param name="loader"></param>
-        //protected void ForceBreakLoaderProcess(AssetBundleLoader loader)
-        //{
-        //    foreach (var subLoader in loader.m_AllDepdenceLoadAssetCoroutine)
-        //    {
-        //        subLoader.Key.ForceBreakLoaderProcess(subLoader.Key);
-        //    }
-        //    loader.m_AllDepdenceLoadAssetCoroutine.Clear();
-        //}
-
-
-
 
     }
 }

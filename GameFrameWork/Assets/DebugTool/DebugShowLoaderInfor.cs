@@ -9,7 +9,7 @@ namespace GameFrameWork.EditorExpand
     /// <summary>
     /// 编辑器下显示资源加载器的详情
     /// </summary>
-    public class DebugShowLoaderInfor : Singleton_Mono<DebugShowLoaderInfor>
+    public class DebugShowLoaderInfor : Singleton_Mono_NotDestroy<DebugShowLoaderInfor>
     {
 #if UNITY_EDITOR
 

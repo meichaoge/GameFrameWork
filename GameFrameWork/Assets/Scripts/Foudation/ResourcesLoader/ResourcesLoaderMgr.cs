@@ -174,7 +174,7 @@ namespace GameFrameWork.ResourcesLoader
                     if (Time.realtimeSinceStartup - checkLoader.UnUseTime < checkLoader.m_GCInterval)
                         break;  //由于加载器是一个队列 因此最前面的加载肯定先到达最长生命周期
 
-                    Debug.LogInfor("[GC Loaders ] Type=" + checkLoader.GetType().Name + "  Url" + checkLoader.m_ResourcesUrl);
+                    Debug.LogInfor("[GC Loaders ] Type=" + checkLoader.GetType().Name + "  Url=" + checkLoader.m_ResourcesUrl);
 
                     //当前加载器回收后超过了最大生命周期时间需要被删除回收资源
                     checkLoader.Dispose();  //加载器释放最后的资源

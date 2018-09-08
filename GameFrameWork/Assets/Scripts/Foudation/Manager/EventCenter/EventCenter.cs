@@ -20,6 +20,8 @@ namespace GameFrameWork
             DelayTwooFrame = 3,
         }
 
+#region  Data
+
         public delegate void UpdateHandle();
         List<UpdateHandle> m_AllUpdateEvent_Normal = new List<UpdateHandle>();
         List<UpdateHandle> m_AllUpdateEvent_OneFrameDelay = new List<UpdateHandle>();
@@ -29,6 +31,26 @@ namespace GameFrameWork
         List<UpdateHandle> m_AllFixedUpdateEvent_Normal = new List<UpdateHandle>();
         List<UpdateHandle> m_AllFixedUpdateEvent_OneFrameDelay = new List<UpdateHandle>();
         List<UpdateHandle> m_AllFixedUpdateEvent_TwoFrameDelay = new List<UpdateHandle>();
+
+        #endregion
+
+        #region  变量
+        /// <summary>
+        /// 当前系统更新了多少帧
+        /// </summary>
+        public int CurFrameCount { get; private set; }
+ #endregion
+
+
+        #region 编辑器下设置
+#if UNITY_EDITOR
+        protected override void Reset()
+        {
+            base.Reset();
+            gameObject.name = "EventCenter";
+        }
+#endif
+        #endregion
 
 
         protected override void Awake()
@@ -41,6 +63,7 @@ namespace GameFrameWork
         #region UpdateEvent
         private void Update()
         {
+            ++CurFrameCount;
             if (m_AllUpdateEvent_Normal.Count > 0)
             {//Normal
                 ExcuteEvent(ref m_AllUpdateEvent_Normal);

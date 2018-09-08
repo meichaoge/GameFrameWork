@@ -6,6 +6,7 @@ using UnityEngine;
 
 public class TestShader : MonoBehaviour
 {
+    public LoadAssetModel m_LoadAssetModel = LoadAssetModel.Async;
     public string m_Url;
     public GameObject go;
     // Use this for initialization
@@ -19,7 +20,7 @@ public class TestShader : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.A))
         {
-            ShaderLoader.LoadAsset( m_Url, CompleteLoadHandler);
+            ShaderLoader.LoadAsset( m_Url, m_LoadAssetModel, CompleteLoadHandler);
         }
 
         if (Input.GetKeyDown(KeyCode.D))

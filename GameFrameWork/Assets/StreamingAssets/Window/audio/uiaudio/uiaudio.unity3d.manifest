@@ -1,0 +1,16 @@
+ManifestFileVersion: 0
+CRC: 1909568036
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 18d496d6e272f3690fc94e8d8b65d45a
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: c516f2a3b2b6b67ef759f6410a790acd
+HashAppended: 0
+ClassTypes:
+- Class: 83
+  Script: {instanceID: 0}
+Assets:
+- Assets/Resources/Audio/UIAudio/MVT_Click_B.ogg
+Dependencies: []

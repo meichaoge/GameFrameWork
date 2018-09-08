@@ -1,0 +1,18 @@
+ManifestFileVersion: 0
+CRC: 1908405964
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 3a66504fc910a953f7aa62ace971a975
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 785fb799265a1e603507680a9bcfdd2c
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 224
+  Script: {instanceID: 0}
+Assets:
+- Assets/Resources/Prefabs/UI/UIAudioMgr/UIAudioMgr.prefab
+Dependencies: []

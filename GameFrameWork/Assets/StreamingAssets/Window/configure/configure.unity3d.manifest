@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 4120860212
+CRC: 1056199570
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 2c8eda1b39c954bb43c1919718cf3b64
+    Hash: fc5881413b36b2aa2e23db16ae5e4580
   TypeTreeHash:
     serializedVersion: 2
     Hash: 1033bf7ddfd4c6d43e7a6382c0a0a61a
@@ -14,5 +14,7 @@ ClassTypes:
 Assets:
 - Assets/Resources/Configure/ApplicationVersion_config.txt
 - Assets/Resources/Configure/Application_config.txt
+- Assets/Resources/Configure/ButtonAudio_Config.txt
 - Assets/Resources/Configure/Font_Chinese.txt
+- Assets/Resources/Configure/Temple.txt
 Dependencies: []

@@ -21,16 +21,31 @@ namespace GameFrameWork
             public int m_Priority = 1;  //优先级
         }
 
+        [CustomerHeaderAttribute("应用当前的语言版本", "#00E7E7FF")]
+        [SerializeField]
+        private Language m_CurLanguageType = Language.Chinese;
+        public Language CurLanguageType
+        {
+            get { return m_CurLanguageType; }
+        }
+
+        [CustomerHeaderAttribute("标识是否是开发模式(true 则优先加载Resources文件)", "#FF0000FF")]
+        [Space(20)]
+        public bool IsDevelopMode = true;
+
+        #region  资源加载配置
+
         /// <summary>
         /// 配置的加载路径优先级
         /// </summary>
         [CustomerHeaderAttribute("默认的资源加载路径优先级 可以设置 m_Priority 改变优先级", "#FF0000FF")]
         [SerializeField]
+        [Space(20)]
         private List<LoadAssetPathInfor> m_LoadAssetPath = new List<LoadAssetPathInfor>();
 
-        [CustomerHeaderAttribute("优先级排序规则 ，默认从高到低规则(根据定义的LoadAssetPathEnum 确定如何选择)", "#FF0000FF")]
-        [SerializeField]
-        private bool m_IsPriorityUpToLower = true;
+        //[CustomerHeaderAttribute("优先级排序规则 ，默认从高到低规则(根据定义的LoadAssetPathEnum 确定如何选择)", "#FF0000FF")]
+        //[SerializeField]
+        //private bool m_IsPriorityUpToLower = true;
 
         [CustomerHeaderAttribute("排序后的优先级序列   只读不要修改!!!!!", "gray")]
         [SerializeField]
@@ -43,10 +58,12 @@ namespace GameFrameWork
         [Space(10)]
         public LoadAssetModel m_CurLoadAssetModel = LoadAssetModel.Async;
 
-        [Space(10)]
-        [CustomerHeaderAttribute("日志输出级别，默认只输出 Log 级别日志 ", "#00E7E7FF")]
-        public Debug.LogLevel m_LogLevel = Debug.LogLevel.Log;
+        #endregion
 
+
+        //[Space(10)]
+        //[CustomerHeaderAttribute("日志输出级别，默认只输出 Log 级别日志 ", "#00E7E7FF")]
+        //public Debug.LogLevel m_LogLevel = Debug.LogLevel.Log;
 
         [Space(10)]
         [CustomerHeaderAttribute("控制是否统计资源被加载次数,用于系统资源分析", "#00E7E7FF")]
@@ -60,6 +77,7 @@ namespace GameFrameWork
         [CustomerHeaderAttribute("标识用于资源热更新的服务器地址", "#00E7E7FF")]
         //public string m_AssetServerPath = "file://" + @"E:/My_WorkSpace/AssetBundle_Test/";
         public List<HotAssetServerAddressInfor> m_AllHotAssetServerInfor = new List<HotAssetServerAddressInfor>();
+
 
         #region  Frame 
 #if UNITY_EDITOR
@@ -75,10 +93,10 @@ namespace GameFrameWork
         /// </summary>
         private void OnValidate()
         {
-           for (int dex=0;dex< m_AllHotAssetServerInfor.Count;++dex)
-           {
+            for (int dex = 0; dex < m_AllHotAssetServerInfor.Count; ++dex)
+            {
                 m_AllHotAssetServerInfor[dex].EditorUpdateView();
-           }
+            }
         }
 
         /// <summary>
@@ -95,7 +113,7 @@ namespace GameFrameWork
                 infor.m_AssetPathEnum = (LoadAssetPathEnum)System.Enum.Parse(typeof(LoadAssetPathEnum), item.ToString());
                 infor.m_Priority = priority;
                 if (infor.m_AssetPathEnum == LoadAssetPathEnum.None) continue;
-                    m_LoadAssetPath.Add(infor);
+                m_LoadAssetPath.Add(infor);
                 ++priority;
             }
         }
@@ -129,6 +147,8 @@ namespace GameFrameWork
         #endregion
 
         #region 配置
+
+
         /// <summary>
         /// 按照优先级高到低排序
         /// </summary>
@@ -142,35 +162,64 @@ namespace GameFrameWork
                 Debug.LogError("没有配置资源加载路径 优先级关系");
                 return;
             }
-            if(m_IsPriorityUpToLower)
-            {
-                m_LoadAssetPathOfPriority.Sort((lparameter, rparameter) =>
-                {
-                    if (lparameter.m_AssetPathEnum == LoadAssetPathEnum.None)
-                        return 1;
+            //if(m_IsPriorityUpToLower)
+            //{
+            //    m_LoadAssetPathOfPriority.Sort((lparameter, rparameter) =>
+            //    {
+            //        if (lparameter.m_AssetPathEnum == LoadAssetPathEnum.None)
+            //            return 1;
 
-                    if (lparameter.m_Priority < rparameter.m_Priority)
-                        return 1;
-                    if (lparameter.m_Priority == rparameter.m_Priority)
-                        return 0;
+            //        if (lparameter.m_Priority < rparameter.m_Priority)
+            //            return 1;
+            //        if (lparameter.m_Priority == rparameter.m_Priority)
+            //            return 0;
+            //        return -1;
+            //    });
+            //}
+            //else
+            //  {
+            m_LoadAssetPathOfPriority.Sort((lparameter, rparameter) =>
+            {
+                if (lparameter.m_AssetPathEnum == LoadAssetPathEnum.None)
                     return -1;
-                });
-            }
-            else
-            {
-                m_LoadAssetPathOfPriority.Sort((lparameter, rparameter) =>
-                {
-                    if (lparameter.m_AssetPathEnum == LoadAssetPathEnum.None)
-                        return -1;
 
-                    if (lparameter.m_Priority < rparameter.m_Priority)
-                        return 0;
-                    if (lparameter.m_Priority == rparameter.m_Priority)
-                        return 1;
+                if (lparameter.m_Priority < rparameter.m_Priority)
+                    return 0;
+                if (lparameter.m_Priority == rparameter.m_Priority)
                     return 1;
-                });
+                return 1;
+            });
+#if UNITY_EDITOR
+            if (IsDevelopMode)
+            {
+                int index = -1;
+                for (int dex = 0; dex < m_LoadAssetPathOfPriority.Count; ++dex)
+                {
+                    if (m_LoadAssetPathOfPriority[dex].m_AssetPathEnum == LoadAssetPathEnum.ResourcesPath)
+                    {
+                        index = dex;
+                        break;
+                    }
+                }
+
+                if (index == -1)
+                {
+                    Debug.LogError("SortLoadAssetPathPriority Fail,Not Define ResourcesLoad");
+                    return;
+                }
+                LoadAssetPathInfor resourceLoadInfor = m_LoadAssetPathOfPriority[index];
+                m_LoadAssetPathOfPriority.RemoveAt(index);
+                resourceLoadInfor.m_Priority = int.MaxValue;
+                m_LoadAssetPathOfPriority.Insert(0, resourceLoadInfor);
+            }//编辑器开发者模式下优先加载Resources 目录资源
+#endif
+
+            for (int dex=0;dex< m_LoadAssetPathOfPriority.Count;++dex)
+            {
+                Debug.LogEditorInfor(string.Format("dex={0} value={1}", dex, m_LoadAssetPathOfPriority[dex]));
             }
-        
+
+            //  }
         }
 
         /// <summary>Oa
@@ -180,12 +229,12 @@ namespace GameFrameWork
         /// <returns></returns>
         public void GetNextLoadAssetPath(ref LoadAssetPathEnum curAssetPath)
         {
-            for (int dex = 0; dex < m_LoadAssetPath.Count - 1; ++dex)
+            for (int dex = 0; dex < m_LoadAssetPathOfPriority.Count - 1; ++dex)
             {
-                if (m_LoadAssetPath[dex].m_AssetPathEnum == curAssetPath)
+                if (m_LoadAssetPathOfPriority[dex].m_AssetPathEnum == curAssetPath)
                 {
-                    curAssetPath = m_LoadAssetPath[dex + 1].m_AssetPathEnum;
-                    return ;
+                    curAssetPath = m_LoadAssetPathOfPriority[dex + 1].m_AssetPathEnum;
+                    return;
                 }
             }
             curAssetPath = LoadAssetPathEnum.None;
@@ -205,7 +254,7 @@ namespace GameFrameWork
         /// </summary>
         /// <param name="assetEum"></param>
         /// <returns></returns>
-        public HotAssetServerAddressInfor GetHotAssetServerAddressInforByType(HotAssetEnum assetEum )
+        public HotAssetServerAddressInfor GetHotAssetServerAddressInforByType(HotAssetEnum assetEum)
         {
             foreach (var item in m_AllHotAssetServerInfor)
             {
@@ -215,7 +264,10 @@ namespace GameFrameWork
             Debug.LogError("没有定义热更新资源服务器地址：" + assetEum);
             return null;
         }
-      
+
         #endregion
+
+
+
     }
 }
