@@ -27,18 +27,28 @@ namespace GameFrameWork.HotUpdate
 
 
 
-        protected override void GetLocalAssetRecordInfor(string assetText)
+        protected override bool GetLocalAssetRecordInfor(string assetText)
         {
             if (string.IsNullOrEmpty(assetText))
             {
                 m_LocalAssetRecord = null;
                 Debug.Log("本地配置不存在 ");
+                return false;
             }
             else
             {
-                m_LocalAssetRecord = JsonMapper.ToObject<HotAssetBaseRecordInfor>(assetText);
+                try
+                {
+                    m_LocalAssetRecord = JsonMapper.ToObject<HotAssetBaseRecordInfor>(assetText);
+                }
+                catch (System.Exception ex)
+                {
+                    Debug.LogError("GetLocalAssetRecordInfor  "+ex);
+                    return false;
+                }
             }
             Debug.Log("m_LocalAssetRecord " + m_LocalAssetRecord);
+            return true;
         }
 
 

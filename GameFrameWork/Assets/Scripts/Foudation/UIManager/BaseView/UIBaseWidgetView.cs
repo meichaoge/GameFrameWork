@@ -28,6 +28,12 @@ namespace GameFrameWork.UGUI
 
         protected bool m_IsDestroyedHide = false;
 
+        protected override void Awake()
+        {
+            m_WindowType = WindowTypeEnum.Widget;
+            base.Awake();
+        }
+
 
         public override void ShowWindow(params object[] parameter)
         {

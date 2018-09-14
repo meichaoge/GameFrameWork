@@ -42,6 +42,8 @@ namespace GameFrameWork.EditorExpand
             GetAndSetNeedPackAssetName(ConstDefine.S_ResourcesPath);
             CallAPIBuildAssetBundle();  //生成AssetBundle
             AssetDatabase.Refresh(); 
+
+            //***将生成的AssetBundle  移动到Applicaiton.persistentDataPath 中
             CopyAndMoveAssetBundleAsset();
             CreateAssetBundleDepends(); //创建依赖关系字典
             SaveAllDepdenceToLocalFile();

@@ -164,31 +164,31 @@ namespace GameFrameWork
             }
             //if(m_IsPriorityUpToLower)
             //{
-            //    m_LoadAssetPathOfPriority.Sort((lparameter, rparameter) =>
-            //    {
-            //        if (lparameter.m_AssetPathEnum == LoadAssetPathEnum.None)
-            //            return 1;
-
-            //        if (lparameter.m_Priority < rparameter.m_Priority)
-            //            return 1;
-            //        if (lparameter.m_Priority == rparameter.m_Priority)
-            //            return 0;
-            //        return -1;
-            //    });
-            //}
-            //else
-            //  {
             m_LoadAssetPathOfPriority.Sort((lparameter, rparameter) =>
             {
                 if (lparameter.m_AssetPathEnum == LoadAssetPathEnum.None)
-                    return -1;
+                    return 1;
 
                 if (lparameter.m_Priority < rparameter.m_Priority)
-                    return 0;
-                if (lparameter.m_Priority == rparameter.m_Priority)
                     return 1;
-                return 1;
-            });
+                if (lparameter.m_Priority == rparameter.m_Priority)
+                    return 0;
+                return -1;
+            });  //默认优先级是从高到低
+            //}
+            //else
+            //  {
+            //m_LoadAssetPathOfPriority.Sort((lparameter, rparameter) =>
+            //{
+            //    if (lparameter.m_AssetPathEnum == LoadAssetPathEnum.None)
+            //        return -1;
+
+            //    if (lparameter.m_Priority < rparameter.m_Priority)
+            //        return 0;
+            //    if (lparameter.m_Priority == rparameter.m_Priority)
+            //        return 1;
+            //    return 1;
+            //});
 #if UNITY_EDITOR
             if (IsDevelopMode)
             {
@@ -214,9 +214,9 @@ namespace GameFrameWork
             }//编辑器开发者模式下优先加载Resources 目录资源
 #endif
 
-            for (int dex=0;dex< m_LoadAssetPathOfPriority.Count;++dex)
+            for (int dex = 0; dex < m_LoadAssetPathOfPriority.Count; ++dex)
             {
-                Debug.LogEditorInfor(string.Format("dex={0} value={1}", dex, m_LoadAssetPathOfPriority[dex]));
+                Debug.LogEditorInfor(string.Format("dex={0} value={1}", dex, m_LoadAssetPathOfPriority[dex].m_AssetPathEnum));
             }
 
             //  }

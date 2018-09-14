@@ -167,6 +167,32 @@ namespace GameFrameWork
             m_AllRecordViewPopup.Add(view);
         }
 
+
+        /// <summary>
+        /// 打开一个弹窗界面 （属于当前页面的）
+        /// </summary>
+        /// <param name="view"></param>
+        /// <param name="popupOperate"></param>
+        /// <param name="isFailRecord">如果是因为优先级而无法弹出 则表示是否需要记录 如果为false 则当无法显示时候不会自动弹出，而是隐藏了</param>
+        /// <param name="parameter"></param>
+        /// 
+        public void OpenPopUp(UIBasePopupView view, PopupOpenOperateEnum popupOperate, bool isFailRecord, object[] parameter)
+        {
+            OpenPopUp(view, popupOperate, CurOpenPage, isFailRecord, parameter);
+        }
+
+        /// <summary>
+        /// 打开一个弹窗界面 （属于当前页面的）
+        /// </summary>
+        /// <param name="view"></param>
+        /// <param name="popupOperate"></param>
+        /// <param name="isFailRecord">如果是因为优先级而无法弹出 则表示是否需要记录 如果为false 则当无法显示时候不会自动弹出，而是隐藏了</param>
+        public void OpenPopUp(UIBasePopupView view, PopupOpenOperateEnum popupOperate, bool isFailRecord=true)
+        {
+            OpenPopUp(view, popupOperate, CurOpenPage, isFailRecord, null);
+        }
+
+
         /// <summary>
         /// 关闭一个弹窗界面
         /// </summary>
@@ -687,7 +713,7 @@ namespace GameFrameWork
         {
             if (string.IsNullOrEmpty(viewName))
             {
-                Debug.LogError("GetUI Fail Not Exit");
+                //Debug.LogError("GetUI Fail Not Exit");
                 return null;
             }
             if (m_AllExitView.ContainsKey(viewName))
@@ -705,7 +731,7 @@ namespace GameFrameWork
         /// <param name="isActivate"></param>
         /// <param name="isResetTransProperty"></param>
         /// <param name="viewName"></param>
-        public void ForceGetUI<T>(string viewPath, Transform parentTrans, System.Action<T> callback, bool isActivate = true, bool isResetTransProperty = true, string viewName = "") where T : UIBaseView
+        public void ForceGetUI<T>(string viewPath, Transform parentTrans, System.Action<T> callback, bool isActivate , bool isResetTransProperty = true, string viewName = "") where T : UIBaseView
         {
             T view = GetUI<T>(viewName);
             if (view != null)

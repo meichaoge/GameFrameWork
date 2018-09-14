@@ -12,6 +12,12 @@ namespace GameFrameWork
         #region UGUI 
 
         public static string UIAssetUpdateViewPath = "Prefabs/UI/AssetUpdate/UIAssetUpdateView"; //热更界面
+
+        #region 登录界面 UILogin
+
+        public static string UILoginPopupViewPath = "Prefabs/UI/Login/UILoginPopupView"; //登录弹窗界面
+        #endregion
+
         #endregion
 
     }

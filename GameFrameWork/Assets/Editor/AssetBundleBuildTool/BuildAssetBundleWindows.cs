@@ -340,6 +340,8 @@ namespace GameFrameWork.EditorExpand
             EditorUtility.DisplayDialog("打包AssetBundle ", message, "已知晓");
             if (S_BuildAssetBundleWindows != null)
                 S_BuildAssetBundleWindows.Close();
+
+
         }
 
     }

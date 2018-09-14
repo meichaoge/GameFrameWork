@@ -102,7 +102,8 @@ namespace GameFrameWork.ResourcesLoader
             }
             catch (System.Exception ex)
             {
-                Debug.LogError("LoadByteAssetSync  Fail,error" + ex.Message);
+
+            //    Debug.LogError("LoadByteAssetSync  Fail,error" + ex.Message);
                 OnCompleteLoad(IsError, ex.Message, null, true);
             }
             finally

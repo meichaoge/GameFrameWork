@@ -148,7 +148,6 @@ namespace GameFrameWork.UGUI
         protected virtual void OnCompleteShowWindow()
         {
             IsCompleteShow = true;
-            IsOpen = true;
         }
 
 
@@ -201,7 +200,10 @@ namespace GameFrameWork.UGUI
         /// </summary>
         public virtual void HideWindow(params object[] parameter)
         {
-
+            if(IsCompleteShow==false)
+            {
+                Debug.LogEditorInfor("HideWindow Exception !!! Is Not Complete ShowWindow Process " + gameObject.name);
+            }
         }
         /// <summary>
         /// /子类重写这个方法实现 协程关闭界面
@@ -217,7 +219,6 @@ namespace GameFrameWork.UGUI
         protected virtual void OnCompleteHideWindow()
         {
             IsCompleteShow = true;
-            IsOpen = false;
             gameObject.SetActive(false);
         }
 

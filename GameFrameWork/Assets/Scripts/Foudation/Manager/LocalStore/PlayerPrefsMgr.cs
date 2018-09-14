@@ -170,7 +170,7 @@ namespace GameFrameWork
             {
                 return record.DataValue.ToString();
             }
-            Debug.LogError("GetInt  Fail,Not Exit " + key);
+            Debug.LogInfor("GetInt  Fail,Not Exit " + key);
             return "";
         }
         #endregion

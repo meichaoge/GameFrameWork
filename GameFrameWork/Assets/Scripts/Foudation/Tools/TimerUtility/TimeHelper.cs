@@ -29,7 +29,7 @@ namespace GameFrameWork
         /// </summary>
         /// <param name="time"></param>
         /// <returns></returns>
-        public static long DateTime2Second(DateTime time)
+        public long DateTime2Second(DateTime time)
         {
             DateTime dateStart = TimeZone.CurrentTimeZone.ToLocalTime(new DateTime(1970, 1, 1, 0, 0, 0)); //根据时区计算当前时间
             int timeStamp = Convert.ToInt32((time - dateStart).TotalSeconds);
@@ -40,7 +40,7 @@ namespace GameFrameWork
         /// 当前系统时间转成秒数
         /// </summary>
         /// <returns></returns>
-        public static long DateTime2Second_Now()
+        public long DateTime2Second_Now()
         {
             DateTime dt = System.DateTime.Now;  //当前系统时间
             return DateTime2Second(dt);
@@ -56,7 +56,7 @@ namespace GameFrameWork
         /// <param name="time"></param
         /// <param name="antoComplement">当不足10秒时候左边自动补齐0</param
         /// <returns></returns>
-        public static string GetShowTimeFromSecond(int time, bool antoComplement)
+        public string GetShowTimeFromSecond(int time, bool antoComplement)
         {
             if (time < 0)
             {
@@ -76,7 +76,7 @@ namespace GameFrameWork
         /// </summary>
         /// <param name="time"></param>
         /// <returns></returns>
-        public static string GetShowTimeFromSecond_Second(int time)
+        public string GetShowTimeFromSecond_Second(int time)
         {
             if (time >= 3600)
                 return GetShowTimeFromSecond_Hour(time);  //超过一个小时
@@ -102,7 +102,7 @@ namespace GameFrameWork
         /// </summary>
         /// <param name="time">秒</param>
         /// <returns></returns>
-        public static string GetShowTimeFromSecond_Hour(int time)
+        public string GetShowTimeFromSecond_Hour(int time)
         {
             int hours = time / 3600;  //小时
             int mins = (time - hours * 3600) / 60;//分
@@ -136,7 +136,7 @@ namespace GameFrameWork
         /// <param name="secondFomat">对秒数的格式化 =0标识小于1分钟显示1分钟，=1标识显示真实的秒数，其他显示刚刚</param>
         /// <param name="isOnlyNum">标识是否只显示为{0}天，{0}分钟，{0}秒</param>
         /// <returns></returns>
-        public static string ShowTimeFormat(int time, bool isBefore, int secondFomat, bool isOnlyNum = false)
+        public string ShowTimeFormat(int time, bool isBefore, int secondFomat, bool isOnlyNum = false)
         {
             if (time <= 0) return "";
 
@@ -201,7 +201,7 @@ namespace GameFrameWork
         /// <summary>
         /// 获得配置文件中的格式
         /// </summary>
-        private static string GetTimeFormation(string key)
+        private string GetTimeFormation(string key)
         {
             return UILanguageMgr.Instance.GetUIDynamicStrConfig(S_TimeFormationConfigName, key);
         }

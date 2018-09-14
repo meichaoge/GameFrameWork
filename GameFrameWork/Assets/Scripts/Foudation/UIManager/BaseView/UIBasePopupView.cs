@@ -67,7 +67,11 @@ namespace GameFrameWork.UGUI
 
         public object[] WillPopupParameter { get; protected set; }
 
-
+        protected override void Awake()
+        {
+            m_WindowType = WindowTypeEnum.PopUp;
+            base.Awake();
+        }
 
         public override void ShowWindow(params object[] parameter)
         {
@@ -78,6 +82,7 @@ namespace GameFrameWork.UGUI
                 return;
             }
 #endif
+      
             //     if (parameter[0] != null)
             BelongPageView = parameter[0] as UIBasePageView;
             //else

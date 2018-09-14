@@ -87,7 +87,7 @@ namespace GameFrameWork.ResourcesLoader
                     {
                         string fileName = System.IO.Path.GetFileNameWithoutExtension(url);
 
-                        Debug.Log("加载外部资源，且以AssetBundle 加载");
+                        Debug.Log("[AssetBundler ]加载外部资源，且以AssetBundle 加载");
                         if (assetBundleExitState == AssetBundleExitState.SinglePrefab)
                             bridgeLoader.m_ConnectLoader = AssetBundleLoader.LoadAssetBundleAsset(url.ToLower(), fileName, LoadAssetModel.Async, null, isloadSceneAsset);  //单独预制体
                         else
@@ -97,8 +97,11 @@ namespace GameFrameWork.ResourcesLoader
                     {
                         if (isloadSceneAsset == false)
                         {
-                            Debug.Log("优先加载外部资源,但是不是AssetBundle 资源，则以Byte[] 尝试 加载");
-                            bridgeLoader.m_ConnectLoader = ByteLoader.LoadAsset(url, LoadAssetModel.Async, null);
+                            Debug.Log("[byteLoader ]优先加载外部资源,但是不是AssetBundle 资源，则以Byte[] 尝试 加载");
+                            string path = url;
+                            if (url.StartsWith(ConstDefine.S_AssetBundleTopPath) == false)
+                                path = ConstDefine.S_AssetBundleTopPath + url;
+                            bridgeLoader.m_ConnectLoader = ByteLoader.LoadAsset(path, LoadAssetModel.Async, null);
                         }
                         else
                         {
@@ -108,6 +111,7 @@ namespace GameFrameWork.ResourcesLoader
                 }
                 else if (curLoadAssetPathEnum == LoadAssetPathEnum.ResourcesPath)
                 {
+                    Debug.Log("[RecourcsLoader ]  加载Resources 资源 " + url);
                     bridgeLoader.m_ConnectLoader = ResourcesLoader.LoadResourcesAsset(url, LoadAssetModel.Async, null, isloadSceneAsset);
                 }
 
@@ -125,7 +129,7 @@ namespace GameFrameWork.ResourcesLoader
                 }
 
             } while (curLoadAssetPathEnum != LoadAssetPathEnum.None);
-            Debug.LogInfor("如果加载成功不会执行到这里");
+            Debug.LogError("如果加载成功不会执行到这里" + url);
             bridgeLoader.m_ConnectLoader = null;  //如果加载成功不会执行到这里
         }
 
@@ -222,7 +226,10 @@ namespace GameFrameWork.ResourcesLoader
                         if (isloadSceneAsset == false)
                         {
                             Debug.Log("优先加载外部资源,但是不是AssetBundle 资源，则以Byte[] 尝试 加载");
-                            bridgeLoader.m_ConnectLoader = ByteLoader.LoadAsset(url, LoadAssetModel.Sync, null);
+                            string path = url;
+                            if (url.StartsWith(ConstDefine.S_AssetBundleTopPath) == false)
+                                path = ConstDefine.S_AssetBundleTopPath + url;
+                            bridgeLoader.m_ConnectLoader = ByteLoader.LoadAsset(path, LoadAssetModel.Sync, null);
                         }
                         else
                         {
@@ -232,7 +239,7 @@ namespace GameFrameWork.ResourcesLoader
                 }
                 else if (curLoadAssetPathEnum == LoadAssetPathEnum.ResourcesPath)
                 {
-                    bridgeLoader.m_ConnectLoader = ResourcesLoader.LoadResourcesAsset(url, LoadAssetModel.Sync,null, isloadSceneAsset);
+                    bridgeLoader.m_ConnectLoader = ResourcesLoader.LoadResourcesAsset(url, LoadAssetModel.Sync, null, isloadSceneAsset);
                 }
                 if (bridgeLoader.m_ConnectLoader.ResultObj != null)
                     return;
@@ -294,7 +301,7 @@ namespace GameFrameWork.ResourcesLoader
         protected override void ForceBreakLoaderProcess()
         {
             if (m_ConnectLoader.IsCompleted) return;
-            if(LoadassetModel!=LoadAssetModel.Async)
+            if (LoadassetModel != LoadAssetModel.Async)
             {
                 Debug.LogError("非异步加载方式不需要强制结束 " + LoadassetModel);
                 return;

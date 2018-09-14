@@ -9,7 +9,6 @@ using UnityEngine.Serialization;
 
 namespace GameFrameWork.HotUpdate
 {
-
     [System.Serializable]
     public enum HotAssetEnum
     {
@@ -67,7 +66,6 @@ namespace GameFrameWork.HotUpdate
         protected int m_AllNeedDownLoadAssetCount = 0; //所有需要下载的资源总数
         protected int m_CurrentDownLoadCount = 0;//当前下载的AB资源数量
         protected int m_TotalDownLoadAssetCount = 0;   //下载成功的资源数量
-  //      protected static int S_DownLoadCoutToRecord = 5;  //当下载的资源数量是5的整数倍则开始保存记录
 
         protected int m_MaxTryDownLoadTime = 3; //下载失败最大尝试次数
 
@@ -154,7 +152,7 @@ namespace GameFrameWork.HotUpdate
             {
                 if (m_UpdateTimerHashCode != 0)
                     TimeTickUtility.Instance.UnRegisterTimer(m_UpdateTimerHashCode);
-                UpdateLocalRecordConfigureText(true);  //避免某些情况下 没有刷新本地的配置文件
+                UpdateLocalRecordConfigureText();  //避免某些情况下 没有刷新本地的配置文件
 
             }
 
@@ -245,7 +243,7 @@ namespace GameFrameWork.HotUpdate
         /// 资源加载完成后的操作(转成对应的对象)
         /// </summary>
         /// <param name="assetText"></param>
-        protected abstract void GetLocalAssetRecordInfor(string assetText);
+        protected abstract bool GetLocalAssetRecordInfor(string assetText);
         // {
         //需要根据不同的配置文件转成不同的对象
         //    m_LocalAssetRecord = JsonMapper.ToObject<HotAssetBaseRecordInfor>(assetText);
@@ -259,7 +257,10 @@ namespace GameFrameWork.HotUpdate
         {
             //****
             Debug.LogEditorInfor("这里需要优化 ，可以同步加载本地和处理服务器请求  TODO");
-            GetLocalAssetRecordInfor(assetText);
+            if (GetLocalAssetRecordInfor(assetText) == false)
+            {
+                AssetUpdateMgr.Instance.RecordAssetUpdateError(this, "本地配置文件没有正确读取", AssetUpdateErrorCode.LocalConfigureNotAvalible);
+            }
             GetServerAssetConfigureRecordText(CheckLocalAbundleNeedUpdateRecord);
         }
 
@@ -278,6 +279,7 @@ namespace GameFrameWork.HotUpdate
                 if (string.IsNullOrEmpty(www.error) == false)
                 {
                     Debug.LogError("GetServerABundleRecordText Fail  Error: " + www.error);
+                    AssetUpdateMgr.Instance.RecordAssetUpdateError(this, "服务器配置文件没有正确读取", AssetUpdateErrorCode.ServerConfigNotAvalible);
                     OnDownLoadServerConfigFail();
                     return;
                 }
@@ -287,6 +289,7 @@ namespace GameFrameWork.HotUpdate
                 {
                     Debug.LogError("Server ABInfor Can't Identify");
                     OnDownLoadServerConfigFail();
+                    AssetUpdateMgr.Instance.RecordAssetUpdateError(this, "服务器配置文件没有正确读取", AssetUpdateErrorCode.ServerConfigNotAvalible);
                     if (m_OnUpdateFailAct != null)
                         m_OnUpdateFailAct.Invoke("Server ABInfor Can't Identify");
                     return;
@@ -473,7 +476,8 @@ namespace GameFrameWork.HotUpdate
             if (allFailDownloadAsset.Count != 0)
             {
                 Debug.LogError("OnDownLoadMainABundleCallBack  有资源下载多次失败 本次下载失败");
-                UpdateLocalRecordConfigureText(true);  //这里强制写入一次配置文件 避免由于部分资源下载失败而没有记录的问题
+                AssetUpdateMgr.Instance.RecordAssetUpdateError(this, "资源更新失败!!!", AssetUpdateErrorCode.AssetDownLoadFail);
+                UpdateLocalRecordConfigureText();  //这里强制写入一次配置文件 避免由于部分资源下载失败而没有记录的问题
                 if (m_OnDownLoadAssetFailAct != null)
                     m_OnDownLoadAssetFailAct(allFailDownloadAsset);
 
@@ -496,7 +500,7 @@ namespace GameFrameWork.HotUpdate
             m_IsContainNewDownloadAsset = false;
             Debug.LogInfor("aaaaaaaaaaaa " + time);
 
-            UpdateLocalRecordConfigureText(false);
+            UpdateLocalRecordConfigureText();
         }
 
         #endregion
@@ -574,6 +578,7 @@ namespace GameFrameWork.HotUpdate
             }
             catch (System.Exception ex)
             {
+                AssetUpdateMgr.Instance.RecordAssetUpdateError(this, "资源保存失败!!!", AssetUpdateErrorCode.SaveDateFail);
                 Debug.LogError("OnDownLoadCallBack Exception:  " + ex.ToString());
             }
         }
@@ -584,7 +589,7 @@ namespace GameFrameWork.HotUpdate
         /// 更新本地的配置文件  防止由于意外下载完成一半而导致部分 Asset 已经更新但是配置文件没有更新的问题
         /// </summary>
         /// <param name="forceRecord">是否忽略下载的文件个数限制</param>
-        protected virtual void UpdateLocalRecordConfigureText(bool forceRecord)
+        protected virtual void UpdateLocalRecordConfigureText()
         {
             if (m_IsCompleteUpdate || m_AllCompleteDownLoadAssetDic.Count == 0)
             {
@@ -659,18 +664,19 @@ namespace GameFrameWork.HotUpdate
         /// <param name="jsonData"></param>
         private void UpdateLocalRecordFile(string localConfigureFilePath, string jsonData)
         {
+            string filePath = ConstDefine.S_AssetBundleTopPath + localConfigureFilePath;
             FileStream fileStream = null;
             byte[] data = Encoding.UTF8.GetBytes(jsonData);
             try
             {
                 //***********更新本地配置文件
-                if (File.Exists(localConfigureFilePath))
+                if (File.Exists(filePath))
                 {
-                    fileStream = File.Open(localConfigureFilePath, FileMode.Truncate, FileAccess.ReadWrite, FileShare.ReadWrite);
+                    fileStream = File.Open(filePath, FileMode.Truncate, FileAccess.ReadWrite, FileShare.ReadWrite);
                 }
                 else
                 {
-                    fileStream = File.Create(localConfigureFilePath);
+                    fileStream = File.Create(filePath);
                 }
 
                 if (fileStream != null)

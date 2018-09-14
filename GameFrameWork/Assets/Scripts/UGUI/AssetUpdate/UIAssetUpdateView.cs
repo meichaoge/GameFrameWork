@@ -102,9 +102,11 @@ namespace GameFrameWork.UGUI
             m_txtUpdateStateText.text = m_StrCheckingLocalAssetState;
             yield return new WaitForSeconds(0.3f);
             if (AssetUpdateMgr.S_IsCompleteUpdateAsset == false)
-                AssetUpdateMgr.Instance.BeginAssetUpdate(OnBeginUpdateAsset, OnCompleteUpdateAsset, OnUpdateFailAsset, OnCompleteCheckAssetState);
+                AssetUpdateMgr.Instance.BeginAssetUpdate(OnBeginUpdateAsset, OnCompleteUpdateAsset, OnUpdateFailAsset, OnCompleteCheckAssetState, OnUpdateProcessBreak);
             else
                 OnAssetUpdateComplete(true);
+
+            OnCompleteShowWindow();
         }
 
         #endregion
@@ -170,8 +172,8 @@ namespace GameFrameWork.UGUI
         {
             if (m_TotalDownloadedSize == TotalSize)
             {
-                m_txtUpdateStateText.text = "m_StrUpdateAssteComplete";
-                Debug.LogInfor("CheckIsCompleteDownLoad 下载完成 ");
+                m_txtUpdateStateText.text = m_StrUpdateAssteComplete;
+                Debug.LogInfor("CheckIsCompleteDownLoad>>>>>>>>>>>> 下载完成 ");
                 EventCenter.Instance.DelayDoEnumerator(0.2f, StopUpdateDownloadProcess);
                 return true;
             }
@@ -237,7 +239,7 @@ namespace GameFrameWork.UGUI
                 m_txtUpdateStateText.text = m_StrBegineDownLoadAsset;
                 m_TotalSize = TotalSize = size;
                 NetWorkUtility.Instance.GetNetDataDesciption(ref m_TotalSize, ref m_TotalSizeEnum, true);  //获取总共需要下载的数据总量
-                InvokeRepeating("UpdateDownLoadProcess", 0, 0.1f);
+                InvokeRepeating("UpdateDownLoadProcess", 0, 0.3f);
 
                 AssetUpdateMgr.Instance.BeginDownloadAsset(0.2f, OnDownLoadAssetSuccess);
             }
@@ -259,38 +261,60 @@ namespace GameFrameWork.UGUI
             m_DownLoadSizeRecordThisSecond += dataSize;
             m_TotalDownloadedSize += dataSize;
 
-            //Debug.Log("OnDownLoadAssetSuccess " + path + "  data=" + dataSize+ "   m_TotalDownloadedSize="+ m_TotalDownloadedSize+ "   m_DownLoadSizeRecordThisSecond="+ m_DownLoadSizeRecordThisSecond);
+            //  Debug.Log("OnDownLoadAssetSuccess XXXXXXXXXXXXXX" + path + "  dataSize=" + dataSize + "   m_TotalDownloadedSize=" + m_TotalDownloadedSize + "   m_DownLoadSizeRecordThisSecond=" + m_DownLoadSizeRecordThisSecond);
 
-            if (dataSize == 0)
+            if (m_TotalDownloadedSize == TotalSize)
             {
                 Debug.LogInfor("资源更新完毕 可以开始游戏!!!");
                 OnAssetUpdateComplete(false);
             }
+
         }
 
-
+        /// <summary>
+        /// 资源更新完成
+        /// </summary>
+        /// <param name="isDirectComplete"></param>
         private void OnAssetUpdateComplete(bool isDirectComplete)
         {
             if (isDirectComplete)
                 DirectShowCompleteUpdateView();
 
             m_btnStartUpButton.interactable = true;
-            //   UIManager.Instance.ClosePage();
         }
 
 
-
+        /// <summary>
+        /// 致命错误导致更新失败
+        /// </summary>
+        /// <param name="errorRecord"></param>
+        private void OnUpdateProcessBreak(HotUpdate.AssetUpdateErrorRecordInfor errorRecord)
+        {
+            CancelInvoke("UpdateDownLoadProcess");
+            m_txtUpdateStateText.text = errorRecord.ErrorDescription;
+        }
         #endregion
 
         #region  界面操作
         private void OnStartUpBtnClick()
         {
+            if (AssetUpdateMgr.Instance.IsUpdateError)
+            {
+                Debug.LogError("无法启动游戏  资源更新失败");
+                return;
+            }
 
 
+            UIManager.Instance.ForceGetUI<UILoginPopupView>(Define_ResPath.UILoginPopupViewPath, UIManagerHelper.Instance.PopupParentTrans, (loginPopView) =>
+            {
+                UIManager.Instance.OpenPopUp(loginPopView, PopupOpenOperateEnum.KeepPreviousAvailable, true,null);
+            }, false, true);
         }
         #endregion
 
 
 
     }
+
+
 }
