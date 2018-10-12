@@ -713,6 +713,14 @@ namespace GameFrameWork.HotUpdate
             if (m_OnAssetUpdateDone != null)
                 m_OnAssetUpdateDone(m_IsCompleteUpdate);
         }
+
+        /// <summary>
+        /// 清理本地的AssetBundel 资源  删除一些过时的文件
+        /// </summary>
+        protected abstract void ClearLocalAssetBundleAsset();
+
+
+
         #endregion
 
         #region 记录下载的文件的状态

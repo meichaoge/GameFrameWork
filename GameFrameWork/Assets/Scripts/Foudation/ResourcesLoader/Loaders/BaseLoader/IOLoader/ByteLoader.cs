@@ -152,7 +152,7 @@ namespace GameFrameWork.ResourcesLoader
         protected virtual void LoadByteAssetASync(string path)
         {
             m_ResourcesUrl = path;
-            Debug.Log("  [ByteLoader] loadByteAssetASync  url=" + path);
+            Debug.Log("[ByteLoader] loadByteAssetASync  url=" + path);
             if (System.IO.File.Exists(path) == false)
             {
                 //Debug.LogError(string.Format("Load File Not Exit Path:{0}", path));

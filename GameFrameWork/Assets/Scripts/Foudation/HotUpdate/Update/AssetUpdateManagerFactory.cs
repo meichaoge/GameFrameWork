@@ -22,7 +22,7 @@ namespace GameFrameWork.HotUpdate
                     return new AsssetBundleUpdateManager();
 
                 case HotAssetEnum.LuaAsset:
-                    Debug.LogError("没有处理Lua");
+                    Debug.LogError("没有处理Lua  TODO");
                     return null;
 
                 default:

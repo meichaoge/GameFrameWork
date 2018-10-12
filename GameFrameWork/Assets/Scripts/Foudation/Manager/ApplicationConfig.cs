@@ -162,8 +162,7 @@ namespace GameFrameWork
                 Debug.LogError("没有配置资源加载路径 优先级关系");
                 return;
             }
-            //if(m_IsPriorityUpToLower)
-            //{
+
             m_LoadAssetPathOfPriority.Sort((lparameter, rparameter) =>
             {
                 if (lparameter.m_AssetPathEnum == LoadAssetPathEnum.None)
@@ -175,20 +174,7 @@ namespace GameFrameWork
                     return 0;
                 return -1;
             });  //默认优先级是从高到低
-            //}
-            //else
-            //  {
-            //m_LoadAssetPathOfPriority.Sort((lparameter, rparameter) =>
-            //{
-            //    if (lparameter.m_AssetPathEnum == LoadAssetPathEnum.None)
-            //        return -1;
 
-            //    if (lparameter.m_Priority < rparameter.m_Priority)
-            //        return 0;
-            //    if (lparameter.m_Priority == rparameter.m_Priority)
-            //        return 1;
-            //    return 1;
-            //});
 #if UNITY_EDITOR
             if (IsDevelopMode)
             {
@@ -212,14 +198,13 @@ namespace GameFrameWork
                 resourceLoadInfor.m_Priority = int.MaxValue;
                 m_LoadAssetPathOfPriority.Insert(0, resourceLoadInfor);
             }//编辑器开发者模式下优先加载Resources 目录资源
-#endif
 
             for (int dex = 0; dex < m_LoadAssetPathOfPriority.Count; ++dex)
             {
                 Debug.LogEditorInfor(string.Format("dex={0} value={1}", dex, m_LoadAssetPathOfPriority[dex].m_AssetPathEnum));
             }
+#endif
 
-            //  }
         }
 
         /// <summary>Oa

@@ -25,6 +25,12 @@ namespace GameFrameWork
         /// <returns></returns>
         public void Instantiate(string url, Transform parent, LoadAssetModel loadModel, System.Action<GameObject> callback, bool isActivate = true, bool isResetTransProperty = true)
         {
+#if UNITY_EDITOR
+            Debug.LogEditorInfor(string.Format("[ResourcesMgr ] Instantiate Begin >>>>  url={0}  LoadModel={1} Time={2}   RederFrameCont={3}", url, loadModel, Time.realtimeSinceStartup,Time.renderedFrameCount));
+
+#endif
+
+
             if (string.IsNullOrEmpty(url))
             {
                 if (callback != null)
@@ -35,8 +41,8 @@ namespace GameFrameWork
 
             PrefabLoader.LoadAsset(parent, url, loadModel, (loader) =>
              {
-                #region  加载成功后的处理逻辑
-                ResourcesLoadTraceMgr.Instance.RecordTraceResourceInfor(loader);
+                 #region  加载成功后的处理逻辑
+                 ResourcesLoadTraceMgr.Instance.RecordTraceResourceInfor(loader);
                  if (loader == null || loader.ResultObj == null || (loader.IsCompleted && loader.IsError))
                  {
                      Debug.LogError("Instantiate  GameObject Fail,Not Exit At Path= " + url);
@@ -44,7 +50,7 @@ namespace GameFrameWork
                          callback.Invoke(null);
                      return;
                  } //加载资源出错
-                GameObject prefabGo = loader.ResultObj as GameObject;
+                 GameObject prefabGo = loader.ResultObj as GameObject;
                  if (prefabGo == null)
                  {
                      Debug.LogError("Instantiate  GameObject Fail,Load Result Not GameObject Type " + loader.ResultObj.GetType());
@@ -54,7 +60,7 @@ namespace GameFrameWork
                  }
                  if (isActivate == false)
                      prefabGo.SetActive(false);  //临时改变预制体资源的可见性 返回前恢复
-                GameObject go = GameObject.Instantiate(prefabGo, parent);
+                 GameObject go = GameObject.Instantiate(prefabGo, parent);
                  go.name = prefabGo.name;
 
                  if (isResetTransProperty)
@@ -72,12 +78,20 @@ namespace GameFrameWork
                  if (isActivate == false)
                      prefabGo.SetActive(true);  //恢复可见性
 
-                if (callback != null)
+#if UNITY_EDITOR
+                 Debug.LogEditorInfor(string.Format("[ResourcesMgr ] Instantiate Complete <<<<<  url={0}  LoadModel={1} Time={2}  RederFrameCont={3}", url, loadModel, Time.realtimeSinceStartup, Time.renderedFrameCount));
+#endif
+
+                 if (callback != null)
                      callback.Invoke(go);
 
-                #endregion
-            });
+                 #endregion
+             });
         }
+
+
+
+
 
         /// <summary>
         /// 加载已经打成Prefab的预制体的资源的Sprite 精灵
@@ -103,8 +117,8 @@ namespace GameFrameWork
 
             SpriteLoader.LoadAsset(targetImag.transform, url, loadModel, (loader) =>
              {
-                #region  加载成功后的处理逻辑
-                ResourcesLoadTraceMgr.Instance.RecordTraceResourceInfor(loader);
+                 #region  加载成功后的处理逻辑
+                 ResourcesLoadTraceMgr.Instance.RecordTraceResourceInfor(loader);
                  if (loader == null || (loader.IsCompleted && loader.IsError))
                  {
                      Debug.LogError("LoadSprite   Fail,Not Exit At Path= " + url);
@@ -113,11 +127,11 @@ namespace GameFrameWork
                      return;
                  } //加载资源出错
 
-                targetImag.sprite = loader.ResultObj as Sprite;
+                 targetImag.sprite = loader.ResultObj as Sprite;
                  if (callback != null)
                      callback.Invoke(targetImag.sprite);
-                #endregion
-            });
+                 #endregion
+             });
         }
 
         /// <summary>
@@ -137,8 +151,8 @@ namespace GameFrameWork
             TextAssetLoader.LoadAsset(url, loadModel, (loader) =>
             {
                 ResourcesLoadTraceMgr.Instance.RecordTraceResourceInfor(loader);
-               #region  加载成功后的处理逻辑
-               if (loader == null || (loader.IsCompleted && loader.IsError))
+                #region  加载成功后的处理逻辑
+                if (loader == null || (loader.IsCompleted && loader.IsError))
                 {
                     Debug.LogInfor("LoadFile   Fail,Not Exit At Path= " + url);
                     if (callback != null)
@@ -146,10 +160,10 @@ namespace GameFrameWork
                     return;
                 } //加载资源出错
 
-               if (callback != null)
+                if (callback != null)
                     callback.Invoke(loader.ResultObj.ToString());
-               #endregion
-           });
+                #endregion
+            });
         }
 
 
@@ -170,8 +184,8 @@ namespace GameFrameWork
             FontLoader.LoadFontAsset(url, loadModel, (loader) =>
              {
                  ResourcesLoadTraceMgr.Instance.RecordTraceResourceInfor(loader);
-                #region  加载成功后的处理逻辑
-                if (loader == null || (loader.IsCompleted && loader.IsError))
+                 #region  加载成功后的处理逻辑
+                 if (loader == null || (loader.IsCompleted && loader.IsError))
                  {
                      Debug.LogError("LoadFont   Fail,Not Exit At Path= " + url);
                      if (callback != null)
@@ -179,10 +193,10 @@ namespace GameFrameWork
                      return;
                  } //加载资源出错
 
-                if (callback != null)
+                 if (callback != null)
                      callback.Invoke(loader.ResultObj as Font);
-                #endregion
-            });
+                 #endregion
+             });
         }
         /// <summary>
         /// 加载材质球
@@ -201,8 +215,8 @@ namespace GameFrameWork
             MaterialLoader.LoadAsset(target, url, loadModel, (loader) =>
              {
                  ResourcesLoadTraceMgr.Instance.RecordTraceResourceInfor(loader);
-                #region  加载成功后的处理逻辑
-                if (loader == null || (loader.IsCompleted && loader.IsError))
+                 #region  加载成功后的处理逻辑
+                 if (loader == null || (loader.IsCompleted && loader.IsError))
                  {
                      Debug.LogError("LoadMaterial   Fail,Not Exit At Path= " + url);
                      if (callback != null)
@@ -211,12 +225,12 @@ namespace GameFrameWork
                  } //加载资源出错
 
 
-                Material mat = loader.ResultObj as Material;
+                 Material mat = loader.ResultObj as Material;
 
                  if (callback != null)
                      callback.Invoke(mat);
-                #endregion
-            });
+                 #endregion
+             });
         }
 
         /// <summary>
@@ -237,8 +251,8 @@ namespace GameFrameWork
             AudioLoader.LoadAudioClip(parent, url, loadModel, (loader) =>
              {
                  ResourcesLoadTraceMgr.Instance.RecordTraceResourceInfor(loader);
-                #region  加载成功后的处理逻辑
-                if (loader == null || (loader.IsCompleted && loader.IsError))
+                 #region  加载成功后的处理逻辑
+                 if (loader == null || (loader.IsCompleted && loader.IsError))
                  {
                      Debug.LogError("LoadMaterial   Fail,Not Exit At Path= " + url);
                      if (callback != null)
@@ -247,12 +261,12 @@ namespace GameFrameWork
                  } //加载资源出错
 
 
-                AudioClip clip = loader.ResultObj as AudioClip;
+                 AudioClip clip = loader.ResultObj as AudioClip;
 
                  if (callback != null)
                      callback.Invoke(clip);
-                #endregion
-            });
+                 #endregion
+             });
         }
 
 
@@ -273,19 +287,19 @@ namespace GameFrameWork
 
             SceneLoader.LoadScene(url, loadassetModel, (loader) =>
             {
-               // ResourcesLoadTraceMgr.Instance.RecordTraceResourceInfor(loader);
-               #region  加载成功后的处理逻辑
-               if (loader == null || (loader.IsCompleted && loader.IsError))
+                // ResourcesLoadTraceMgr.Instance.RecordTraceResourceInfor(loader);
+                #region  加载成功后的处理逻辑
+                if (loader == null || (loader.IsCompleted && loader.IsError))
                 {
                     Debug.LogError("LoadMaterial   Fail,Not Exit At Path= " + url);
                     if (callback != null)
                         callback.Invoke();
                     return;
                 } //加载资源出错
-               string sceneName = System.IO.Path.GetFileNameWithoutExtension(url);
+                string sceneName = System.IO.Path.GetFileNameWithoutExtension(url);
                 EventCenter.Instance.StartCoroutine(LoadSceneAsync(sceneName, loadModel, callback));
-               #endregion
-           });
+                #endregion
+            });
         }
         private IEnumerator LoadSceneAsync(string sceneName, LoadSceneMode loadModel, System.Action callback)
         {

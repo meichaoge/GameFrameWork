@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 820284996
+CRC: 2264554595
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 8ac10f4318dc20cdafb9fe7a03ae4333
+    Hash: c09849c3574d5bdbf773c1966ff830fc
   TypeTreeHash:
     serializedVersion: 2
     Hash: e80a2d0bb2a428597e51fa23180fef9a
@@ -50,7 +50,5 @@ ClassTypes:
 Assets:
 - Assets/Resources/Prefabs/UI/Login/UILoginPopupView.prefab
 Dependencies:
-- E:/My_WorkSpace/GameFrameWork/Assets/StreamingAssets/Window/fonts & materials/fzlthjw
-  sdf.unity3d
 - E:/My_WorkSpace/GameFrameWork/Assets/StreamingAssets/Window/fonts & materials/fonts
   & materials.unity3d

@@ -99,7 +99,7 @@ namespace GameFrameWork
                 ResourcesMgr.Instance.LoadFile(staticConfigfilePath, LoadAssetModel.Sync, (dataStr) => {
                     JsonData jsonData = JsonMapper.ToObject(dataStr);
 
-                    if (!jsonData.Contains(key))
+                    if (!jsonData.ContainsKey(key))
                         return;
                     removed = true;
 

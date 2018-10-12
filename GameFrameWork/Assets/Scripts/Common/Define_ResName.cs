@@ -15,6 +15,11 @@ namespace GameFrameWork
 
         #endregion
 
+
+        #region 公共弹窗
+        public static string UITextTipViewName = "UITextTipView"; //飘字界面
+        #endregion
+
         #endregion
 
     }

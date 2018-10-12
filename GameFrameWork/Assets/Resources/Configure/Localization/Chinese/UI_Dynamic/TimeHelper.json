@@ -1,45 +1,45 @@
 {
   
-"Day1": "Ò»",
+"Day1": "ä¸€",
   
-"Day2": "¶ş",
+"Day2": "äºŒ",
   
-"Day3": "Èı",
+"Day3": "ä¸‰",
  
- "Day4": "ËÄ",
+ "Day4": "å››",
  
- "Day5": "Îå",
+ "Day5": "äº”",
   
-"Day6": "Áù",
+"Day6": "å…­",
   
-"Day7": "ÈÕ",
+"Day7": "æ—¥",
   
 
-"TimeDay01": "{0}ÌìÇ°",
+"TimeDay01": "{0}å¤©å‰",
 
-  "TimeHour01": "{0}Ğ¡Ê±Ç°",
+  "TimeHour01": "{0}å°æ—¶å‰",
  
- "TimeMinute01": "{0}·ÖÖÓÇ°",
+ "TimeMinute01": "{0}åˆ†é’Ÿå‰",
   
-"TimeSecend01": "{0}ÃëÇ°",
+"TimeSecend01": "{0}ç§’å‰",
   
-"TimeJustNow": "¸Õ¸Õ",
+"TimeJustNow": "åˆšåˆš",
   
-"TimeDay02": "{0}Ììºó",
+"TimeDay02": "{0}å¤©å",
   
-"TimeHour02": "{0}Ğ¡Ê±ºó",
+"TimeHour02": "{0}å°æ—¶å",
  
- "TimeMinute02": "{0}·ÖÖÓºó",
+ "TimeMinute02": "{0}åˆ†é’Ÿå",
  
- "TimeSecend02": "{0}Ãëºó",
+ "TimeSecend02": "{0}ç§’å",
  
- "TimeDay": "{0}Ìì",
+ "TimeDay": "{0}å¤©",
   
-"TimeHour": "{0}Ğ¡Ê±",
+"TimeHour": "{0}å°æ—¶",
   
-"TimeMinute": "{0}·ÖÖÓ",
+"TimeMinute": "{0}åˆ†é’Ÿ",
 
-  "TimeSecend": "{0}Ãë"
+  "TimeSecend": "{0}ç§’"
 
 
 

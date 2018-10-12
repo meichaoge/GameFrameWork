@@ -83,11 +83,7 @@ namespace GameFrameWork.UGUI
             }
 #endif
       
-            //     if (parameter[0] != null)
             BelongPageView = parameter[0] as UIBasePageView;
-            //else
-            //    BelongPageView = null;
-
 
             base.ShowWindow(parameter);
         }

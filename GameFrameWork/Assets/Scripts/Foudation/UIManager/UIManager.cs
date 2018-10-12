@@ -55,50 +55,59 @@ namespace GameFrameWork
             {
                 #region 打开一个新的页面
                 m_AllRecordViewPage.Add(view);
-                if (CurOpenPage != null)
-                {
-                    CurOpenPage.HideWindow();
-                    RemoveWillPopupView(CurOpenPage);  //关闭当前界面所包含的弹窗
-                }
+                ClosePageConnectView(CurOpenPage);
+
+                //if (CurOpenPage != null)
+                //{
+                //    CurOpenPage.HideWindow();
+                //    RemoveWillPopupView(CurOpenPage);  //关闭当前界面所包含的弹窗
+                //    CloseAttachWidget(CurOpenPage.transform,false);   //关闭关联的Widget
+                //}
                 CurOpenPage = view;  //更新当前打开的窗口
                 view.ShowWindow(parameter);
                 #endregion
+                return;
             }
-            else
+            #region 打开一个已经打开过的页面
+            Debug.Log("界面已经被打开过 则需要处理");
+            if (view == CurOpenPage)
             {
-                #region 打开一个已经打开过的页面
-                Debug.Log("界面已经被打开过 则需要处理");
-                if (view == CurOpenPage)
+                #region 当前要打开的界面就是最后打开的页面   则根据条件判断是否只需要刷新
+
+                if (CurOpenPage.IsOpen && CurOpenPage.IsCompleteShow)
                 {
-                    if (CurOpenPage.IsOpen && CurOpenPage.IsCompleteShow)
-                    {
-                        Debug.Log("界面已经打开了  执行刷新操作 ");
-                        CurOpenPage.FlushWindow(parameter);
-                    }
-                    else
-                    {
-                        Debug.LogError("当前界面状态异常 正在打开中..... " + CurOpenPage.IsOpen + ":" + CurOpenPage.IsCompleteShow);
-                    }
-                    return;
-                }//当前要打开的界面就是最后打开的页面   则根据条件判断是否只需要刷新
+                    Debug.Log("界面已经打开了  执行刷新操作 ");
+                    CurOpenPage.FlushWindow(parameter);
+                }
                 else
                 {
-                    if (CurOpenPage != null)
-                    {
-                        CurOpenPage.HideWindow();
-                        RemoveWillPopupView(CurOpenPage);  //关闭当前界面所包含的弹窗
-                    }
-
-                    for (int dex = m_AllRecordViewPage.Count - 1; dex >= 0; --dex)
-                    {
-                        if (m_AllRecordViewPage[dex] != view)
-                            m_AllRecordViewPage.RemoveAt(dex);
-                    } //弹出已经打开过的界面
-                    CurOpenPage = view;
-                    view.ShowWindow(parameter);
+                    Debug.LogError("当前界面状态异常 正在打开中..... " + CurOpenPage.IsOpen + ":" + CurOpenPage.IsCompleteShow);
                 }
                 #endregion
-            }
+
+                return;
+            }//当前要打开的界面就是最后打开的页面   则根据条件判断是否只需要刷新
+
+            #region  弹出已经打开过的界面 并记录当前页面
+            //if (CurOpenPage != null)
+            //{
+            //    CurOpenPage.HideWindow();
+            //    RemoveWillPopupView(CurOpenPage);  //关闭当前界面所包含的弹窗
+            //    CloseAttachWidget(CurOpenPage.transform, false);   //关闭关联的Widget
+            //}
+            ClosePageConnectView(CurOpenPage);
+
+            for (int dex = m_AllRecordViewPage.Count - 1; dex >= 0; --dex)
+            {
+                if (m_AllRecordViewPage[dex] != view)
+                    m_AllRecordViewPage.RemoveAt(dex);
+            } //弹出已经打开过的界面
+            CurOpenPage = view;
+            m_AllRecordViewPage.Add(view);
+            view.ShowWindow(parameter);
+            #endregion
+
+            #endregion
         }
 
         /// <summary>
@@ -116,16 +125,47 @@ namespace GameFrameWork
                 return;
             }
 #endif
-            if (m_AllRecordViewPage.Count == 1)
+            //if (m_AllRecordViewPage.Count == 1)
+            //{
+            //    Debug.LogError("只剩下一个界面 无法关闭" + CurOpenPage.name);
+            //    return;
+            //}
+            if(m_AllRecordViewPage.Count>1)
             {
-                Debug.LogError("只剩下一个界面 无法关闭" + CurOpenPage.name);
-                return;
-            }
-
-            CurOpenPage.HideWindow();
-            CurOpenPage = m_AllRecordViewPage[m_AllRecordViewPage.Count - 1];
-            CurOpenPage.ShowWindow(parameter);
+                CurOpenPage = m_AllRecordViewPage[m_AllRecordViewPage.Count - 1];
+                CurOpenPage.ShowWindow(parameter);
+            } //在打开另一个界面时候回关闭当前界面
+            else
+            {
+                m_AllRecordViewPage.Clear();
+                ClosePageConnectView(CurOpenPage);
+                CurOpenPage = null;
+            } //关闭最后一个页面
         }
+
+        public void ClosePage(UIBasePageView view, params object[] parameter)
+        {
+            if (view != CurOpenPage) return;
+
+            ClosePage(parameter);
+        }
+
+
+        /// <summary>
+        /// 关闭一个页面所有关联的Popup /Widget
+        /// </summary>
+        /// <param name="view"></param>
+        private void  ClosePageConnectView(UIBasePageView view)
+        {
+            if (view != null)
+            {
+                view.HideWindow();
+                RemoveWillPopupView(view);  //关闭当前界面所包含的弹窗（没有弹出的）
+                CloseConnectPopupView(view); //关闭当前界面所包含的弹窗 (已经弹出的)
+                CloseAttachWidget(view.transform, false);   //关闭关联的Widget
+            }
+        }
+
 
         #endregion
 
@@ -163,7 +203,7 @@ namespace GameFrameWork
             }
             if (belongPageView == null)
                 belongPageView = CurOpenPage;
-            view.ShowWindow(belongPageView, isFailRecord, parameter); //注意这里的第一个参数
+            view.ShowWindow ( Helper.Instance.MegerParameter(new object[] { belongPageView, isFailRecord }, parameter)  ); //注意这里的第一个参数
             m_AllRecordViewPopup.Add(view);
         }
 
@@ -326,7 +366,7 @@ namespace GameFrameWork
 
 
         /// <summary>
-        /// 关闭页面时候关闭这个页面所包含的弹窗
+        /// 关闭页面时候关闭这个页面所包含的没有弹出的弹窗
         /// </summary>
         /// <param name="pageview"></param>
         private void RemoveWillPopupView(UIBasePageView pageview)
@@ -339,6 +379,29 @@ namespace GameFrameWork
             if (m_LowerPriorityPopupView.ContainsKey(pageview) == false) return;
             m_LowerPriorityPopupView[pageview].Clear();
         }
+       /// <summary>
+       /// 关闭已经打开的弹窗
+       /// </summary>
+       /// <param name="pageview"></param>
+        private void  CloseConnectPopupView(UIBasePageView belongPageView)
+        {
+            if (belongPageView == null)
+            {
+                Debug.LogError("ClosePopupView Is Null Page");
+                return;
+            }
+
+            for (int dex= m_AllRecordViewPopup.Count-1;dex>=0;--dex)
+            {
+                if(m_AllRecordViewPopup[dex].BelongPageView== belongPageView)
+                {
+                    m_AllRecordViewPopup[dex].HideWindow();
+                    m_AllRecordViewPopup.RemoveAt(dex);
+                }
+            }
+        }
+
+
 
         /// <summary>
         /// 记录需要弹出来的窗口
@@ -495,7 +558,7 @@ namespace GameFrameWork
             }
 #endif
 
-            view.ShowWindow(autoDestroyTime, parameter);
+            view.ShowWindow(Helper.Instance. MegerParameter(autoDestroyTime, parameter));
             m_AllRecordViewTips.Add(view);
         }
 
@@ -530,8 +593,8 @@ namespace GameFrameWork
         /// </summary>
         /// <param name="view"></param>
         /// <param name="parentTrans"></param>
-        /// <param name="showTime"></param>
-        /// <param name="isSingleton"></param>
+        /// <param name="showTime">=0 标识一直存在</param>
+        /// <param name="isSingleton">=true 标识只会创建一个</param>
         /// <param name="parameter"></param>
         public void OpenWidget(UIBaseWidgetView view, Transform parentTrans, float showTime, bool isSingleton, params object[] parameter)
         {
@@ -572,14 +635,12 @@ namespace GameFrameWork
                     }
                     if (m_AllWidgetView[parentTrans].Count == 0)
                         m_AllWidgetView[parentTrans].Add(view);
-
-                    ShowWidgetView(view, parentTrans, showTime, isSingleton);
                 }
                 else
                 {
                     m_AllWidgetView[parentTrans].Add(view);
-                    ShowWidgetView(view, parentTrans, showTime, isSingleton);
                 }
+                ShowWidgetView(view, parentTrans, showTime, isSingleton, parameter);
                 #endregion
             }
             else
@@ -589,7 +650,7 @@ namespace GameFrameWork
                 widgetViews.Add(view);
                 m_AllWidgetView.Add(parentTrans, widgetViews);
 
-                ShowWidgetView(view, parentTrans, showTime, isSingleton);
+                ShowWidgetView(view, parentTrans, showTime, isSingleton, parameter);
                 #endregion
             }
 
@@ -605,12 +666,13 @@ namespace GameFrameWork
         /// <param name="parameter"></param>
         private void ShowWidgetView(UIBaseWidgetView view, Transform parentTrans, float showTime, bool isSingleton, params object[] parameter)
         {
-            view.rectransform.SetParent(parentTrans);
+            if (view.rectransform.parent != parentTrans)
+                view.rectransform.SetParent(parentTrans);
             view.rectransform.ResetRectTransProperty();
             if (view.IsOpen)
                 view.FlushWindow(parameter);
             else
-                view.ShowWindow(parentTrans, showTime, isSingleton, parameter);
+                view.ShowWindow(Helper.Instance.MegerParameter(new object[] { parentTrans, showTime, isSingleton }, parameter));
         }
 
 
@@ -682,7 +744,7 @@ namespace GameFrameWork
         /// <param name="isActivate">是否生成后保持激活</param>
         /// <param name="isResetTransProperty">是否重置属性</param>
         /// <param name="viewName">默认为预制体名</param>
-        public void CreateUI<T>(string viewPath, Transform parentTrans, System.Action<T> callback, bool isActivate = true, bool isResetTransProperty = true, string viewName = "") where T : UIBaseView
+        public void CreateUIAsync<T>(string viewPath, Transform parentTrans, System.Action<T> callback, bool isActivate , bool isResetTransProperty = true, string viewName = "") where T : UIBaseView
         {
             if (string.IsNullOrEmpty(viewPath))
             {
@@ -704,22 +766,71 @@ namespace GameFrameWork
         }
 
         /// <summary>
+        /// 创建UI 异步加载方式
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="viewPath"></param>
+        /// <param name="callback"></param>
+        /// <param name="isActivate">是否生成后保持激活</param>
+        /// <param name="isResetTransProperty">是否重置属性</param>
+        /// <param name="viewName">默认为预制体名</param>
+        public void CreateUISync<T>(string viewPath, Transform parentTrans, System.Action<T> callback, bool isActivate , bool isResetTransProperty = true, string viewName = "") where T : UIBaseView
+        {
+            if (string.IsNullOrEmpty(viewPath))
+            {
+                Debug.LogError("CreateUI Fail, View Path Is Not Avaliable");
+                return;
+            }
+            ResourcesMgr.Instance.Instantiate(viewPath, parentTrans, LoadAssetModel.Sync, (obj) =>
+            {
+                if (obj != null && string.IsNullOrEmpty(viewName) == false)
+                    obj.name = viewName;
+
+                T viewScript = obj.GetAddComponent<T>();
+                //Debug.LogEditorInfor("CreateUI  " + viewScript.gameObject.activeSelf+ "           viewPath="+ viewPath+ "            isActivate="+ isActivate);
+
+                obj.SetActive(isActivate);
+
+                if (callback != null)
+                    callback.Invoke(viewScript);
+            }, true, isResetTransProperty);
+        }
+
+        /// <summary>
         /// 获取已经存在的UIView
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="viewName"></param>
         /// <returns></returns>
-        public T GetUI<T>(string viewName) where T : UIBaseView
+        public T GetExitUIInstance<T>(string viewName) where T : UIBaseView
         {
             if (string.IsNullOrEmpty(viewName))
             {
-                //Debug.LogError("GetUI Fail Not Exit");
+                Debug.LogError("GetUI Fail Not Exit");
                 return null;
             }
             if (m_AllExitView.ContainsKey(viewName))
                 return m_AllExitView[viewName] as T;
             return null;
         }
+
+        /// <summary>
+        ///  获取已经存在的UIView
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public T GetExitUIInstance<T>( ) where T : UIBaseView
+        {
+            foreach (var item in m_AllExitView.Values)
+            {
+                if(item .GetType()==typeof(T))
+                {
+                    return item as T;
+                }
+            }
+            return null;
+        }
+
 
         /// <summary>
         /// 强制获取一个组件 没有就创建
@@ -731,9 +842,12 @@ namespace GameFrameWork
         /// <param name="isActivate"></param>
         /// <param name="isResetTransProperty"></param>
         /// <param name="viewName"></param>
-        public void ForceGetUI<T>(string viewPath, Transform parentTrans, System.Action<T> callback, bool isActivate , bool isResetTransProperty = true, string viewName = "") where T : UIBaseView
+        public void ForceGetUIAsync<T>(string viewPath, Transform parentTrans, System.Action<T> callback, bool isActivate , bool isResetTransProperty = true, string viewName = "") where T : UIBaseView
         {
-            T view = GetUI<T>(viewName);
+            if (string.IsNullOrEmpty(viewName))
+                viewName = System.IO.Path.GetFileNameWithoutExtension(viewPath);
+
+            T view = GetExitUIInstance<T>(viewName);
             if (view != null)
             {
                 if (view.transform.parent != parentTrans)
@@ -748,8 +862,30 @@ namespace GameFrameWork
                 return;
             }
 
-            CreateUI<T>(viewPath, parentTrans, callback, isActivate, isResetTransProperty, viewName);
+            CreateUIAsync<T>(viewPath, parentTrans, callback, isActivate, isResetTransProperty, viewName);
         }
+        public void ForceGetUISync<T>(string viewPath, Transform parentTrans, System.Action<T> callback, bool isActivate, bool isResetTransProperty = true, string viewName = "") where T : UIBaseView
+        {
+            if(string.IsNullOrEmpty(viewName))
+                viewName = System.IO.Path.GetFileNameWithoutExtension(viewPath);
+            T view = GetExitUIInstance<T>(viewName);
+            if (view != null)
+            {
+                if (view.transform.parent != parentTrans)
+                    view.transform.SetParent(parentTrans);
+                if (isResetTransProperty)
+                    view.transform.ResetTransProperty();
+
+                view.gameObject.SetActive(isActivate);
+
+                if (callback != null)
+                    callback(view);
+                return;
+            }
+
+            CreateUISync<T>(viewPath, parentTrans, callback, isActivate, isResetTransProperty, viewName);
+        }
+
 
 
         #endregion
@@ -786,6 +922,11 @@ namespace GameFrameWork
         }
 
         #endregion
+
+
+    
+
+
 
     }
 }

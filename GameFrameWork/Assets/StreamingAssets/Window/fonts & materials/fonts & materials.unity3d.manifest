@@ -1,12 +1,12 @@
 ManifestFileVersion: 0
-CRC: 409859841
+CRC: 4256521146
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 8221ca79b6dfc1366d0d41980c8c78c9
+    Hash: 3e4ed0d8b7ba18528d2b035ad980b788
   TypeTreeHash:
     serializedVersion: 2
-    Hash: 007be97d342d89736165b403eb38efa7
+    Hash: d8bf15f08e9bd628bc686cadfdfe0ce1
 HashAppended: 0
 ClassTypes:
 - Class: 21
@@ -15,11 +15,14 @@ ClassTypes:
   Script: {instanceID: 0}
 - Class: 48
   Script: {instanceID: 0}
+- Class: 114
+  Script: {fileID: -667331979, guid: 89f0137620f6af44b9ba852b4190e64e, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
 - Class: 128
   Script: {instanceID: 0}
 Assets:
 - Assets/Resources/Fonts & Materials/FZLTHJW_Outline_Black.mat
+- Assets/Resources/Fonts & Materials/FZLTHJW SDF.asset
 - Assets/Resources/Fonts & Materials/FZLTHJW.TTF
-Dependencies:
-- E:/My_WorkSpace/GameFrameWork/Assets/StreamingAssets/Window/fonts & materials/fzlthjw
-  sdf.unity3d
+Dependencies: []

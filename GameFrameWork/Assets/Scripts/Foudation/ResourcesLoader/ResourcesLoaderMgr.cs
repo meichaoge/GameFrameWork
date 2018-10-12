@@ -130,7 +130,7 @@ namespace GameFrameWork.ResourcesLoader
             if (Time.realtimeSinceStartup - lastCheckTime >= S_CheckGCTime)
             {
                 CheckUnRefenceLoader();
-                CheckLoaderStateForGC();
+            //    CheckLoaderStateForGC();
                 lastCheckTime = Time.realtimeSinceStartup;
             }
         }
@@ -155,39 +155,39 @@ namespace GameFrameWork.ResourcesLoader
         /// </summary>
         private static void CheckLoaderStateForGC()
         {
-            BaseAbstracResourceLoader checkLoader = null;
-            bool isNeedGC = false;  //标识是否需要回收一次资源
-            foreach (var loaders in S_UnUseLoader.Values)
-            {
-                while (true)
-                {
-                    if (loaders.Count == 0)
-                        break;  //已经检测完这个类型的加载器
-                    checkLoader = loaders.Peek();
-                    if (checkLoader == null)
-                    {
-                        checkLoader.Dispose();  //加载器释放最后的资源
-                        loaders.Dequeue();  //删除对象
-                        isNeedGC = true;
-                        continue;
-                    }
-                    if (Time.realtimeSinceStartup - checkLoader.UnUseTime < checkLoader.m_GCInterval)
-                        break;  //由于加载器是一个队列 因此最前面的加载肯定先到达最长生命周期
+            //BaseAbstracResourceLoader checkLoader = null;
+            //bool isNeedGC = false;  //标识是否需要回收一次资源
+            //foreach (var loaders in S_UnUseLoader.Values)
+            //{
+            //    while (true)
+            //    {
+            //        if (loaders.Count == 0)
+            //            break;  //已经检测完这个类型的加载器
+            //        checkLoader = loaders.Peek();
+            //        if (checkLoader == null)
+            //        {
+            //            checkLoader.Dispose();  //加载器释放最后的资源
+            //            loaders.Dequeue();  //删除对象
+            //            isNeedGC = true;
+            //            continue;
+            //        }
+            //        if (Time.realtimeSinceStartup - checkLoader.UnUseTime < checkLoader.m_GCInterval)
+            //            break;  //由于加载器是一个队列 因此最前面的加载肯定先到达最长生命周期
 
-                    Debug.LogInfor("[GC Loaders ] Type=" + checkLoader.GetType().Name + "  Url=" + checkLoader.m_ResourcesUrl);
+            //        Debug.LogInfor("[GC Loaders ] Type=" + checkLoader.GetType().Name + "  Url=" + checkLoader.m_ResourcesUrl);
 
-                    //当前加载器回收后超过了最大生命周期时间需要被删除回收资源
-                    checkLoader.Dispose();  //加载器释放最后的资源
-                    loaders.Dequeue();  //删除对象
-                    isNeedGC = true;
-                    continue;
-                }//while
-            }//forech
+            //        //当前加载器回收后超过了最大生命周期时间需要被删除回收资源
+            //        checkLoader.Dispose();  //加载器释放最后的资源
+            //        loaders.Dequeue();  //删除对象
+            //        isNeedGC = true;
+            //        continue;
+            //    }//while
+            //}//forech
 
-            if (isNeedGC)
-            {
-                GC.Collect();  //回收资源
-            }
+            //if (isNeedGC)
+            //{
+            //    GC.Collect();  //回收资源
+            //}
         }
 
         #endregion
@@ -205,7 +205,6 @@ namespace GameFrameWork.ResourcesLoader
         public static T GetOrCreateLoaderInstance<T>(string url, ref bool isLoaderExit) where T : BaseAbstracResourceLoader, new()
         {
             //Debug.LogEditorInfor("GetOrCreateLoaderInstance  url=" + url+"  type="+typeof(T));
-            //       url = string.Format(@"{0}", url);
             T resultLoader = null;
             isLoaderExit = false;
             Dictionary<string, BaseAbstracResourceLoader> typeOfLoaders = null;

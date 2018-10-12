@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using System;
 
 namespace GameFrameWork.HotUpdate
 {
@@ -17,9 +17,9 @@ namespace GameFrameWork.HotUpdate
             base.InitialedUpdateMgr();
             HotAssetManagerEnum = HotAssetEnum.AssetBundleAsset;
             m_LocalAssetConfigurePath ="";
-            m_LocalAssetConfigureFileName = string.Format("{0}_{1}", AssetBundleMgr.Instance.GetHotAssetBuildPlatformName(), "AssetBundleInfor.txt");
+            m_LocalAssetConfigureFileName = string.Format("{0}{1}", AssetBundleMgr.Instance.GetHotAssetBuildPlatformName(), ConstDefine.S_AssetBundleBuildRecordConfigureName);
 
-            Debug.LogInfor("InitialedUpdateMgr HotAssetManagerEnum=" + m_LocalAssetConfigurePath);
+            Debug.LogInfor("InitialedUpdateMgr HotAssetManagerEnum=" + HotAssetManagerEnum);
             Debug.LogInfor("InitialedUpdateMgr m_LocalAssetConfigureFileName=" + m_LocalAssetConfigureFileName);
 
         }
@@ -61,6 +61,7 @@ namespace GameFrameWork.HotUpdate
             //{
             //    Debug.Log("" + item.Value.m_MD5Code + "  ;;;" + item.Value.m_ByteSize+"\n");
             //}
+            AssetBundleMgr.Instance.RecordAllLocalAssetBundleAsset(m_ServerAssetRecord);  //记录本地所有的AssetBundel 资源
         }
 
         protected override string GetAssetDownLoadPath(string assetName)
@@ -83,5 +84,9 @@ namespace GameFrameWork.HotUpdate
             return url.Substring(index + abundleDwonPath.Length);
         }
 
+        protected override void ClearLocalAssetBundleAsset()
+        {
+            Debug.LogError("TODO   清理本地AssetBundel 资源");
+        }
     }
 }

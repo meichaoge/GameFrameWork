@@ -39,7 +39,7 @@ namespace LitJson
     public class JsonWriter
     {
         #region Fields
-        private static NumberFormatInfo number_format;
+        private static readonly NumberFormatInfo number_format;
 
         private WriterContext        context;
         private Stack<WriterContext> ctx_stack;
@@ -50,6 +50,7 @@ namespace LitJson
         private StringBuilder        inst_string_builder;
         private bool                 pretty_print;
         private bool                 validate;
+        private bool                 lower_case_properties;
         private TextWriter           writer;
         #endregion
 
@@ -75,6 +76,11 @@ namespace LitJson
         public bool Validate {
             get { return validate; }
             set { validate = value; }
+        }
+
+        public bool LowerCaseProperties {
+            get { return lower_case_properties; }
+            set { lower_case_properties = value; }
         }
         #endregion
 
@@ -166,6 +172,7 @@ namespace LitJson
             indent_value = 4;
             pretty_print = false;
             validate = true;
+            lower_case_properties = false;
 
             ctx_stack = new Stack<WriterContext> ();
             context = new WriterContext ();
@@ -216,58 +223,57 @@ namespace LitJson
                 writer.Write (',');
 
             if (pretty_print && ! context.ExpectingValue)
-                writer.Write ('\n');
+                writer.Write (Environment.NewLine);
         }
 
         private void PutString (string str)
         {
             Put (String.Empty);
+
             writer.Write ('"');
 
-            #region 默认的存字符串方法 2017/2/13更改
-            //int n = str.Length;
-            //for (int i = 0; i < n; i++)
-            //{
-            //    switch (str[i])
-            //    {
-            //        case '\n':
-            //            writer.Write("\\n");
-            //            continue;
-            //        case '\r':
-            //            writer.Write("\\r");
-            //            continue;
-            //        case '\t':
-            //            writer.Write("\\t");
-            //            continue;
-            //        case '"':
-            //        case '\\':
-            //            writer.Write('\\');
-            //            writer.Write(str[i]);
-            //            continue;
-            //        case '\f':
-            //            writer.Write("\\f");
-            //            continue;
-            //        case '\b':
-            //            writer.Write("\\b");
-            //            continue;
-            //    }
-            //    if ((int)str[i] >= 32 && (int)str[i] <= 126)
-            //    {
-            //        writer.Write(str[i]);
-            //        continue;
-            //    }
-            //    // Default, turn into a \uXXXX sequence
-            //    IntToHex((int)str[i], hex_seq);
-            //    writer.Write("\\u");
-            //    writer.Write(hex_seq);
-            //}
-            //writer.Write('"');
-            #endregion
+            int n = str.Length;
+            for (int i = 0; i < n; i++) {
+                switch (str[i]) {
+                case '\n':
+                    writer.Write ("\\n");
+                    continue;
 
-            #region  新的方案 直接存储原始字符串，不再做任何转义字符的解析          可以读写汉字 
-            writer.Write(str);  //*****更改后可以保存Unicode汉字以及解析
-            writer.Write('"');
-            #endregion
+                case '\r':
+                    writer.Write ("\\r");
+                    continue;
+
+                case '\t':
+                    writer.Write ("\\t");
+                    continue;
+
+                case '"':
+                case '\\':
+                    writer.Write ('\\');
+                    writer.Write (str[i]);
+                    continue;
+
+                case '\f':
+                    writer.Write ("\\f");
+                    continue;
+
+                case '\b':
+                    writer.Write ("\\b");
+                    continue;
+                }
+
+                if ((int) str[i] >= 32 && (int) str[i] <= 126) {
+                    writer.Write (str[i]);
+                    continue;
+                }
+
+                // Default, turn into a \uXXXX sequence
+                IntToHex ((int) str[i], hex_seq);
+                writer.Write ("\\u");
+                writer.Write (hex_seq);
+            }
+
+            writer.Write ('"');
         }
 
         private void Unindent ()
@@ -443,14 +449,17 @@ namespace LitJson
         {
             DoValidation (Condition.Property);
             PutNewline ();
+            string propertyName = (property_name == null || !lower_case_properties)
+                ? property_name
+                : property_name.ToLowerInvariant();
 
-            PutString (property_name);
+            PutString (propertyName);
 
             if (pretty_print) {
-                if (property_name.Length > context.Padding)
-                    context.Padding = property_name.Length;
+                if (propertyName.Length > context.Padding)
+                    context.Padding = propertyName.Length;
 
-                for (int i = context.Padding - property_name.Length;
+                for (int i = context.Padding - propertyName.Length;
                      i >= 0; i--)
                     writer.Write (' ');
 

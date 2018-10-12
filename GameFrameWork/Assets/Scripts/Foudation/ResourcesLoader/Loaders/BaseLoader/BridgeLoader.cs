@@ -76,22 +76,19 @@ namespace GameFrameWork.ResourcesLoader
         private IEnumerator LoadAssetByPriorityAsync(string url, BridgeLoader bridgeLoader, bool isloadSceneAsset)
         {
             LoadAssetPathEnum curLoadAssetPathEnum = ApplicationConfig.Instance.GetFirstPriortyAssetPathEnum();  //加载的优先级
+            string fileName = System.IO.Path.GetFileNameWithoutExtension(url);
             do
             {
                 if (curLoadAssetPathEnum == LoadAssetPathEnum.PersistentDataPath)
                 {
-                    string newUrl = "";
-                    AssetBundleExitState assetBundleExitState = AssetBundleLoader.CheckIsAssetBundleExit(url.ToLower(), ref newUrl);
+
+                    AssetBundleExitState assetBundleExitState;
+                    string newUrl = HotUpdate.AssetBundleMgr.Instance.CheckIfAssetBundleAsset(url.ToLower(), out assetBundleExitState);
 
                     if (assetBundleExitState != AssetBundleExitState.None)
                     {
-                        string fileName = System.IO.Path.GetFileNameWithoutExtension(url);
-
                         Debug.Log("[AssetBundler ]加载外部资源，且以AssetBundle 加载");
-                        if (assetBundleExitState == AssetBundleExitState.SinglePrefab)
-                            bridgeLoader.m_ConnectLoader = AssetBundleLoader.LoadAssetBundleAsset(url.ToLower(), fileName, LoadAssetModel.Async, null, isloadSceneAsset);  //单独预制体
-                        else
-                            bridgeLoader.m_ConnectLoader = AssetBundleLoader.LoadAssetBundleAsset(newUrl, fileName, LoadAssetModel.Async, null, isloadSceneAsset);   //整体打包的资源
+                        bridgeLoader.m_ConnectLoader = NewAssetBundleLoader3.LoadAssetBundleAsset(newUrl, fileName, LoadAssetModel.Async, assetBundleExitState, isloadSceneAsset);   //整体打包的资源
                     }
                     else
                     {
@@ -117,17 +114,23 @@ namespace GameFrameWork.ResourcesLoader
 
                 while (bridgeLoader.m_ConnectLoader.IsCompleted == false)
                     yield return null;
-                if (bridgeLoader.m_ConnectLoader.ResultObj != null)
+
+                if (curLoadAssetPathEnum == LoadAssetPathEnum.PersistentDataPath && (bridgeLoader.m_ConnectLoader.GetType() == typeof(NewAssetBundleLoader3)))
                 {
-                    yield break;
+                    NewAssetBundleLoader3 assetBundleLoader = bridgeLoader.m_ConnectLoader as NewAssetBundleLoader3;
+                    if (assetBundleLoader.AssetLoaderResultInfor.GetAssetByUrl(assetBundleLoader.m_ResourcesUrl, fileName) != null)
+                        yield break;
                 }
                 else
                 {
-                    bridgeLoader.m_ConnectLoader.ReduceReference(bridgeLoader.m_ConnectLoader, false);  //卸载这个加载器
-                    ApplicationConfig.Instance.GetNextLoadAssetPath(ref curLoadAssetPathEnum);
-                    continue;  //如果加载得到则返回否则继续尝试其他的加载方式
+                    if (bridgeLoader.m_ConnectLoader.ResultObj != null)
+                    {
+                        yield break;
+                    }
                 }
-
+                //    bridgeLoader.m_ConnectLoader.ReduceReference(bridgeLoader.m_ConnectLoader, false);  //卸载这个加载器
+                ApplicationConfig.Instance.GetNextLoadAssetPath(ref curLoadAssetPathEnum);
+                continue;  //如果加载得到则返回否则继续尝试其他的加载方式
             } while (curLoadAssetPathEnum != LoadAssetPathEnum.None);
             Debug.LogError("如果加载成功不会执行到这里" + url);
             bridgeLoader.m_ConnectLoader = null;  //如果加载成功不会执行到这里
@@ -139,20 +142,29 @@ namespace GameFrameWork.ResourcesLoader
         /// <param name="url"></param>
         /// <param name="birdgeLoader"></param>
         /// <returns></returns>
-        private IEnumerator LoadAssetAsync(string url, BridgeLoader birdgeLoader)
+        private IEnumerator LoadAssetAsync(string url, BridgeLoader bridgeLoader)
         {
-            birdgeLoader.m_ResourcesUrl = url;
-            if (birdgeLoader.m_ConnectLoader == null)
+            bridgeLoader.m_ResourcesUrl = url;
+            if (bridgeLoader.m_ConnectLoader == null)
             {
                 OnLoadAssetFail();
                 yield break;
             }
 
-            while (birdgeLoader.m_ConnectLoader.IsCompleted == false)
+            while (bridgeLoader.m_ConnectLoader.IsCompleted == false)
                 yield return null;
 
-            OnCompleteLoad(birdgeLoader.m_ConnectLoader.IsError, birdgeLoader.m_ConnectLoader.Description, birdgeLoader.m_ConnectLoader.ResultObj, birdgeLoader.m_ConnectLoader.IsCompleted);
-            yield break;
+            if (bridgeLoader.m_ConnectLoader.GetType() == typeof(NewAssetBundleLoader3))
+            {
+                string fileName = System.IO.Path.GetFileNameWithoutExtension(url);
+                NewAssetBundleLoader3 assetBundleloader = bridgeLoader.m_ConnectLoader as NewAssetBundleLoader3;
+                object asset = assetBundleloader.AssetLoaderResultInfor.GetAssetByUrl(assetBundleloader.m_ResourcesUrl, fileName);
+                OnCompleteLoad(bridgeLoader.m_ConnectLoader.IsError, bridgeLoader.m_ConnectLoader.Description, asset, bridgeLoader.m_ConnectLoader.IsCompleted);
+            }
+            else
+            {
+                OnCompleteLoad(bridgeLoader.m_ConnectLoader.IsError, bridgeLoader.m_ConnectLoader.Description, bridgeLoader.m_ConnectLoader.ResultObj, bridgeLoader.m_ConnectLoader.IsCompleted);
+            }
         }
         #endregion
 
@@ -204,28 +216,24 @@ namespace GameFrameWork.ResourcesLoader
         private void LoadAssetByPrioritySync(string url, BridgeLoader bridgeLoader, bool isloadSceneAsset)
         {
             LoadAssetPathEnum curLoadAssetPathEnum = ApplicationConfig.Instance.GetFirstPriortyAssetPathEnum();  //加载的优先级
+            string fileName = System.IO.Path.GetFileNameWithoutExtension(url);
             do
             {
                 if (curLoadAssetPathEnum == LoadAssetPathEnum.PersistentDataPath)
                 {
-                    string newUrl = "";
-                    AssetBundleExitState assetBundleExitState = AssetBundleLoader.CheckIsAssetBundleExit(url.ToLower(), ref newUrl);
+                    AssetBundleExitState assetBundleExitState;
+                    string newUrl = HotUpdate.AssetBundleMgr.Instance.CheckIfAssetBundleAsset(url.ToLower(), out assetBundleExitState);
 
                     if (assetBundleExitState != AssetBundleExitState.None)
                     {
-                        string fileName = System.IO.Path.GetFileNameWithoutExtension(url);
-
                         Debug.Log("加载外部资源，且以AssetBundle 加载");
-                        if (assetBundleExitState == AssetBundleExitState.SinglePrefab)
-                            bridgeLoader.m_ConnectLoader = AssetBundleLoader.LoadAssetBundleAsset(url.ToLower(), fileName, LoadAssetModel.Sync, null, isloadSceneAsset);  //单独预制体
-                        else
-                            bridgeLoader.m_ConnectLoader = AssetBundleLoader.LoadAssetBundleAsset(newUrl, fileName, LoadAssetModel.Sync, null, isloadSceneAsset);   //整体打包的资源
+                        bridgeLoader.m_ConnectLoader = NewAssetBundleLoader3.LoadAssetBundleAsset(newUrl, fileName, LoadAssetModel.Sync, assetBundleExitState, isloadSceneAsset);
                     }
                     else
                     {
                         if (isloadSceneAsset == false)
                         {
-                            Debug.Log("优先加载外部资源,但是不是AssetBundle 资源，则以Byte[] 尝试 加载");
+                            Debug.Log("[ByteLoader] 优先加载外部资源,但是不是AssetBundle 资源，则以Byte[] 尝试 加载 url=" + url);
                             string path = url;
                             if (url.StartsWith(ConstDefine.S_AssetBundleTopPath) == false)
                                 path = ConstDefine.S_AssetBundleTopPath + url;
@@ -241,9 +249,20 @@ namespace GameFrameWork.ResourcesLoader
                 {
                     bridgeLoader.m_ConnectLoader = ResourcesLoader.LoadResourcesAsset(url, LoadAssetModel.Sync, null, isloadSceneAsset);
                 }
-                if (bridgeLoader.m_ConnectLoader.ResultObj != null)
-                    return;
-                bridgeLoader.m_ConnectLoader.ReduceReference(bridgeLoader.m_ConnectLoader, false);  //卸载这个加载器
+
+                //********处理不同的加载器回调
+                if (bridgeLoader.m_ConnectLoader.GetType() == typeof(NewAssetBundleLoader3))
+                {
+                    NewAssetBundleLoader3 assetBundleloader = bridgeLoader.m_ConnectLoader as NewAssetBundleLoader3;
+                    if (assetBundleloader.AssetLoaderResultInfor.GetAssetByUrl(assetBundleloader.m_ResourcesUrl, fileName) != null)
+                        return;
+                }// AssetBundler 类型
+                else
+                {
+                    if (bridgeLoader.m_ConnectLoader.ResultObj != null)
+                        return;
+                }
+                //   bridgeLoader.m_ConnectLoader.ReduceReference(bridgeLoader.m_ConnectLoader, false);  //卸载这个加载器
                 ApplicationConfig.Instance.GetNextLoadAssetPath(ref curLoadAssetPathEnum);
                 continue;  //如果加载得到则返回否则继续尝试其他的加载方式
             } while (curLoadAssetPathEnum != LoadAssetPathEnum.None);
@@ -257,15 +276,26 @@ namespace GameFrameWork.ResourcesLoader
         /// <param name="url"></param>
         /// <param name="birdgeLoader"></param>
         /// <returns></returns>
-        private void LoadAssetSync(string url, BridgeLoader birdgeLoader)
+        private void LoadAssetSync(string url, BridgeLoader bridgeLoader)
         {
-            birdgeLoader.m_ResourcesUrl = url;
-            if (birdgeLoader.m_ConnectLoader == null)
+            bridgeLoader.m_ResourcesUrl = url;
+            if (bridgeLoader.m_ConnectLoader == null)
             {
                 OnLoadAssetFail();
                 return;
             }
-            OnCompleteLoad(birdgeLoader.m_ConnectLoader.IsError, birdgeLoader.m_ConnectLoader.Description, birdgeLoader.m_ConnectLoader.ResultObj, birdgeLoader.m_ConnectLoader.IsCompleted);
+
+            if (bridgeLoader.m_ConnectLoader.GetType() == typeof(NewAssetBundleLoader3))
+            {
+                string fileName = System.IO.Path.GetFileNameWithoutExtension(url);
+                NewAssetBundleLoader3 assetBundleloader = bridgeLoader.m_ConnectLoader as NewAssetBundleLoader3;
+                object asset = assetBundleloader.AssetLoaderResultInfor.GetAssetByUrl(assetBundleloader.m_ResourcesUrl, fileName);
+                OnCompleteLoad(bridgeLoader.m_ConnectLoader.IsError, bridgeLoader.m_ConnectLoader.Description, asset, bridgeLoader.m_ConnectLoader.IsCompleted);
+            }
+            else
+            {
+                OnCompleteLoad(bridgeLoader.m_ConnectLoader.IsError, bridgeLoader.m_ConnectLoader.Description, bridgeLoader.m_ConnectLoader.ResultObj, bridgeLoader.m_ConnectLoader.IsCompleted);
+            }
         }
 
 
@@ -285,17 +315,17 @@ namespace GameFrameWork.ResourcesLoader
             }
             bridgeLoader.ReduceReference(bridgeLoader, isForceDelete);
         }
-        #endregion  
+        #endregion
 
 
 
-        public override void OnCompleteLoad(bool isError, string description, object result, bool iscomplete, float process = 1)
-        {
-            base.OnCompleteLoad(isError, description, result, iscomplete, process);
-            if (m_ConnectLoader != null)
-                m_ConnectLoader.ReduceReference(m_ConnectLoader, false);
-            ReduceReference(this, false);
-        }
+        //  public override void OnCompleteLoad(bool isError, string description, object result, bool iscomplete, float process = 1)
+        //  {
+        //      base.OnCompleteLoad(isError, description, result, iscomplete, process);
+        //      if (m_ConnectLoader != null)
+        //          m_ConnectLoader.ReduceReference(m_ConnectLoader, false);
+        //      ReduceReference(this, false);
+        //  }
 
 
         protected override void ForceBreakLoaderProcess()

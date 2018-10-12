@@ -1,0 +1,5 @@
+{
+  "PlayerNameCharLimit": "用户名至少包含{0}字符至多{1}个字符",
+  "PlayerPasswordCharLimit": "用户密码至少包含{0}字符至多{1}个字符"
+
+}

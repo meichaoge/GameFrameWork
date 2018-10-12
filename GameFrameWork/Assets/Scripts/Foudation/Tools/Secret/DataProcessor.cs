@@ -10,7 +10,7 @@ namespace GameFrameWork
     /// </summary>
     public class DataProcessor:Singleton_Static<DataProcessor>
     {
-     
+
 
         /// <summary>
         /// 加密数据
@@ -21,7 +21,7 @@ namespace GameFrameWork
         {
             //给明文加密用GetBytes
             byte[] dataToEncryptArray = Encoding.UTF8.GetBytes(dataToEncrypt);
-            byte[] dataAfterEncryptArray = GlobalDataHelper.DataEncryptAlgorithm().CreateEncryptor()   .TransformFinalBlock(dataToEncryptArray, 0, dataToEncryptArray.Length);
+            byte[] dataAfterEncryptArray = GlobalDataHelper.DataEncryptAlgorithm().CreateEncryptor().TransformFinalBlock(dataToEncryptArray, 0, dataToEncryptArray.Length);
             return Convert.ToBase64String(dataAfterEncryptArray, 0, dataAfterEncryptArray.Length);
         }
         /// <summary>
@@ -33,7 +33,7 @@ namespace GameFrameWork
         {
             //给密文解密用FromBase64String
             byte[] dataToDecryptArray = Convert.FromBase64String(dataToDecrypt);
-            byte[] dataAfterDecryptArray = GlobalDataHelper.DataEncryptAlgorithm().CreateDecryptor()     .TransformFinalBlock(dataToDecryptArray, 0, dataToDecryptArray.Length);
+            byte[] dataAfterDecryptArray = GlobalDataHelper.DataEncryptAlgorithm().CreateDecryptor().TransformFinalBlock(dataToDecryptArray, 0, dataToDecryptArray.Length);
             return Encoding.UTF8.GetString(dataAfterDecryptArray);
         }
         /// <summary>

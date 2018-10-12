@@ -35,7 +35,7 @@ namespace GameFrameWork
         /// </summary>
         public void StartUpTimer()
         {
-            Debug.LogInfor("计时器开始工作 " + S_TimeStartUp);
+            Debug.LogInfor("计时器开始工作  启动时间：" + S_TimeStartUp);
         }
 
 

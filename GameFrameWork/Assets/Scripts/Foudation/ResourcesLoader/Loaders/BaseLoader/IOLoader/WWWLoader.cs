@@ -85,6 +85,9 @@ namespace GameFrameWork.ResourcesLoader
             }
             m_ResourcesUrl = url;
             IsPathExit = true;
+
+            Debug.Log("LoadAssetAsync    fileAbsolutelyPath=" + fileAbsolutelyPath + "   url=" + url);
+
             WWW www = new WWW(string.Format(@"file:///{0}", fileAbsolutelyPath)); //WWW 下载路径必须加上 file:///  
             while (www.isDone == false)
             {

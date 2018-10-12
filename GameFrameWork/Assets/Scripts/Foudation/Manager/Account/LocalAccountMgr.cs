@@ -13,6 +13,12 @@ namespace GameFrameWork
         #region Data 
         private const string S_LocalAccountKey = "GameFrame_Account"; //本地账户存储的名称
 
+#if UNITY_EDITOR
+        /// <summary>
+        /// 本地账户存储的名称
+        /// </summary>
+        public static string LocalAccountKey { get { return S_LocalAccountKey; } }
+#endif
         private LocalAccount m_LocalAccountData = null;  //本地所有的账户信息
         /// <summary>
         /// 本地所有的账户
@@ -50,11 +56,12 @@ namespace GameFrameWork
         }
 
         /// <summary>
-        /// 更新本地的账户信息
+        ///  更新本地的账户信息
         /// </summary>
-        /// <param name="account"></param>
+        /// <param name="accountName"></param>
         /// <param name="passworld"></param>
-        public void UpdateLocalAccount(string accountName,string passworld)
+        /// <param name="isEncrypt">标识当前密码是否已经进行了加密处理</param>
+        public void UpdateLocalAccount(string accountName,string passworld,bool isEncrypt)
         {
             bool isAlradyRecord = false;
 
@@ -63,7 +70,10 @@ namespace GameFrameWork
                 if (LocalAccountData.AllUseLocalAccount[dex].AccountName== accountName)
                 {
                     isAlradyRecord = true;
-                    LocalAccountData.AllUseLocalAccount[dex].AccountPassworld = DataProcessor.Instance.EncryptData(passworld);
+                    if (isEncrypt)
+                        LocalAccountData.AllUseLocalAccount[dex].AccountPassworld = passworld;
+                    else
+                        LocalAccountData.AllUseLocalAccount[dex].EncryptPassworld();
                     break;
                 }
             }
@@ -71,12 +81,29 @@ namespace GameFrameWork
             if(isAlradyRecord==false)
             {
                 LocalAccountInfor newAccount = new LocalAccountInfor(accountName, passworld);
+                newAccount.EncryptPassworld();
                 LocalAccountData.AllUseLocalAccount.Add(newAccount);
             }
 
-            PlayerPrefsMgr.Instance.SetString(S_LocalAccountKey, JsonMapper.ToJson(LocalAccountData)); //保存数据
+            string accountStr = JsonMapper.ToJson(LocalAccountData);
+         //   Debug.LogEditorInfor("UpdateLocalAccount accountStr= " + accountStr);
+            PlayerPrefsMgr.Instance.SetString(S_LocalAccountKey, accountStr); //保存数据
            
         }
+        /// <summary>
+        /// 更新本地的账户信息
+        /// </summary>
+        /// <param name="accountInfor"></param>
+        public void UpdateLocalAccount(LocalAccountInfor accountInfor)
+        {
+            if(accountInfor==null)
+            {
+                Debug.LogError("UpdateLocalAccount Fail, Null");
+                return;
+            }
+            UpdateLocalAccount(accountInfor.AccountName, accountInfor.AccountPassworld, accountInfor.IsEncrypt);
+        }
+
 
         /// <summary>
         /// 获取加密的密码的真是密码
@@ -85,7 +112,9 @@ namespace GameFrameWork
         /// <returns></returns>
         public string GetAccountPassworld(string passworld)
         {
-            return DataProcessor.Instance.DecryptData(passworld);
+            string result= DataProcessor.Instance.DecryptData(passworld);
+            Debug.LogInfor("GetAccountPassworld passworld=" + passworld + "   result=" + result);
+            return result;
         }
     }
 }

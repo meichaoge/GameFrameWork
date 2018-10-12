@@ -109,6 +109,13 @@ namespace GameFrameWork.UGUI
             OnCompleteShowWindow();
         }
 
+        public override void HideWindow(params object[] parameter)
+        {
+            base.HideWindow(parameter);
+
+            OnCompleteHideWindow();
+        }
+
         #endregion
 
 
@@ -211,14 +218,7 @@ namespace GameFrameWork.UGUI
 
         private void OnCompleteUpdateAsset()
         {
-            AppSceneManager.Instance.LoadScene(SceneNameEnum.StartUp, LoadSceneModeEnum.KeepPrevious, (isComplete) =>
-            {
-                if (isComplete)
-                {
-                    Debug.LogInfor("应用已经起来了..Go!!!");
-                }
-            }, () => { Debug.LogInfor("卸载其他场景完成"); }
-        );
+
         }
 
         private void OnUpdateFailAsset(string tipView)
@@ -305,10 +305,16 @@ namespace GameFrameWork.UGUI
             }
 
 
-            UIManager.Instance.ForceGetUI<UILoginPopupView>(Define_ResPath.UILoginPopupViewPath, UIManagerHelper.Instance.PopupParentTrans, (loginPopView) =>
+            UIManager.Instance.ForceGetUIAsync<UILoginPopupView>(Define_ResPath.UILoginPopupViewPath, UIManagerHelper.Instance.PopupParentTrans, (loginPopView) =>
             {
-                UIManager.Instance.OpenPopUp(loginPopView, PopupOpenOperateEnum.KeepPreviousAvailable, true,null);
-            }, false, true);
+                UIManager.Instance.OpenPopUp(loginPopView, PopupOpenOperateEnum.KeepPreviousAvailable,this, true, null);
+            }, true, true);
+
+            //UIManager.Instance.ForceGetUISync<UILoginPopupView>(Define_ResPath.UILoginPopupViewPath, UIManagerHelper.Instance.PopupParentTrans, (loginPopView) =>
+            //{
+            //    UIManager.Instance.OpenPopUp(loginPopView, PopupOpenOperateEnum.KeepPreviousAvailable, true, null);
+            //}, false, true);
+
         }
         #endregion
 

@@ -35,10 +35,14 @@ namespace GameFrameWork
             Debug.Log(" Application.streamingAssetsPath=" + Application.streamingAssetsPath);
             GameObject goDebug = new GameObject("Editor_ShowLoaderInfor");
             goDebug.GetAddComponent<DebugShowLoaderInfor>();
+
+            Resources.UnloadUnusedAssets();
 #endif
             m_ApplicationConfig = transform.GetAddComponent<ApplicationConfig>();
 
             TimeTickUtility.Instance.StartUpTimer();
+            PlayerPrefsMgr.GetInstance();
+
             base.Awake();
       
         }
@@ -49,7 +53,7 @@ namespace GameFrameWork
         {
             StartCoroutine(LoadAppConfig(() =>
             {
-                UIManager.Instance.CreateUI<UIAssetUpdateView>(Define_ResPath.UIAssetUpdateViewPath, UIManagerHelper.Instance.PageParentTrans, (obj) =>
+                UIManager.Instance.CreateUISync<UIAssetUpdateView>(Define_ResPath.UIAssetUpdateViewPath, UIManagerHelper.Instance.PageParentTrans, (obj) =>
                 {
                     UIManager.Instance.OpenPage(obj);
                 }, false, true, Define_ResName.UIAssetUpdateViewName);

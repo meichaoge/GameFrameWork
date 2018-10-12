@@ -54,9 +54,16 @@ namespace GameFrameWork.UGUI
 
         #region State 
         /// <summary>
-        /// 标识是否是打开状态
+        /// 标识是否是打开状态(并不能作为判断当前View是否可见的标识)
         /// </summary>
-        public bool IsOpen { get; private set; }
+        public bool IsOpen { get { return gameObject.activeSelf; } }
+
+        /// <summary>
+        /// 标识是否正在显示窗口
+        /// </summary>
+        protected bool IsShowingWindow { get; private set; }
+
+
         /// <summary>
         /// 标识是否完成了显示初始化
         /// </summary>
@@ -67,7 +74,7 @@ namespace GameFrameWork.UGUI
         #region Unity Frame 
         protected virtual void Awake()
         {
-            IsOpen = false;
+            IsShowingWindow = false;
             IsCompleteShow = false;
             UIManager.Instance.RecordView(this);
         }
@@ -78,11 +85,12 @@ namespace GameFrameWork.UGUI
 
         protected virtual void OnEnable()
         {
-            IsOpen = true;
+            // IsOpen = true;  //2018/09/27 修改 这里不能执行这个 否则第一次创建的时候就已经打开了 后面的逻辑不好处理
         }
+
         protected virtual void OnDisable()
         {
-            IsOpen = false;
+            IsShowingWindow = false;
         }
 
         protected virtual void OnDestroy()
@@ -91,7 +99,7 @@ namespace GameFrameWork.UGUI
             UIManager.Instance.UnRecordView(this);
         }
 
-        protected virtual void Update()  {  }
+        //protected virtual void Update()  {  }
 
         #endregion
 
@@ -108,19 +116,20 @@ namespace GameFrameWork.UGUI
 
 
 
-
         /// <summary>
         /// 外部调用 显示窗口
         /// </summary>
         /// <param name="parameter"></param>
         public virtual void ShowWindow(params object[] parameter)
         {
-            if (IsOpen)
+            if (IsShowingWindow)
             {
-                Debug.LogError("当前UI已经是打开状态 请使用接口 FlushWindow() 刷新界面 ");
+                Debug.LogError("当前UI已经是打开状态 请使用接口 FlushWindow() 刷新界面!!!! 这里自动转化成 FlushWindow() 接口调用");
+                FlushWindow(parameter);
                 return;
             }
             IsCompleteShow = false;
+            IsShowingWindow = true;
             gameObject.SetActive(true);
 
         }
@@ -163,7 +172,8 @@ namespace GameFrameWork.UGUI
         {
             if (IsOpen == false)
             {
-                Debug.LogError("没有打开的界面需要调用  ShowWindow()");
+                Debug.LogError("没有打开的界面需要调用  ShowWindow()!!!  这里自动转化成 ShowWindow() 接口调用   ");
+                ShowWindow(parameter);
                 return;
             }
         }
@@ -214,7 +224,7 @@ namespace GameFrameWork.UGUI
             yield return null;
         }
         /// <summary>
-        /// 完成刷新窗口 
+        /// 完成刷新窗口 (必须在 HideWindow中调用这个接口 否则无法关闭界面  )
         /// </summary>
         protected virtual void OnCompleteHideWindow()
         {

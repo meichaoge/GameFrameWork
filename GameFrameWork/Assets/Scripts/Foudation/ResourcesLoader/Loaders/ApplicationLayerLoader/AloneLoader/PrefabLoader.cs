@@ -76,7 +76,7 @@ namespace GameFrameWork.ResourcesLoader
             while (m_BridgeLoader.IsCompleted == false)
                 yield return null;
 
-            yield return new WaitForSeconds(1);
+            //yield return new WaitForSeconds(1);
 
             OnCompleteLoad(m_BridgeLoader.IsError, m_BridgeLoader.Description, m_BridgeLoader.ResultObj, m_BridgeLoader.IsCompleted);
             yield break;

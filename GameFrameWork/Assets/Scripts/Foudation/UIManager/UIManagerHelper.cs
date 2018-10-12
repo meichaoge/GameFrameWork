@@ -82,6 +82,22 @@ namespace GameFrameWork
             }
         }
 
+
+        [SerializeField]
+        private Transform m_WidgetParentTrans;
+        /// <summary>
+        /// 部分不属于任何界面的Widget  都应该在这个下面
+        /// </summary>
+        public Transform WidgetParentTrans
+        {
+            get
+            {
+                if (m_WidgetParentTrans == null)
+                    m_WidgetParentTrans = transform.GetChild(3);
+                return m_WidgetParentTrans;
+            }
+        }
+
         #endregion
 
     }

@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 2103171324
+CRC: 2345392710
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: ead4905d062e1a0733e7ae6e9cfaf9e7
+    Hash: afecfb54af451a326352920711f90062
   TypeTreeHash:
     serializedVersion: 2
     Hash: df2ac007c78f9c1f20fd4d981040b02e
@@ -36,5 +36,5 @@ ClassTypes:
 Assets:
 - Assets/Resources/Prefabs/UI/AssetUpdate/UIAssetUpdateView.prefab
 Dependencies:
-- E:/My_WorkSpace/GameFrameWork/Assets/StreamingAssets/Window/fonts & materials/fzlthjw
-  sdf.unity3d
+- E:/My_WorkSpace/GameFrameWork/Assets/StreamingAssets/Window/fonts & materials/fonts
+  & materials.unity3d

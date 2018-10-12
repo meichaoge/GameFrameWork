@@ -138,7 +138,7 @@ namespace GameFrameWork
         /// </summary>
         public void BeginDownloadAsset(float delayTime, Action<string, int> donwnloadCallback)
         {
-            if (S_IsCompleteUpdateAsset) return;
+            if (S_IsCompleteUpdateAsset|| TotalNeedDownloadAsset==0) return;
             m_CurProcess= EventCenter.Instance.StartCoroutine(UpdateAssetProcess(delayTime, donwnloadCallback));
         }
 
@@ -146,8 +146,8 @@ namespace GameFrameWork
 
         private IEnumerator UpdateAssetProcess(float delayTime, Action<string, int> donwnloadCallback)
         {
-            if (TotalNeedDownloadAsset == 0)
-                yield break;
+            //if (TotalNeedDownloadAsset == 0)
+            //    yield break;
 
             if (delayTime >= 0)
                 yield return new WaitForSeconds(delayTime);

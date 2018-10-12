@@ -131,7 +131,7 @@ namespace GameFrameWork.EditorExpand
 
             string assetName = "";
             string extensionName = Path.GetExtension(filePath);
-            if (extensionName == ".prefab" || extensionName == ".unity" || extensionName == ".asset")
+            if (extensionName == ".prefab" || extensionName == ".unity" )//|| extensionName == ".asset")
             { //Prefab 和 Scene 文件单独打包成AssetBundle
                 assetName = filePathRelativeResourceWithoutExtension.Replace(@"\", "/") + ConstDefine.AssetBundleExtensionName;
             }
@@ -207,7 +207,7 @@ namespace GameFrameWork.EditorExpand
                 _infor.m_MD5Code = MD5Helper.GetFileMD5(path);
                 System.IO.FileInfo fileInfor = new System.IO.FileInfo(path);
                 _infor.m_ByteSize = (int)fileInfor.Length;
-                _infor.m_DependeceAssetNamePath.AddRange(depences);
+      //          _infor.m_DependeceAssetNamePath.AddRange(depences);
                 if (S_HotAssetBaseRecordInfor.AllAssetRecordsDic.ContainsKey(item))
                 {
                     Debug.LogError("重复的AssetBundleName=" + item);
@@ -230,6 +230,8 @@ namespace GameFrameWork.EditorExpand
                 #endregion
 
             }
+
+            AssetBundleMgr.Instance.m_MainAssetBundle.Unload(true);  //避免打包后编辑器加载报错
             #endregion
         }
 

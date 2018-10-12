@@ -198,7 +198,7 @@ namespace GameFrameWork.ResourcesLoader
 
             base.OnCompleteLoad(isError, description, ResultObj, iscomplete, process);
 
-            UnLoadAsset(m_ResourcesUrl, false); //使用完成卸载资源
+         //   UnLoadAsset(m_ResourcesUrl, false); //使用完成卸载资源
         }
 
     }

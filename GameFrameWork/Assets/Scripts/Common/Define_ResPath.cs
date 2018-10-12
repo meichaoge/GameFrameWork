@@ -18,6 +18,12 @@ namespace GameFrameWork
         public static string UILoginPopupViewPath = "Prefabs/UI/Login/UILoginPopupView"; //登录弹窗界面
         #endregion
 
+        #region 公共组件
+        public static string UITextTipViewPath = "Prefabs/UI/Common/UITextTipView"; //飘字界面
+        public static string UICanvasMaskViewPath = "Prefabs/UI/Common/UICanvasMaskView"; //全屏Mask界面
+
+        #endregion
+
         #endregion
 
     }

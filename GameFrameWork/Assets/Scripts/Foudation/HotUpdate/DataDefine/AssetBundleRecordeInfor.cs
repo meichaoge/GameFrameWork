@@ -10,7 +10,7 @@ namespace GameFrameWork.HotUpdate
     /// </summary>
     public class AssetBundleRecordeInfor : HotAssetBaseInfor
     {
-        public readonly List<string> m_DependeceAssetNamePath = new List<string>();  //AssetBundle 依赖
+       // public readonly List<string> m_DependeceAssetNamePath = new List<string>();  //AssetBundle 依赖
 
     }
 }

@@ -60,6 +60,7 @@ namespace GameFrameWork
                 for (int dex = 0; dex < json.Count; ++dex)
                 {
                     ButtonAudioConfInfor infor = new ButtonAudioConfInfor();
+                    Debug.LogInfor("AnalysisConfig  " + json[dex]["ButtonAudio"].ToString());
                     infor.ButtonAudio = (ButtonAudioEnum)System.Enum.Parse(typeof(ButtonAudioEnum), json[dex]["ButtonAudio"].ToString());
                     infor.AudioPath = json[dex]["AudioPath"].ToString();
                     infor.AudioName = json[dex]["AudioName"].ToString();
