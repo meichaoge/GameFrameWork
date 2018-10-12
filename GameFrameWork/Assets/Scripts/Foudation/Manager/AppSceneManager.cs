@@ -45,6 +45,7 @@ namespace GameFrameWork
         /// </summary>
         public bool IsUnLoadingScene { private set; get; }
 
+
         #region  初始化
 
         /// <summary>

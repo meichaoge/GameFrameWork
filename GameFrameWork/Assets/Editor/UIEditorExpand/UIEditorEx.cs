@@ -89,11 +89,19 @@ namespace GameFrameWork.EditorExpand
         #endregion
 
 
-        [MenuItem("Assets/UIEdirorEx/创建精灵 SpriteRender 预制体")]
-        public static void CreateSpriteRender()
+        [MenuItem("Assets/UIEdirorEx/选中图片 创建精灵 SpriteRender 预制体")]
+        public static void CreateSpriteRender_File()
         {
             EditorCreateSpriteRender.CreateSpriteRender();
         }
+        [MenuItem("Assets/UIEdirorEx/选中目录创建精灵 SpriteRender 预制体")]
+        public static void CreateSpriteRender_Directory()
+        {
+          
+               EditorCreateSpriteRender.CreateMultiSpriteRenders_Dirctory();
+        }
+
+
 
         [MenuItem("Assets/UIEdirorEx/选中节点，生成View代码")]
         // [MenuItem("CONTEXT/UICacheView/生成View代码")]

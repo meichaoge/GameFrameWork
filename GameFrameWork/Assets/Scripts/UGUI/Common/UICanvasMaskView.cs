@@ -22,7 +22,6 @@ namespace GameFrameWork.UGUI
 
         private const float S_DelayShowLoadingTime = 5f;  //延时5秒显示转圈
         private float m_RotateAngle = 100f;
-   //     private Tweener m_WaitConectTweenner = null;
         private bool m_IsShowWaite = false;
 #if UNITY_EDITOR
         private List<Transform> m_AllReference_EditorOnly = new List<Transform>();
@@ -56,8 +55,6 @@ namespace GameFrameWork.UGUI
             base.OnDisable();
             CancelInvoke("ShowWaitConnectView");
             m_IsShowWaite = false;
-            //if (m_WaitConectTweenner != null && m_WaitConectTweenner.IsPlaying())
-            //    m_WaitConectTweenner.Complete();
         }
 
 
@@ -168,7 +165,7 @@ namespace GameFrameWork.UGUI
             m_AllReferenceCount_EditorOnly.AddRange(m_AllReferenceInfor.Values);
 #endif
 
-            if(m_IsShowWaite)
+            if(m_IsShowWaite&&AppSceneManager.Instance.IsUnLoadingScene==false)
             {
                 m_imgWaitImage.transform.Rotate(Vector3.back, Time.deltaTime * m_RotateAngle);
             }
