@@ -51,7 +51,7 @@ namespace GameFrameWork.UGUI
         }
 
 
-        public override void ShowWindow(params object[] parameter)
+        public override void ShowWindow(UIParameterArgs parameter)
         {
 
 

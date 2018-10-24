@@ -53,10 +53,7 @@ namespace GameFrameWork
         {
             StartCoroutine(LoadAppConfig(() =>
             {
-                UIManager.Instance.CreateUISync<UIAssetUpdateView>(Define_ResPath.UIAssetUpdateViewPath, UIManagerHelper.Instance.PageParentTrans, (obj) =>
-                {
-                    UIManager.Instance.OpenPage(obj);
-                }, false, true, Define_ResName.UIAssetUpdateViewName);
+                UIManager.Instance.OpenPage(UIViewReference.Instance.UiAssetUpdateView, UIParameterArgs.Create());
             }));
         }
 

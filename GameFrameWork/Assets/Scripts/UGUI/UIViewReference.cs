@@ -6,16 +6,18 @@ using UnityEngine;
 namespace GameFrameWork
 {
     /// <summary>
-    /// 提供常用的UI 引用
+    /// 提供常用的UI 引用 （同步方式加载界面,主要是方便项目引用方便，对于子界面可以使用异步方式自行获取引用关系）
     /// </summary>
     public class UIViewReference : Singleton_Static<UIViewReference>
     {
+        #region 常见弹框 、Widget
+
 
         private UICanvasMaskView m_UICanvasMaskView = null;
         /// <summary>
         /// 全屏幕Mask
         /// </summary>
-        public UICanvasMaskView UICanvasMaskView_
+        public UICanvasMaskView UiCanvasMaskView
         {
             get
             {
@@ -28,5 +30,50 @@ namespace GameFrameWork
             }
         }
 
+        #endregion
+
+
+        #region 常用的PageView
+        private UIAssetUpdateView m_UIAssetUpdateView = null;
+        /// <summary>
+        /// 资源更新界面
+        /// </summary>
+        public UIAssetUpdateView UiAssetUpdateView
+        {
+            get
+            {
+                if(m_UIAssetUpdateView ==null)
+                {
+                    UIManager.Instance.ForceGetUISync<UIAssetUpdateView>(Define_ResPath.UIAssetUpdateViewPath, UIManagerHelper.Instance.PageParentTrans, (view) =>
+                    {
+                        m_UIAssetUpdateView = view;
+                    }, true);
+                }
+                return m_UIAssetUpdateView;
+            }
+        }
+
+
+        private UILoginPopupView m_UILoginPopupView;
+        /// <summary>
+        /// 登录弹窗
+        /// </summary>
+        public UILoginPopupView UiLoginPopupView
+        {
+            get
+            {
+                if (m_UILoginPopupView == null)
+                {
+                    UIManager.Instance.ForceGetUISync<UILoginPopupView>(Define_ResPath.UILoginPopupViewPath, UIManagerHelper.Instance.PopupParentTrans, (view) =>
+                    {
+                        m_UILoginPopupView = view;
+                    }, true);
+                }
+                return m_UILoginPopupView;
+            }
+        }
+
+
+        #endregion
     }
 }

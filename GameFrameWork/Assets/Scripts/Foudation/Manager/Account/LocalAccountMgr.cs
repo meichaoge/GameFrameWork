@@ -113,7 +113,7 @@ namespace GameFrameWork
         public string GetAccountPassworld(string passworld)
         {
             string result= DataProcessor.Instance.DecryptData(passworld);
-            Debug.LogInfor("GetAccountPassworld passworld=" + passworld + "   result=" + result);
+            //Debug.LogInfor("GetAccountPassworld passworld=" + passworld + "   result=" + result);
             return result;
         }
     }

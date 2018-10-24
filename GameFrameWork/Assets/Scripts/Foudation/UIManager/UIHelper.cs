@@ -28,7 +28,7 @@ namespace GameFrameWork
                     Debug.LogError("ShowTipsViewSync  Fail,Not Exit View " + Define_ResPath.UITextTipViewPath);
                     return;
                 }
-                UIManager.Instance.OpenTip(tipsView, antoDestroyTime, content);
+                UIManager.Instance.OpenTip(tipsView, antoDestroyTime, UIParameterArgs.Create( content));
             }, false, true);
         }
 

@@ -96,7 +96,7 @@ namespace GameFrameWork.UGUI
             m_tglShowPasswordToggle.isOn = m_IsShowPassworld;
         }
 
-        public override void ShowWindow(params object[] parameter)
+        public override void ShowWindow(UIParameterArgs parameter)
         {
             base.ShowWindow(parameter);
             ShowDefaultView();
@@ -105,7 +105,7 @@ namespace GameFrameWork.UGUI
         }
 
 
-        public override void HideWindow(params object[] parameter)
+        public override void HideWindow(UIParameterArgs parameter)
         {
             base.HideWindow(parameter);
 
@@ -255,20 +255,17 @@ namespace GameFrameWork.UGUI
             } //更新本地账户列表
 
 
-            UIAssetUpdateView assetUpdateView = UIManager.Instance.GetExitUIInstance<UIAssetUpdateView>();
-            if (assetUpdateView != null)
-                UIManager.Instance.ClosePage(assetUpdateView);
+          
+            if (UIViewReference.Instance.UiAssetUpdateView != null && UIViewReference.Instance.UiAssetUpdateView.IsActivate)
+                UIManager.Instance.ClosePage(UIParameterArgs.Create( UIViewReference.Instance.UiAssetUpdateView));
 
-            //UICanvasMaskView uiCanvasMaskView= UIManager.Instance.GetExitUIInstance<UICanvasMaskView>();
-            //if(uiCanvasMaskView==null)
-            //{
-            //    UIManager.Instance.ForceGetUISync<UICanvasMaskView>(Define_ResPath.UICanvasMaskViewPath, UIManagerHelper.Instance.WidgetParentTrans,
-            //                           (view) => { uiCanvasMaskView = view; }, true);
-            //}
-            UIManager.Instance.OpenWidget(UIViewReference.Instance.UICanvasMaskView_, UIManagerHelper.Instance.WidgetParentTrans, 0, true,null);
+
+
+            UIManager.Instance.OpenWidget(UIViewReference.Instance.UiCanvasMaskView, UIManagerHelper.Instance.WidgetParentTrans, 0, true, UIParameterArgs.Create());
 
             AppSceneManager.Instance.LoadScene(SceneNameEnum.StartUp, LoadSceneModeEnum.KeepPrevious, (isComplete) =>
             {
+                UIManager.Instance.CloseWidget(UIViewReference.Instance.UiCanvasMaskView, false, UIParameterArgs.Create( false,true));
                 if (isComplete)
                 {
                     Debug.LogInfor("应用已经起来了..Go!!!");
@@ -281,7 +278,7 @@ namespace GameFrameWork.UGUI
 
         private void CloseBtnClick()
         {
-            HideWindow();
+            HideWindow(UIParameterArgs.Create());
         }
 
 

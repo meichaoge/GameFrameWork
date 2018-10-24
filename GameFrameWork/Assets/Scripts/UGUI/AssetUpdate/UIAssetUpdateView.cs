@@ -88,7 +88,7 @@ namespace GameFrameWork.UGUI
         }
 
 
-        public override void ShowWindow(params object[] parameter)
+        public override void ShowWindow(UIParameterArgs parameter)
         {
             base.ShowWindow(parameter);
             StartCoroutine(OnEnumerateShowWindow());
@@ -109,7 +109,7 @@ namespace GameFrameWork.UGUI
             OnCompleteShowWindow();
         }
 
-        public override void HideWindow(params object[] parameter)
+        public override void HideWindow(UIParameterArgs parameter)
         {
             base.HideWindow(parameter);
 
@@ -305,15 +305,15 @@ namespace GameFrameWork.UGUI
             }
 
 
-            UIManager.Instance.ForceGetUIAsync<UILoginPopupView>(Define_ResPath.UILoginPopupViewPath, UIManagerHelper.Instance.PopupParentTrans, (loginPopView) =>
-            {
-                UIManager.Instance.OpenPopUp(loginPopView, PopupOpenOperateEnum.KeepPreviousAvailable,this, true, null);
-            }, true, true);
-
-            //UIManager.Instance.ForceGetUISync<UILoginPopupView>(Define_ResPath.UILoginPopupViewPath, UIManagerHelper.Instance.PopupParentTrans, (loginPopView) =>
+            //UIManager.Instance.ForceGetUIAsync<UILoginPopupView>(Define_ResPath.UILoginPopupViewPath, UIManagerHelper.Instance.PopupParentTrans, (loginPopView) =>
             //{
-            //    UIManager.Instance.OpenPopUp(loginPopView, PopupOpenOperateEnum.KeepPreviousAvailable, true, null);
-            //}, false, true);
+            //    UIManager.Instance.OpenPopUp(loginPopView, PopupOpenOperateEnum.KeepPreviousAvailable,this, true, null);
+            //}, true, true);
+
+            UIManager.Instance.OpenPopUp(UIViewReference.Instance.UiLoginPopupView, PopupOpenOperateEnum.KeepPreviousAvailable, this, true, UIParameterArgs.Create());
+
+
+         
 
         }
         #endregion

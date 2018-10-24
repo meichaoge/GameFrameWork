@@ -58,9 +58,9 @@ namespace GameFrameWork.UGUI
         }
 
 
-        public override void ShowWindow(params object[] parameter)
+        public override void ShowWindow(UIParameterArgs parameter)
         {
-            if (parameter != null && parameter.Length == 0)
+            if (parameter != null && parameter.ParemeterCount == 0)
             {
                 Debug.LogError("全屏Mske 必须传入哪个物体请求打开这个界面的参数");
                 return;
@@ -70,7 +70,7 @@ namespace GameFrameWork.UGUI
             if (parameter == null)
                 AddReference(null);
             else
-                AddReference(parameter[0] as Transform);
+                AddReference(parameter.GetParameterByIndex(0) as Transform);
             ShowDefaultView();
 
             OnCompleteShowWindow();
@@ -79,9 +79,9 @@ namespace GameFrameWork.UGUI
       
 
 
-        public override void FlushWindow(params object[] parameter)
+        public override void FlushWindow(UIParameterArgs parameter)
         {
-            if (parameter != null && parameter.Length == 0)
+            if (parameter != null && parameter.ParemeterCount == 0)
             {
                 Debug.LogError("全屏Mske 必须传入哪个物体请求打开这个界面的参数");
                 return;
@@ -92,7 +92,7 @@ namespace GameFrameWork.UGUI
             if (parameter == null)
                 AddReference(null);
             else
-                AddReference(parameter[0] as Transform);
+                AddReference(parameter.GetParameterByIndex(0) as Transform);
             ShowDefaultView();
 
             OnCompleteFlushWindow();
@@ -100,26 +100,28 @@ namespace GameFrameWork.UGUI
 
 
         /// <summary>
-        /// 需要至少一个参数  第一个参数bool 类型判断是强制关闭 //第二个参数是Transform 参数 // 第三个参数为bool 类型判断是释放一次引用还是多个
+        /// 需要至少三个参数  第一个参数bool 类型判断是强制关闭 //第二个参数是Transform 参数
+        /// // 第三个参数为bool 类型判断是释放一次引用还是多个
         /// </summary>
         /// <param name="parameter"></param>
-        public override void HideWindow(params object[] parameter)
+        public override void HideWindow(UIParameterArgs parameter)
         {
-            if (parameter == null || parameter.Length < 1)
+            base.HideWindow(parameter);
+            if (parameter == null || parameter.ParemeterCount < 3)
             {
                 Debug.LogError("全屏Mske 必须传入哪个物体请求打开这个界面的参数");
                 return;
             }
 
-            bool isForceClose = bool.Parse(parameter[0].ToString());
+            bool isForceClose = bool.Parse(parameter.GetParameterByIndex(0).ToString());
             if (isForceClose)
             {
                 ReleasAllTransformReference();
             }
             else
             {
-                Transform target = parameter[1] as Transform;
-                bool isReleaseOnece = bool.Parse(parameter[2].ToString());
+                Transform target = parameter.GetParameterByIndex(1) as Transform;
+                bool isReleaseOnece = bool.Parse(parameter.GetParameterByIndex(2).ToString());
                 if (isReleaseOnece)
                     ReleaseReference(target);
                 else
@@ -128,7 +130,7 @@ namespace GameFrameWork.UGUI
 
             if (CheckIfNeedCloseView() == false) return;
 
-            base.HideWindow(parameter);
+          
             OnCompleteHideWindow();
         }
         #endregion

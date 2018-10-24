@@ -35,26 +35,26 @@ namespace GameFrameWork.UGUI
         }
 
 
-        public override void ShowWindow(params object[] parameter)
+        public override void ShowWindow(UIParameterArgs parameter)
         {
 #if UNITY_EDITOR
-            if (parameter == null || parameter.Length < 1)
+            if (parameter == null || parameter.ParemeterCount < 3)
             {
                 Debug.LogEditorInfor("ShowWindow Fail, 没有传入当前弹窗所属的界面");
                 return;
             }
 #endif
-            BelongParent = parameter[0] as Transform;
-            HideDelayTime = float.Parse(parameter[1].ToString());
-            IsSinglenton = bool.Parse(parameter[2].ToString());
+            BelongParent = parameter.GetParameterByIndex(0) as Transform;
+            HideDelayTime = float.Parse(parameter.GetParameterByIndex(1).ToString());
+            IsSinglenton = bool.Parse(parameter.GetParameterByIndex(2).ToString());
 
             base.ShowWindow(parameter);
         }
 
 
-        public override void HideWindow(params object[] parameter)
+        public override void HideWindow(UIParameterArgs parameter)
         {
-            m_IsDestroyedHide = bool.Parse(parameter[0].ToString());
+            m_IsDestroyedHide = bool.Parse(parameter.GetParameterByIndex(0).ToString());
             base.HideWindow(parameter);
         }
 

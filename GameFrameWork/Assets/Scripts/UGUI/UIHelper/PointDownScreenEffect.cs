@@ -9,6 +9,10 @@ namespace GameFrameWork
     /// </summary>
     public class PointDownScreenEffect : MonoBehaviour
     {
+        [Header("如果UI相机不是主相机 这这里需要指定值")]
+        public Camera m_UICamera;
+
+
         /// <summary>
         /// 记录特效对象和存在的时间
         /// </summary>
@@ -31,6 +35,24 @@ namespace GameFrameWork
         private Vector3 m_MouseCanvasPostion; //点击时候鼠标的位置 转换到中心点再屏幕正中心的坐标
 
 
+        private void Awake()
+        {
+            if (m_UICamera == null)
+                m_UICamera = Camera.main;
+
+            if (m_UICamera.orthographic == false)
+            {
+                Debug.LogError("UICamera 应该是 透视(perspective)模式"); //透视模式下相机的Size 影响特效的大小
+            }
+
+            if (m_UICamera.nearClipPlane > 1)
+            {
+                Debug.LogError("UICamera 近视点要小于1 否则无法看到特效");
+            }
+
+        }
+
+
         void Update()
         {
             UpdateEffectObjsState();
@@ -45,9 +67,9 @@ namespace GameFrameWork
                         if (touch.phase == TouchPhase.Began)
                         {
                             m_MouseCanvasPostion = new Vector3(touch.position.x, touch.position.y, 1);
-                            m_MouseCanvasPostion = Camera.main.ScreenToWorldPoint(m_MouseCanvasPostion);
+                            m_MouseCanvasPostion = m_UICamera.ScreenToWorldPoint(m_MouseCanvasPostion);
                             GameObject go = GetEffectObject();
-                            go.transform.localPosition = Camera.main.transform.InverseTransformPoint(m_MouseCanvasPostion);
+                            go.transform.localPosition = m_UICamera.transform.InverseTransformPoint(m_MouseCanvasPostion);
                         }
                     }
                 }
@@ -55,9 +77,9 @@ namespace GameFrameWork
             else if (Input.GetMouseButtonDown(0))
             {
                 m_MouseCanvasPostion = new Vector3(Input.mousePosition.x, Input.mousePosition.y, 1);
-                m_MouseCanvasPostion = Camera.main.ScreenToWorldPoint(m_MouseCanvasPostion);
+                m_MouseCanvasPostion = m_UICamera.ScreenToWorldPoint(m_MouseCanvasPostion);
                 GameObject go = GetEffectObject();
-                go.transform.localPosition = Camera.main.transform.InverseTransformPoint(m_MouseCanvasPostion);
+                go.transform.localPosition = m_UICamera.transform.InverseTransformPoint(m_MouseCanvasPostion);
             }
         }
 
@@ -86,9 +108,9 @@ namespace GameFrameWork
                 }
             } //获取之前生成的Effect
 
-            GameObject go = new GameObject("特效");// ResourceMgr.instance.Instantiate(EffectResPath.ScreenEffectItemPath, Camera.main.transform);
-            go.transform.SetParent(Camera.main.transform);
-            go.transform.localPosition = Camera.main.transform.InverseTransformPoint(m_MouseCanvasPostion); ;
+            GameObject go = new GameObject("特效");// ResourceMgr.instance.Instantiate(EffectResPath.ScreenEffectItemPath, m_UICamera.transform);
+            go.transform.SetParent(m_UICamera.transform);
+            go.transform.localPosition = m_UICamera.transform.InverseTransformPoint(m_MouseCanvasPostion); ;
             go.transform.localScale = Vector3.one;
 
             EffectRecord record = new EffectRecord(go, m_MaxAliveTime);

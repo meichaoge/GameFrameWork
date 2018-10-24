@@ -65,7 +65,7 @@ namespace GameFrameWork.UGUI
         /// </summary>
         public uint Priority { get; protected set; }
 
-        public object[] WillPopupParameter { get; protected set; }
+        public UIParameterArgs WillPopupParameter { get; protected set; }
 
         protected override void Awake()
         {
@@ -73,18 +73,20 @@ namespace GameFrameWork.UGUI
             base.Awake();
         }
 
-        public override void ShowWindow(params object[] parameter)
+        public override void ShowWindow(UIParameterArgs parameter)
         {
 #if UNITY_EDITOR
-            if (parameter == null || parameter.Length < 1)
+            if (parameter == null || parameter.ParemeterCount < 1)
             {
                 Debug.LogEditorInfor("ShowWindow Fail, 没有传入当前弹窗所属的界面");
                 return;
             }
 #endif
       
-            BelongPageView = parameter[0] as UIBasePageView;
-
+            BelongPageView = parameter.GetParameterByIndex(0) as UIBasePageView;
+            // object[] newParameter =new object[parameter.Length - 1];
+            //   System.Array.Copy(parameter, 0, newParameter, 1, parameter.Length - 1);  //去掉第一个参数
+            parameter.CutParameterToFront(0);  //去掉第一个参数
             base.ShowWindow(parameter);
         }
 
@@ -94,7 +96,7 @@ namespace GameFrameWork.UGUI
         /// </summary>
         public virtual void DelayPopupShowWindow()
         {
-            if (IsOpen == false)
+            if (IsActivate == false)
                 gameObject.SetActive(true);
         }
 
@@ -102,10 +104,10 @@ namespace GameFrameWork.UGUI
         /// <summary>
         /// 记录由于优先级关闭而不能显示的弹窗
         /// </summary>
-        public virtual void FailShowByPriority(params object[] parameter)
+        public virtual void FailShowByPriority(UIParameterArgs  parameter)
         {
             WillPopupParameter = parameter;
-            if (IsOpen)
+            if (IsActivate)
                 gameObject.SetActive(false);
         }
 

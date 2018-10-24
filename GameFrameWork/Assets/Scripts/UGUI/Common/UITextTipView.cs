@@ -38,15 +38,15 @@ namespace GameFrameWork.UGUI
 
         }
 
-        public override void ShowWindow(params object[] parameter)
+        public override void ShowWindow(UIParameterArgs parameter)
         {
             base.ShowWindow(parameter);
-            if (parameter == null || parameter.Length < 2)
+            if (parameter == null || parameter.ParemeterCount < 2)
             {
                 Debug.LogError("飘字弹窗不合法");
                 return;
             }
-            m_ShowTipsContent = parameter[1].ToString();
+            m_ShowTipsContent = parameter.GetParameterByIndex(1).ToString();
 
             StartCoroutine(OnEnumerateShowWindow());
         }

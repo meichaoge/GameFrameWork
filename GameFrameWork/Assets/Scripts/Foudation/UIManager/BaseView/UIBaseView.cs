@@ -48,20 +48,21 @@ namespace GameFrameWork.UGUI
         #endregion
 
         #region 事件
+
         protected System.Action<UIBaseView> m_OnCompleteShowAct = null;  //完成显示时候调用
 
         #endregion
 
         #region State 
         /// <summary>
-        /// 标识是否是打开状态(并不能作为判断当前View是否可见的标识)
+        /// 标识是否是可见状态 并不标识已经初始化了
         /// </summary>
-        public bool IsOpen { get { return gameObject.activeSelf; } }
+        public bool IsActivate { get { return gameObject.activeSelf; } }
 
         /// <summary>
         /// 标识是否正在显示窗口
         /// </summary>
-        protected bool IsShowingWindow { get; private set; }
+        public bool IsShowingWindow { get; private set; }
 
 
         /// <summary>
@@ -120,7 +121,7 @@ namespace GameFrameWork.UGUI
         /// 外部调用 显示窗口
         /// </summary>
         /// <param name="parameter"></param>
-        public virtual void ShowWindow(params object[] parameter)
+        public virtual void ShowWindow(UIParameterArgs parameter)
         {
             if (IsShowingWindow)
             {
@@ -168,14 +169,12 @@ namespace GameFrameWork.UGUI
         /// 外部调用 刷新窗口
         /// </summary>
         /// <param name="parameter"></param>
-        public virtual void FlushWindow(params object[] parameter)
+        public virtual void FlushWindow(UIParameterArgs parameter)
         {
-            if (IsOpen == false)
-            {
+            if (IsActivate == false) return;
                 Debug.LogError("没有打开的界面需要调用  ShowWindow()!!!  这里自动转化成 ShowWindow() 接口调用   ");
                 ShowWindow(parameter);
                 return;
-            }
         }
         /// <summary>
         /// 子类重写这个方法实现 协程刷新界面  只有打开了界面才能执行这个接口
@@ -208,7 +207,7 @@ namespace GameFrameWork.UGUI
         /// <summary>
         /// / 外部调用 关闭窗口
         /// </summary>
-        public virtual void HideWindow(params object[] parameter)
+        public virtual void HideWindow(UIParameterArgs parameter)
         {
             if(IsCompleteShow==false)
             {
@@ -216,10 +215,10 @@ namespace GameFrameWork.UGUI
             }
         }
         /// <summary>
-        /// /子类重写这个方法实现 协程关闭界面
+        /// 子类重写这个方法实现 协程关闭界面
         /// </summary>
         /// <returns></returns>
-        protected virtual IEnumerator OnHideWindow(params object[] parameter)
+        protected virtual IEnumerator OnHideWindow(UIParameterArgs parameter)
         {
             yield return null;
         }

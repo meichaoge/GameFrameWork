@@ -35,11 +35,16 @@ namespace GameFrameWork
         /// 打开一个页面UI
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        public void OpenPage(UIBasePageView view, params object[] parameter)
+        public void OpenPage(UIBasePageView view, UIParameterArgs parameter)
         {
             if (view == null)
             {
                 Debug.LogError("OpenPage Fail,The View Is Null");
+                return;
+            }
+            if (parameter == null)
+            {
+                Debug.LogError("parameter 不要使用null  使用默认的 UIParameterArgs.Create() 无参数方法替代");
                 return;
             }
 
@@ -74,14 +79,14 @@ namespace GameFrameWork
             {
                 #region 当前要打开的界面就是最后打开的页面   则根据条件判断是否只需要刷新
 
-                if (CurOpenPage.IsOpen && CurOpenPage.IsCompleteShow)
+                if (CurOpenPage.IsActivate && CurOpenPage.IsShowingWindow && CurOpenPage.IsCompleteShow)
                 {
                     Debug.Log("界面已经打开了  执行刷新操作 ");
                     CurOpenPage.FlushWindow(parameter);
                 }
                 else
                 {
-                    Debug.LogError("当前界面状态异常 正在打开中..... " + CurOpenPage.IsOpen + ":" + CurOpenPage.IsCompleteShow);
+                    Debug.LogError("当前界面状态异常 正在打开中..... " + CurOpenPage.IsShowingWindow + ":" + CurOpenPage.IsCompleteShow);
                 }
                 #endregion
 
@@ -115,9 +120,14 @@ namespace GameFrameWork
         /// </summary>
         /// <param name="view"></param>
         /// <param name="parameter"></param>
-        public void ClosePage(params object[] parameter)
+        public void ClosePage( UIParameterArgs parameter)
         {
             if (CurOpenPage == null) return;
+            if (parameter == null)
+            {
+                Debug.LogError("parameter 不要使用null  使用默认的 UIParameterArgs.Create() 无参数方法替代");
+                return;
+            }
 #if UNITY_EDITOR
             if (m_AllRecordViewPage.Count == 0 || m_AllRecordViewPage[m_AllRecordViewPage.Count - 1] != CurOpenPage)
             {
@@ -125,6 +135,7 @@ namespace GameFrameWork
                 return;
             }
 #endif
+
             //if (m_AllRecordViewPage.Count == 1)
             //{
             //    Debug.LogError("只剩下一个界面 无法关闭" + CurOpenPage.name);
@@ -143,10 +154,14 @@ namespace GameFrameWork
             } //关闭最后一个页面
         }
 
-        public void ClosePage(UIBasePageView view, params object[] parameter)
+        public void ClosePage(UIBasePageView view,  UIParameterArgs parameter)
         {
             if (view != CurOpenPage) return;
-
+            if (parameter == null)
+            {
+                Debug.LogError("parameter 不要使用null  使用默认的 UIParameterArgs.Create() 无参数方法替代");
+                return;
+            }
             ClosePage(parameter);
         }
 
@@ -159,10 +174,10 @@ namespace GameFrameWork
         {
             if (view != null)
             {
-                view.HideWindow();
+                view.HideWindow(UIParameterArgs.Create());
                 RemoveWillPopupView(view);  //关闭当前界面所包含的弹窗（没有弹出的）
                 CloseConnectPopupView(view); //关闭当前界面所包含的弹窗 (已经弹出的)
-                CloseAttachWidget(view.transform, false);   //关闭关联的Widget
+                CloseAttachWidget(view.transform, false,UIParameterArgs.Create());   //关闭关联的Widget
             }
         }
 
@@ -180,14 +195,18 @@ namespace GameFrameWork
         /// <param name="isFailRecord">如果是因为优先级而无法弹出 则表示是否需要记录 如果为false 则当无法显示时候不会自动弹出，而是隐藏了</param>
         /// <param name="parameter"></param>
         /// 
-        public void OpenPopUp(UIBasePopupView view, PopupOpenOperateEnum popupOperate, UIBasePageView belongPageView, bool isFailRecord, object[] parameter)
+        public void OpenPopUp(UIBasePopupView view, PopupOpenOperateEnum popupOperate, UIBasePageView belongPageView, bool isFailRecord, UIParameterArgs parameter)
         {
             if (view == null)
             {
                 Debug.LogError("OpenPopUp Fail,The View Is Null");
                 return;
             }
-
+            if (parameter == null)
+            {
+                Debug.LogError("parameter 不要使用null  使用默认的 UIParameterArgs.Create() 无参数方法替代");
+                return;
+            }
 #if UNITY_EDITOR
             if (view.WindowType != WindowTypeEnum.PopUp)
             {
@@ -198,12 +217,14 @@ namespace GameFrameWork
             Dictionary<int, UIBasePopupView> allWillHidePopupView = GetWillHidePopupView(view, popupOperate, isFailRecord, parameter);
             foreach (var item in allWillHidePopupView)
             {
-                item.Value.HideWindow();
+                item.Value.HideWindow(UIParameterArgs.Create());
                 m_AllRecordViewPopup.RemoveAt(item.Key);
             }
             if (belongPageView == null)
                 belongPageView = CurOpenPage;
-            view.ShowWindow ( Helper.Instance.MegerParameter(new object[] { belongPageView, isFailRecord }, parameter)  ); //注意这里的第一个参数
+
+            UIParameterArgs args0 = UIParameterArgs.Create(belongPageView, isFailRecord);
+            view.ShowWindow(Helper.Instance.MegerParameter(args0, parameter)); //注意这里的第一个参数
             m_AllRecordViewPopup.Add(view);
         }
 
@@ -216,7 +237,7 @@ namespace GameFrameWork
         /// <param name="isFailRecord">如果是因为优先级而无法弹出 则表示是否需要记录 如果为false 则当无法显示时候不会自动弹出，而是隐藏了</param>
         /// <param name="parameter"></param>
         /// 
-        public void OpenPopUp(UIBasePopupView view, PopupOpenOperateEnum popupOperate, bool isFailRecord, object[] parameter)
+        public void OpenPopUp(UIBasePopupView view, PopupOpenOperateEnum popupOperate, bool isFailRecord, UIParameterArgs parameter)
         {
             OpenPopUp(view, popupOperate, CurOpenPage, isFailRecord, parameter);
         }
@@ -245,7 +266,8 @@ namespace GameFrameWork
                 Debug.LogError("ClosePopup Fail,The View Is Null");
                 return;
             }
-            view.HideWindow();
+           
+            view.HideWindow(UIParameterArgs.Create());
             m_AllRecordViewPopup.Remove(view);
             DealHidePopView(view, closeOperate);
         }
@@ -285,7 +307,7 @@ namespace GameFrameWork
 
                     for (int dex = 0; dex < allPopupViewCurPage.Count; ++dex)
                     {
-                        m_AllRecordViewPopup[dex].HideWindow();
+                        m_AllRecordViewPopup[dex].HideWindow(UIParameterArgs.Create());
                     }//关闭弹窗
 
                     allPopupViewCurPage.Reverse();
@@ -312,7 +334,7 @@ namespace GameFrameWork
         /// </summary>
         /// <param name="view"></param>
         /// <param name="popupOperate"></param>
-        private Dictionary<int, UIBasePopupView> GetWillHidePopupView(UIBasePopupView popupView, PopupOpenOperateEnum popupOperate, bool isFailRecord, object[] parameter)
+        private Dictionary<int, UIBasePopupView> GetWillHidePopupView(UIBasePopupView popupView, PopupOpenOperateEnum popupOperate, bool isFailRecord, UIParameterArgs parameter)
         {
             Dictionary<int, UIBasePopupView> allWillHidePopupView = new Dictionary<int, UIBasePopupView>();
             if (m_AllRecordViewPopup.Count == 0) return allWillHidePopupView;
@@ -346,7 +368,7 @@ namespace GameFrameWork
                         }
                         else
                         {
-                            popupView.HideWindow();
+                            popupView.HideWindow(UIParameterArgs.Create());
                         }
                     }  //加入到待弹出界面中
                     else
@@ -395,7 +417,7 @@ namespace GameFrameWork
             {
                 if(m_AllRecordViewPopup[dex].BelongPageView== belongPageView)
                 {
-                    m_AllRecordViewPopup[dex].HideWindow();
+                    m_AllRecordViewPopup[dex].HideWindow(UIParameterArgs.Create());
                     m_AllRecordViewPopup.RemoveAt(dex);
                 }
             }
@@ -494,7 +516,7 @@ namespace GameFrameWork
 
         public void CloseAllPopupView()
         {
-
+           
         }
 
 
@@ -542,14 +564,18 @@ namespace GameFrameWork
         /// <param name="view"></param>
         /// <param name="autoDestroyTime">自动销毁时间 为0标识不会自毁</param>
         /// <param name="parameter"></param>
-        public void OpenTip(UIBaseTipView view, float autoDestroyTime, params object[] parameter)
+        public void OpenTip(UIBaseTipView view, float autoDestroyTime,  UIParameterArgs parameter)
         {
             if (view == null)
             {
                 Debug.LogError("OpenTip Fail,The View Is Null");
                 return;
             }
-
+            if (parameter == null)
+            {
+                Debug.LogError("parameter 不要使用null  使用默认的 UIParameterArgs.Create() 无参数方法替代");
+                return;
+            }
 #if UNITY_EDITOR
             if (view.WindowType != WindowTypeEnum.PopTip)
             {
@@ -557,8 +583,8 @@ namespace GameFrameWork
                 return;
             }
 #endif
-
-            view.ShowWindow(Helper.Instance. MegerParameter(autoDestroyTime, parameter));
+            parameter.InsertParameter(autoDestroyTime, 0);
+            view.ShowWindow( parameter);
             m_AllRecordViewTips.Add(view);
         }
 
@@ -596,11 +622,17 @@ namespace GameFrameWork
         /// <param name="showTime">=0 标识一直存在</param>
         /// <param name="isSingleton">=true 标识只会创建一个</param>
         /// <param name="parameter"></param>
-        public void OpenWidget(UIBaseWidgetView view, Transform parentTrans, float showTime, bool isSingleton, params object[] parameter)
+        public void OpenWidget(UIBaseWidgetView view, Transform parentTrans, float showTime, bool isSingleton,  UIParameterArgs parameter)
         {
             if (view == null)
             {
                 Debug.LogError("OpenWidget Fail,The View Is Null");
+                return;
+            }
+          
+            if (parameter==null)
+            {
+                Debug.LogError("parameter 不要使用null  使用默认的 UIParameterArgs.Create() 无参数方法替代");
                 return;
             }
 
@@ -664,15 +696,18 @@ namespace GameFrameWork
         /// <param name="showTime"></param>
         /// <param name="isSingleton"></param>
         /// <param name="parameter"></param>
-        private void ShowWidgetView(UIBaseWidgetView view, Transform parentTrans, float showTime, bool isSingleton, params object[] parameter)
+        private void ShowWidgetView(UIBaseWidgetView view, Transform parentTrans, float showTime, bool isSingleton,  UIParameterArgs parameter)
         {
             if (view.rectransform.parent != parentTrans)
                 view.rectransform.SetParent(parentTrans);
             view.rectransform.ResetRectTransProperty();
-            if (view.IsOpen)
+            if (view.IsShowingWindow)
                 view.FlushWindow(parameter);
             else
-                view.ShowWindow(Helper.Instance.MegerParameter(new object[] { parentTrans, showTime, isSingleton }, parameter));
+            {
+                UIParameterArgs parameter1 = UIParameterArgs.Create(parentTrans, showTime, isSingleton);
+                view.ShowWindow(Helper.Instance.MegerParameter(parameter1, parameter));
+            }
         }
 
 
@@ -681,14 +716,18 @@ namespace GameFrameWork
         /// </summary>
         /// <param name="view"></param>
         /// <param name="isDestroyWidget"></param>
-        public void CloseWidget(UIBaseWidgetView view,bool isDestroyWidget, params object[] parameter)
+        public void CloseWidget(UIBaseWidgetView view,bool isDestroyWidget,  UIParameterArgs parameter)
         {
             if(m_AllWidgetView.ContainsKey(view.BelongParent)==false)
             {
                 Debug.LogError("CloseWidget Fail,Not Exit " + view.name);
                 return;
             }
-
+            if (parameter == null)
+            {
+                Debug.LogError("parameter 不要使用null  使用默认的 UIParameterArgs.Create() 无参数方法替代");
+                return;
+            }
             int Index = -1;
             for (int dex=0;dex< m_AllWidgetView[view.BelongParent].Count;++dex)
             {
@@ -705,7 +744,8 @@ namespace GameFrameWork
                 return;
             }
 
-            view.HideWindow(isDestroyWidget, parameter);
+            UIParameterArgs parameter1 = UIParameterArgs.Create(isDestroyWidget);
+            view.HideWindow(Helper.Instance.MegerParameter(parameter1, parameter));
             if (isDestroyWidget)
             {
                 m_AllWidgetView[view.BelongParent].RemoveAt(Index);
@@ -718,12 +758,19 @@ namespace GameFrameWork
         /// 关闭所有关联改物体的Widget
         /// </summary>
         /// <param name="targetTrans"></param>
-        public void CloseAttachWidget(Transform targetTrans, bool isDestroyWidget, params object[] parameter)
+        public void CloseAttachWidget(Transform targetTrans, bool isDestroyWidget,  UIParameterArgs parameter)
         {
             if (m_AllWidgetView.ContainsKey(targetTrans) == false) return;
+            if (parameter == null)
+            {
+                Debug.LogError("parameter 不要使用null  使用默认的 UIParameterArgs.Create() 无参数方法替代");
+                return;
+            }
+
             for (int dex=0;dex< m_AllWidgetView[targetTrans].Count;++dex)
             {
-                m_AllWidgetView[targetTrans][dex].HideWindow(isDestroyWidget, parameter);
+                UIParameterArgs parameter1 = UIParameterArgs.Create(isDestroyWidget);
+                m_AllWidgetView[targetTrans][dex].HideWindow(Helper.Instance.MegerParameter(parameter1, parameter));
             }
 
             if (isDestroyWidget)

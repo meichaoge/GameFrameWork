@@ -30,19 +30,19 @@ namespace GameFrameWork.UGUI
         }
 
 
-        public override void ShowWindow(params object[] parameter)
+        public override void ShowWindow(UIParameterArgs parameter)
         {
 #if UNITY_EDITOR
-            if(parameter==null|| parameter.Length<1)
+            if(parameter==null|| parameter.ParemeterCount<1)
             {
                 Debug.LogError("ShowWindow  Fail,参数异常");
                 return;
             }
 #endif
 
-            if (float.TryParse(parameter[0].ToString(), out m_AutoDestroyedTime) == false)
+            if (float.TryParse(parameter.GetParameterByIndex(0).ToString(), out m_AutoDestroyedTime) == false)
             {
-                Debug.LogError("ShowWindow  Fail,错误的类型 " + parameter[0].GetType());
+                Debug.LogError("ShowWindow  Fail,错误的类型 " + parameter. GetParameterByIndex(0).GetType());
                 m_AutoDestroyedTime = 0;
             }
 
