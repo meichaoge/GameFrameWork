@@ -22,10 +22,7 @@ namespace GameFrameWork
             get
             {
                 if (m_UICanvasMaskView == null)
-                {
-                    UIManager.Instance.ForceGetUISync<UICanvasMaskView>(Define_ResPath.UICanvasMaskViewPath, UIManagerHelper.Instance.WidgetParentTrans,
-                        (view) => { m_UICanvasMaskView = view; }, true);
-                }
+                    m_UICanvasMaskView = UIManager.Instance.ForceGetUISync<UICanvasMaskView>(Define_ResPath.UICanvasMaskViewPath, UIManagerHelper.Instance.WidgetParentTrans);
                 return m_UICanvasMaskView;
             }
         }
@@ -42,13 +39,8 @@ namespace GameFrameWork
         {
             get
             {
-                if(m_UIAssetUpdateView ==null)
-                {
-                    UIManager.Instance.ForceGetUISync<UIAssetUpdateView>(Define_ResPath.UIAssetUpdateViewPath, UIManagerHelper.Instance.PageParentTrans, (view) =>
-                    {
-                        m_UIAssetUpdateView = view;
-                    }, true);
-                }
+                if (m_UIAssetUpdateView == null)
+                    m_UIAssetUpdateView = UIManager.Instance.ForceGetUISync<UIAssetUpdateView>(Define_ResPath.UIAssetUpdateViewPath, UIManagerHelper.Instance.PageParentTrans);
                 return m_UIAssetUpdateView;
             }
         }
@@ -63,12 +55,7 @@ namespace GameFrameWork
             get
             {
                 if (m_UILoginPopupView == null)
-                {
-                    UIManager.Instance.ForceGetUISync<UILoginPopupView>(Define_ResPath.UILoginPopupViewPath, UIManagerHelper.Instance.PopupParentTrans, (view) =>
-                    {
-                        m_UILoginPopupView = view;
-                    }, true);
-                }
+                    m_UILoginPopupView = UIManager.Instance.ForceGetUISync<UILoginPopupView>(Define_ResPath.UILoginPopupViewPath, UIManagerHelper.Instance.PopupParentTrans);
                 return m_UILoginPopupView;
             }
         }

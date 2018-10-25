@@ -310,7 +310,7 @@ namespace GameFrameWork.UGUI
             //    UIManager.Instance.OpenPopUp(loginPopView, PopupOpenOperateEnum.KeepPreviousAvailable,this, true, null);
             //}, true, true);
 
-            UIManager.Instance.OpenPopUp(UIViewReference.Instance.UiLoginPopupView, PopupOpenOperateEnum.KeepPreviousAvailable, this, true, UIParameterArgs.Create());
+            UIViewReference.Instance.UiLoginPopupView.OpenPopUp( PopupOpenOperateEnum.KeepPreviousAvailable, this, true, UIParameterArgs.Create());
 
 
          

@@ -255,17 +255,17 @@ namespace GameFrameWork.UGUI
             } //更新本地账户列表
 
 
-          
+
             if (UIViewReference.Instance.UiAssetUpdateView != null && UIViewReference.Instance.UiAssetUpdateView.IsActivate)
-                UIManager.Instance.ClosePage(UIParameterArgs.Create( UIViewReference.Instance.UiAssetUpdateView));
+                UIViewReference.Instance.UiAssetUpdateView.ClosePage(UIParameterArgs.Create(), UIParameterArgs.Create());
 
 
 
-            UIManager.Instance.OpenWidget(UIViewReference.Instance.UiCanvasMaskView, UIManagerHelper.Instance.WidgetParentTrans, 0, true, UIParameterArgs.Create());
+            UIViewReference.Instance.UiCanvasMaskView.OpenWidget(UIManagerHelper.Instance.WidgetParentTrans, 0, true, UIParameterArgs.Create());
 
             AppSceneManager.Instance.LoadScene(SceneNameEnum.StartUp, LoadSceneModeEnum.KeepPrevious, (isComplete) =>
             {
-                UIManager.Instance.CloseWidget(UIViewReference.Instance.UiCanvasMaskView, false, UIParameterArgs.Create( false,true));
+                UIViewReference.Instance.UiCanvasMaskView.CloseWidget(false, UIParameterArgs.Create(false, true));
                 if (isComplete)
                 {
                     Debug.LogInfor("应用已经起来了..Go!!!");

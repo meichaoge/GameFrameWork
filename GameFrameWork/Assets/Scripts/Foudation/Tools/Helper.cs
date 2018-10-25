@@ -94,7 +94,7 @@ namespace GameFrameWork
         /// <param name="agr0"></param>
         /// <param name="parameter"></param>
         /// <returns></returns>
-        public UIParameterArgs MegerParameter(UIParameterArgs agr0, UIParameterArgs agr1)
+        public UIParameterArgs MegerUIParameter(UIParameterArgs agr0, UIParameterArgs agr1)
         {
             List<object> parameter = new List<object>(agr0.ParemeterCount + agr1.ParemeterCount);
             parameter.AddRange(agr0.Parameter);
@@ -111,7 +111,7 @@ namespace GameFrameWork
         /// <param name="agr0"></param>
         /// <param name="parameter"></param>
         /// <returns></returns>
-        public UIParameterArgs MegerParameter(UIParameterArgs agr0, uint beginIndex0, uint count0, UIParameterArgs agr1, uint beginIndex1, uint count1)
+        public UIParameterArgs MegerUIParameter(UIParameterArgs agr0, uint beginIndex0, uint count0, UIParameterArgs agr1, uint beginIndex1, uint count1)
         {
             #region  异常处理
             if (beginIndex0 >= agr0.ParemeterCount||(beginIndex0+ count0)> agr0.ParemeterCount)

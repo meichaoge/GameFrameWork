@@ -32,7 +32,7 @@ namespace GameFrameWork.UGUI
         }
 
         #region 界面属性定义
-        [Header("窗口类型  必须设置")]
+        [Header("窗口类型  必须设置(这里只是显示代码中设置的值)")]
         [SerializeField]
         protected WindowTypeEnum m_WindowType = WindowTypeEnum.None;
         /// <summary>
@@ -86,7 +86,6 @@ namespace GameFrameWork.UGUI
 
         protected virtual void OnEnable()
         {
-            // IsOpen = true;  //2018/09/27 修改 这里不能执行这个 否则第一次创建的时候就已经打开了 后面的逻辑不好处理
         }
 
         protected virtual void OnDisable()
@@ -123,16 +122,12 @@ namespace GameFrameWork.UGUI
         /// <param name="parameter"></param>
         public virtual void ShowWindow(UIParameterArgs parameter)
         {
-            if (IsShowingWindow)
+            if (IsShowingWindow==false)
             {
-                Debug.LogError("当前UI已经是打开状态 请使用接口 FlushWindow() 刷新界面!!!! 这里自动转化成 FlushWindow() 接口调用");
-                FlushWindow(parameter);
-                return;
+                IsShowingWindow = true;
+                gameObject.SetActive(true);
             }
             IsCompleteShow = false;
-            IsShowingWindow = true;
-            gameObject.SetActive(true);
-
         }
         /// <summary>
         /// 子类重写这个方法实现 协程显示界面
@@ -153,53 +148,12 @@ namespace GameFrameWork.UGUI
 
 
         /// <summary>
-        /// 完成打开窗口 
+        /// 完成打开窗口 (需要手动调用) 
         /// </summary>
         protected virtual void OnCompleteShowWindow()
         {
             IsCompleteShow = true;
         }
-
-
-
-
-
-
-        /// <summary>
-        /// 外部调用 刷新窗口
-        /// </summary>
-        /// <param name="parameter"></param>
-        public virtual void FlushWindow(UIParameterArgs parameter)
-        {
-            if (IsActivate == false) return;
-                Debug.LogError("没有打开的界面需要调用  ShowWindow()!!!  这里自动转化成 ShowWindow() 接口调用   ");
-                ShowWindow(parameter);
-                return;
-        }
-        /// <summary>
-        /// 子类重写这个方法实现 协程刷新界面  只有打开了界面才能执行这个接口
-        /// </summary>
-        /// <returns></returns>
-        protected virtual IEnumerator OnEnumerateFlushWindow()
-        {
-            yield return null;
-        }
-
-        /// <summary>
-        /// 直接初始化
-        /// </summary>
-        protected virtual void OnFlushWindow()
-        {
-
-        }
-        /// <summary>
-        /// 完成刷新窗口 
-        /// </summary>
-        protected virtual void OnCompleteFlushWindow()
-        {
-            IsCompleteShow = true;
-        }
-
 
 
 

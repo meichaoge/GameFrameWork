@@ -44,7 +44,7 @@ namespace GameFrameWork
             PlayerPrefsMgr.GetInstance();
 
             base.Awake();
-      
+
         }
 
 
@@ -53,7 +53,7 @@ namespace GameFrameWork
         {
             StartCoroutine(LoadAppConfig(() =>
             {
-                UIManager.Instance.OpenPage(UIViewReference.Instance.UiAssetUpdateView, UIParameterArgs.Create());
+                UIViewReference.Instance.UiAssetUpdateView.OpenPage(UIParameterArgs.Create());
             }));
         }
 

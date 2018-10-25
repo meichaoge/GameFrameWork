@@ -21,15 +21,11 @@ namespace GameFrameWork
         /// <param name="antoDestroyTime">默认标识不销毁 ( 值不等于0标识显示后多少秒销毁)</param>
         public void ShowTipsViewSync(string content, float antoDestroyTime = 0)
         {
-            UIManager.Instance.ForceGetUISync<UITextTipView>(Define_ResPath.UITextTipViewPath, UIManagerHelper.Instance.TipsParentTrans, (tipsView) =>
+            UITextTipView tipsView=UIManager.Instance.ForceGetUISync<UITextTipView>(Define_ResPath.UITextTipViewPath, UIManagerHelper.Instance.TipsParentTrans);
+            if (tipsView != null)
             {
-                if (tipsView == null)
-                {
-                    Debug.LogError("ShowTipsViewSync  Fail,Not Exit View " + Define_ResPath.UITextTipViewPath);
-                    return;
-                }
-                UIManager.Instance.OpenTip(tipsView, antoDestroyTime, UIParameterArgs.Create( content));
-            }, false, true);
+                tipsView.OpenTip(UIParameterArgs.Create(content), antoDestroyTime);
+            }
         }
 
 

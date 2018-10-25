@@ -97,7 +97,6 @@ namespace GameFrameWork
 
             return result;
         }
-
         /// <summary>
         /// 获取一个参数对象
         /// </summary>
@@ -118,6 +117,7 @@ namespace GameFrameWork
 
             return result;
         }
+
 
 
         /// <summary>

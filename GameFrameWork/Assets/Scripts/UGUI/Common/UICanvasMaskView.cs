@@ -79,24 +79,24 @@ namespace GameFrameWork.UGUI
       
 
 
-        public override void FlushWindow(UIParameterArgs parameter)
-        {
-            if (parameter != null && parameter.ParemeterCount == 0)
-            {
-                Debug.LogError("全屏Mske 必须传入哪个物体请求打开这个界面的参数");
-                return;
-            }
+        //public override void FlushWindow(UIParameterArgs parameter)
+        //{
+        //    if (parameter != null && parameter.ParemeterCount == 0)
+        //    {
+        //        Debug.LogError("全屏Mske 必须传入哪个物体请求打开这个界面的参数");
+        //        return;
+        //    }
 
 
-            base.FlushWindow(parameter);
-            if (parameter == null)
-                AddReference(null);
-            else
-                AddReference(parameter.GetParameterByIndex(0) as Transform);
-            ShowDefaultView();
+        //    base.FlushWindow(parameter);
+        //    if (parameter == null)
+        //        AddReference(null);
+        //    else
+        //        AddReference(parameter.GetParameterByIndex(0) as Transform);
+        //    ShowDefaultView();
 
-            OnCompleteFlushWindow();
-        }
+        //    OnCompleteFlushWindow();
+        //}
 
 
         /// <summary>
