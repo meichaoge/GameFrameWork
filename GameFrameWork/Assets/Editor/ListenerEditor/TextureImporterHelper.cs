@@ -16,7 +16,7 @@ namespace GameFrameWork.EditorExpand
         /// 导入UI图片资源
         /// </summary>
         /// <param name="impor"></param>
-        public static void OnPresProcessUITextureSetting(TextureImporter textureImporter,string assetPath)
+        public static void OnPresProcessUITextureSetting(Texture2D texture, TextureImporter textureImporter,string assetPath)
         {
 
             textureImporter.textureType = TextureImporterType.Sprite;
@@ -36,9 +36,10 @@ namespace GameFrameWork.EditorExpand
             settings.textureCompression = TextureImporterCompression.CompressedHQ;
             settings.overridden = true;
             settings.compressionQuality = 100;   //图片压缩比例
-            settings.maxTextureSize = textureImporter.maxTextureSize;
+                                                 //settings.maxTextureSize = textureImporter.maxTextureSize;    //textureImporter.maxTextureSize=2048
+            settings.maxTextureSize =CommonUtility.Instance.GetNearnestPowerNumber(Mathf.Max(texture.width, texture.height),10);
+            //   Debug.Log("OnPresProcessUITextureSetting " + settings.maxTextureSize+" Width="+ texture.width+" Height="+texture.height);
             textureImporter.SetPlatformTextureSettings(settings);
-
         }
     }
 }

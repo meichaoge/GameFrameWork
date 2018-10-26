@@ -18,11 +18,15 @@ namespace GameFrameWork.EditorExpand
         /// </summary>
         public void OnPreprocessTexture()
         {
+            if (AssetImportTool.S_IsEnableImportTeture == false) return;
+
             Debug.Log("OnPreProcessTexture=" + this.assetPath);
             TextureImporter impor = this.assetImporter as TextureImporter;
             if (this.assetPath.StartsWith(string.Format("Assets/{0}", EditorDefine.S_UITextureTopRelativePath)))
             {
-                TextureImporterHelper. OnPresProcessUITextureSetting(impor,this.assetPath);
+
+                Texture2D texture =AssetDatabase.LoadAssetAtPath<Texture2D>(this.assetPath);
+                TextureImporterHelper. OnPresProcessUITextureSetting(texture, impor,this.assetPath);
             } //导入UI资源
         }
 

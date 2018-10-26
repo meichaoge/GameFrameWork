@@ -23,7 +23,11 @@ public class Test_LoadFont : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.A))
         {
             Debug.LogInfor("Time=" + Time.realtimeSinceStartup + "Frame=" + EventCenter.Instance.CurFrameCount);
-            ResourcesMgr.Instance.LoadFont(m_Url, m_LoadAssetModel, OnComplete);
+            if (m_LoadAssetModel == LoadAssetModel.Async)
+                ResourcesMgr.Instance.LoadFontAsync(m_Url, OnComplete);
+            else
+                OnComplete(ResourcesMgr.Instance.LoadFontSync(m_Url));
+
         }
     }
 

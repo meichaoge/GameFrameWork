@@ -13,6 +13,49 @@ namespace GameFrameWork
     {
         #region 加载不同资源的接口 (内部使用加载器加载资源)
 
+        #region 加载并生成GameObject
+
+        /// <summary>
+        /// 根据指定的路径加载一个预制体资源并生成对应的实例 (异步加载)
+        /// </summary>
+        /// <param name="url">资源唯一路径</param>
+        /// <param name="parent">实例生成后挂载在那个父节点下</param>
+        /// <param name="callback">加载资源成功后的回调</param>
+        /// <param name="isActivate">默认为tue 标识生成的实例为激活状态</param>
+        /// <param name="isResetTransProperty">默认为tue 标识是否重置生成对象的Transform 属性</param>
+        /// <returns></returns>
+        public void InstantiateAsync(string url, Transform parent, System.Action<GameObject> callback, bool isActivate = true, bool isResetTransProperty = true)
+        {
+            if (string.IsNullOrEmpty(url))
+            {
+                if (callback != null)
+                    callback(null);
+                return;
+            }
+
+            Instantiate(url, parent, LoadAssetModel.Async, callback, isActivate, isResetTransProperty);
+        }
+
+        /// <summary>
+        /// 根据指定的路径加载一个预制体资源并生成对应的实例 (同步加载)
+        /// </summary>
+        /// <param name="url">资源唯一路径</param>
+        /// <param name="parent">实例生成后挂载在那个父节点下</param>
+        /// <param name="isActivate">默认为tue 标识生成的实例为激活状态</param>
+        /// <param name="isResetTransProperty">默认为tue 标识是否重置生成对象的Transform 属性</param>
+        /// <returns></returns>
+        public GameObject InstantiateSync(string url, Transform parent, bool isActivate = true, bool isResetTransProperty = true)
+        {
+            GameObject loadGameObject = null;
+            if (string.IsNullOrEmpty(url))
+            {
+                return loadGameObject;
+            }
+
+            Instantiate(url, parent, LoadAssetModel.Sync, (go) => { loadGameObject = go; }, isActivate, isResetTransProperty);
+            return loadGameObject;
+        }
+
         /// <summary>
         /// 根据指定的路径加载一个预制体资源并生成对应的实例
         /// </summary>
@@ -21,12 +64,11 @@ namespace GameFrameWork
         /// <param name="callback">加载资源成功后的回调</param>
         /// <param name="isActivate">默认为tue 标识生成的实例为激活状态</param>
         /// <param name="isResetTransProperty">默认为tue 标识是否重置生成对象的Transform 属性</param>
-        /// 
         /// <returns></returns>
-        public void Instantiate(string url, Transform parent, LoadAssetModel loadModel, System.Action<GameObject> callback, bool isActivate = true, bool isResetTransProperty = true)
+        private void Instantiate(string url, Transform parent, LoadAssetModel loadModel, System.Action<GameObject> callback, bool isActivate = true, bool isResetTransProperty = true)
         {
 #if UNITY_EDITOR
-            Debug.LogEditorInfor(string.Format("[ResourcesMgr ] Instantiate Begin >>>>  url={0}  LoadModel={1} Time={2}   RederFrameCont={3}", url, loadModel, Time.realtimeSinceStartup,Time.renderedFrameCount));
+            Debug.LogEditorInfor(string.Format("[ResourcesMgr ] Instantiate Begin >>>>  url={0}  LoadModel={1} Time={2}   RederFrameCont={3}", url, loadModel, Time.realtimeSinceStartup, Time.renderedFrameCount));
 
 #endif
 
@@ -90,8 +132,60 @@ namespace GameFrameWork
         }
 
 
+        #endregion
 
 
+        #region  加载Sprite
+        /// <summary>
+        /// 加载已经打成Prefab的预制体的资源的Sprite 精灵(同步加载)
+        /// </summary>
+        /// <param name="targetImag"></param>
+        /// <param name="url"></param>
+        public Sprite LoadSpriteSync(string url, UnityEngine.UI.Image targetImag)
+        {
+            Sprite result = null;
+            if (CheckLoadSpriteParameter(url, targetImag) == false)
+                return result;
+            LoadSprite(url, targetImag, LoadAssetModel.Sync, (sprite) => { result = sprite; });
+            return result;
+        }
+
+        /// <summary>
+        /// 加载已经打成Prefab的预制体的资源的Sprite 精灵（异步加载）
+        /// </summary>
+        /// <param name="targetImag"></param>
+        /// <param name="url"></param>
+        /// <param name="callback"></param>
+        public void LoadSpriteAsync(string url, UnityEngine.UI.Image targetImag, System.Action<Sprite> callback)
+        {
+            if (CheckLoadSpriteParameter(url, targetImag) == false)
+            {
+                if (callback != null)
+                    callback.Invoke(null);
+                return;
+            }
+            LoadSprite(url, targetImag, LoadAssetModel.Async, callback);
+        }
+        /// <summary>
+        /// 检查参数是否合法
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="targetImag"></param>
+        /// <returns></returns>
+        private bool CheckLoadSpriteParameter(string url, UnityEngine.UI.Image targetImag)
+        {
+            if (string.IsNullOrEmpty(url))
+            {
+                Debug.LogError("CheckLoadSpriteParameter  Fail,Url IsNullOrEmpty");
+                return false;
+            }
+            if (targetImag == null)
+            {
+                Debug.LogError("CheckLoadSpriteParameter Fail,Target Image is Null");
+                return false;
+            }
+            return true;
+        }
 
         /// <summary>
         /// 加载已经打成Prefab的预制体的资源的Sprite 精灵
@@ -99,22 +193,8 @@ namespace GameFrameWork
         /// <param name="targetImag"></param>
         /// <param name="url"></param>
         /// <param name="callback"></param>
-        public void LoadSprite(string url, UnityEngine.UI.Image targetImag, LoadAssetModel loadModel, System.Action<Sprite> callback)
+        private void LoadSprite(string url, UnityEngine.UI.Image targetImag, LoadAssetModel loadModel, System.Action<Sprite> callback)
         {
-            if (targetImag == null)
-            {
-                Debug.LogError("LoadSprite Fail,Target Image is Null");
-                return;
-            }
-
-            if (string.IsNullOrEmpty(url))
-            {
-                if (callback != null)
-                    callback(null);
-                return;
-            }
-
-
             SpriteLoader.LoadAsset(targetImag.transform, url, loadModel, (loader) =>
              {
                  #region  加载成功后的处理逻辑
@@ -134,20 +214,49 @@ namespace GameFrameWork
              });
         }
 
+        #endregion
+
+        #region  加载File 配置文件(text)
+        /// <summary>
+        /// 加载各种配置文件(配置文件只会被加载一次 ，加载后不会被主动销毁) (同步加载)
+        /// </summary>
+        /// <param name="url"></param>
+        public string LoadFileSync(string url)
+        {
+            string result = string.Empty;
+            if (string.IsNullOrEmpty(url))
+            {
+                Debug.LogError("LoadFileSync Fail  路径为null");
+                return result;
+            }
+
+            LoadFile(url, LoadAssetModel.Sync, (asset) => { result = asset; });
+            return result;
+        }
         /// <summary>
         /// 加载各种配置文件(配置文件只会被加载一次 ，加载后不会被主动销毁)
         /// </summary>
         /// <param name="url"></param>
         /// <param name="callback"></param>
-        public void LoadFile(string url, LoadAssetModel loadModel, System.Action<string> callback)
+        public void LoadFileAsync(string url, System.Action<string> callback)
         {
             if (string.IsNullOrEmpty(url))
             {
+                Debug.LogError("LoadFileAsync Fail  路径为null");
                 if (callback != null)
                     callback("");
                 return;
             }
+            LoadFile(url, LoadAssetModel.Async, callback);
+        }
 
+        /// <summary>
+        /// 加载各种配置文件(配置文件只会被加载一次 ，加载后不会被主动销毁)
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="callback"></param>
+        private void LoadFile(string url, LoadAssetModel loadModel, System.Action<string> callback)
+        {
             TextAssetLoader.LoadAsset(url, loadModel, (loader) =>
             {
                 ResourcesLoadTraceMgr.Instance.RecordTraceResourceInfor(loader);
@@ -166,21 +275,48 @@ namespace GameFrameWork
             });
         }
 
+        #endregion
+
+        #region 加载字体
+        /// <summary>
+        /// 加载字体资源 (同步)
+        /// </summary>
+        /// <param name="url"></param>
+        public Font LoadFontSync(string url)
+        {
+            Font result = null;
+            if (string.IsNullOrEmpty(url))
+            {
+                Debug.LogError("LoadFontSync url IsNullOrEmpty");
+                return result;
+            }
+            LoadFont(url, LoadAssetModel.Sync, (font) => { result = font; });
+            return result;
+        }
 
         /// <summary>
         /// 加载字体资源
         /// </summary>
         /// <param name="url"></param>
         /// <param name="callback"></param>
-        public void LoadFont(string url, LoadAssetModel loadModel, System.Action<Font> callback)
+        public void LoadFontAsync(string url, System.Action<Font> callback)
         {
             if (string.IsNullOrEmpty(url))
             {
+                Debug.LogError("LoadFontAsync url IsNullOrEmpty");
                 if (callback != null)
                     callback(null);
                 return;
             }
-
+            LoadFont(url, LoadAssetModel.Async, callback);
+        }
+        /// <summary>
+        /// 加载字体资源
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="callback"></param>
+        private void LoadFont(string url, LoadAssetModel loadModel, System.Action<Font> callback)
+        {
             FontLoader.LoadFontAsset(url, loadModel, (loader) =>
              {
                  ResourcesLoadTraceMgr.Instance.RecordTraceResourceInfor(loader);
@@ -198,20 +334,52 @@ namespace GameFrameWork
                  #endregion
              });
         }
+        #endregion
+
+        #region  加载材质球
         /// <summary>
         /// 加载材质球
         /// </summary>
         /// <param name="url"></param>
         /// <param name="target"></param>
         /// <param name="callback"></param>
-        public void LoadMaterial(string url, Transform target, LoadAssetModel loadModel, System.Action<Material> callback)
+        public Material LoadMaterialSync(string url, Transform target)
+        {
+            Material result = null;
+            if (string.IsNullOrEmpty(url))
+            {
+                Debug.LogError("LoadMaterialSync Fail url IsNullOrEmpty");
+                return result;
+            }
+            LoadMaterial(url, target, LoadAssetModel.Sync, (material) => { result = material; });
+            return result;
+        }
+
+        /// <summary>
+        /// 加载材质球
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="target"></param>
+        /// <param name="callback"></param>
+        public void LoadMaterialAsync(string url, Transform target, System.Action<Material> callback)
         {
             if (string.IsNullOrEmpty(url))
             {
+                Debug.LogError("LoadMaterialAsync Fail url IsNullOrEmpty");
                 if (callback != null)
                     callback(null);
                 return;
             }
+            LoadMaterial(url, target, LoadAssetModel.Async, callback);
+        }
+        /// <summary>
+        /// 加载材质球
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="target"></param>
+        /// <param name="callback"></param>
+        private void LoadMaterial(string url, Transform target, LoadAssetModel loadModel, System.Action<Material> callback)
+        {
             MaterialLoader.LoadAsset(target, url, loadModel, (loader) =>
              {
                  ResourcesLoadTraceMgr.Instance.RecordTraceResourceInfor(loader);
@@ -233,20 +401,54 @@ namespace GameFrameWork
              });
         }
 
+        #endregion
+
+        #region  加载声音
         /// <summary>
         /// 加载声音资源
         /// </summary>
         /// <param name="url"></param>
         /// <param name="parent"></param>
         /// <param name="callback"></param>
-        public void LoadAudio(string url, Transform parent, LoadAssetModel loadModel, System.Action<AudioClip> callback)
+        public AudioClip LoadAudioSync(string url, Transform parent)
+        {
+            AudioClip result = null;
+            if (string.IsNullOrEmpty(url))
+            {
+                Debug.LogError("LoadAudioSync Fail url IsNullOrEmpty");
+                return result;
+            }
+            LoadAudio(url, parent, LoadAssetModel.Sync, (audio) => { result = audio; });
+            return result;
+        }
+
+
+        /// <summary>
+        /// 加载声音资源
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="parent"></param>
+        /// <param name="callback"></param>
+        public void LoadAudioAsync(string url, Transform parent, System.Action<AudioClip> callback)
         {
             if (string.IsNullOrEmpty(url))
             {
+                Debug.LogError("LoadAudioAsync Fail url IsNullOrEmpty");
                 if (callback != null)
                     callback(null);
                 return;
             }
+            LoadAudio(url, parent, LoadAssetModel.Async, callback);
+        }
+
+        /// <summary>
+        /// 加载声音资源
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="parent"></param>
+        /// <param name="callback"></param>
+        private void LoadAudio(string url, Transform parent, LoadAssetModel loadModel, System.Action<AudioClip> callback)
+        {
 
             AudioLoader.LoadAudioClip(parent, url, loadModel, (loader) =>
              {
@@ -269,46 +471,80 @@ namespace GameFrameWork
              });
         }
 
+        #endregion
 
-        /// <summary>
-        /// 根据场景资源路径加载场景(可能是AssetBundle 中的场景)
-        /// </summary>
-        /// <param name="url"></param>
-        /// <param name="loadModel">加载模式</param>
-        /// <param name="callback"></param>
-        public void LoadScene(string url, LoadSceneMode loadModel, LoadAssetModel loadassetModel, System.Action callback)
-        {
-            if (string.IsNullOrEmpty(url))
-            {
-                if (callback != null)
-                    callback();
-                return;
-            }
+        #region  加载场景
+        ///// <summary>
+        ///// 根据场景资源路径加载场景(可能是AssetBundle 中的场景)
+        ///// </summary>
+        ///// <param name="url"></param>
+        ///// <param name="callback"></param>
+        //public void LoadSceneSync(string url, LoadSceneMode loadModel, System.Action callback)
+        //{
+        //    if (string.IsNullOrEmpty(url))
+        //    {
+        //        Debug.LogError("LoadSceneSync Fail url IsNullOrEmpty");
+        //        return;
+        //    }
+        //    LoadScene(url, loadModel, LoadAssetModel.Sync, null);
+        //}
 
-            SceneLoader.LoadScene(url, loadassetModel, (loader) =>
-            {
-                // ResourcesLoadTraceMgr.Instance.RecordTraceResourceInfor(loader);
-                #region  加载成功后的处理逻辑
-                if (loader == null || (loader.IsCompleted && loader.IsError))
-                {
-                    Debug.LogError("LoadMaterial   Fail,Not Exit At Path= " + url);
-                    if (callback != null)
-                        callback.Invoke();
-                    return;
-                } //加载资源出错
-                string sceneName = System.IO.Path.GetFileNameWithoutExtension(url);
-                EventCenter.Instance.StartCoroutine(LoadSceneAsync(sceneName, loadModel, callback));
-                #endregion
-            });
-        }
-        private IEnumerator LoadSceneAsync(string sceneName, LoadSceneMode loadModel, System.Action callback)
-        {
-            AsyncOperation loadAsync = SceneManager.LoadSceneAsync(sceneName, loadModel);
-            while (loadAsync != null && loadAsync.isDone == false)
-                yield return null;
-            if (callback != null)
-                callback.Invoke();
-        }
+        ///// <summary>
+        ///// 根据场景资源路径加载场景(可能是AssetBundle 中的场景)
+        ///// </summary>
+        ///// <param name="url"></param>
+        ///// <param name="callback"></param>
+        //public void LoadSceneAsync(string url, LoadSceneMode loadModel, System.Action callback)
+        //{
+        //    if (string.IsNullOrEmpty(url))
+        //    {
+        //        Debug.LogError("LoadSceneAsync Fail url IsNullOrEmpty");
+        //        if (callback != null)
+        //            callback();
+        //        return;
+        //    }
+        //    LoadScene(url, loadModel, LoadAssetModel.Async, callback);
+        //}
+        ///// <summary>
+        ///// 根据场景资源路径加载场景(可能是AssetBundle 中的场景)
+        ///// </summary>
+        ///// <param name="url"></param>
+        ///// <param name="loadModel">加载模式</param>
+        ///// <param name="callback"></param>
+        //private void LoadScene(string url, LoadSceneMode loadModel, LoadAssetModel loadassetModel, System.Action callback)
+        //{
+        //    SceneLoader.LoadScene(url, loadassetModel, (loader) =>
+        //    {
+        //        // ResourcesLoadTraceMgr.Instance.RecordTraceResourceInfor(loader);
+        //        #region  加载成功后的处理逻辑
+        //        if (loader == null || (loader.IsCompleted && loader.IsError))
+        //        {
+        //            Debug.LogError("LoadMaterial   Fail,Not Exit At Path= " + url);
+        //            if (callback != null)
+        //                callback.Invoke();
+        //            return;
+        //        } //加载资源出错
+        //        string sceneName = System.IO.Path.GetFileNameWithoutExtension(url);
+        //        if (loadassetModel == LoadAssetModel.Async)
+        //        {
+        //            EventCenter.Instance.StartCoroutine(LoadSceneAsyncOperate(sceneName, loadModel, callback));
+        //        } //异步加载场景
+        //        else
+        //        {
+        //            SceneManager.LoadScene(sceneName, loadModel);
+        //        }
+        //        #endregion
+        //    });
+        //}
+        //private IEnumerator LoadSceneAsyncOperate(string sceneName, LoadSceneMode loadModel, System.Action callback)
+        //{
+        //    AsyncOperation loadAsync = SceneManager.LoadSceneAsync(sceneName, loadModel);
+        //    while (loadAsync != null && loadAsync.isDone == false)
+        //        yield return null;
+        //    if (callback != null)
+        //        callback.Invoke();
+        //}
+        #endregion
 
 
         #endregion

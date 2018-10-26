@@ -47,15 +47,14 @@ namespace GameFrameWork
         public void InitialSetting()
         {
             if (IsEnable) return;  //已经初始化了
-            ResourcesMgr.Instance.LoadFile(Define_Config.AppConfigPath, LoadAssetModel.Sync, (dataStr) =>
+            string dataStr = ResourcesMgr.Instance.LoadFileSync(Define_Config.AppConfigPath);
+
+            if (string.IsNullOrEmpty(dataStr))
             {
-                if (string.IsNullOrEmpty(dataStr))
-                {
-                    IsEnable = false;
-                    return;
-                }
-                AnalysisConfig(dataStr);
-            });
+                IsEnable = false;
+                return;
+            }
+            AnalysisConfig(dataStr);
         }
 
         /// <summary>

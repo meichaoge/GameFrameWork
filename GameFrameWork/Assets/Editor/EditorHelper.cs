@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 
@@ -52,5 +53,20 @@ namespace GameFrameWork.EditorExpand
         }
 
 
+        /// <summary>
+        /// 获取精灵的大小
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public Vector2 GetSpriteSize(string path)
+        {
+            Sprite asset = AssetDatabase.LoadAssetAtPath<Sprite>(path);
+            if(asset==null)
+            {
+                Debug.LogError("GetSpriteSize Fail");
+                return Vector2.zero;
+            }
+            return asset.bounds.size;
+        }
     }
 }

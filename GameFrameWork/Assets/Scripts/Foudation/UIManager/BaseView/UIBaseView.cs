@@ -128,15 +128,17 @@ namespace GameFrameWork.UGUI
                 gameObject.SetActive(true);
             }
             IsCompleteShow = false;
+
         }
-        /// <summary>
-        /// 子类重写这个方法实现 协程显示界面
-        /// </summary>
-        /// <returns></returns>
-        protected virtual IEnumerator OnEnumerateShowWindow()
-        {
-            yield return null;
-        }
+        ///// <summary>
+        ///// 子类重写这个方法实现 协程显示界面 (需要手动调用 OnCompleteShowWindow() )
+        ///// </summary>
+        ///// <returns></returns>
+        //protected virtual IEnumerator OnEnumerateShowWindow()
+        //{
+        //    yield return null;
+        //    IsCompleteShow = false;
+        //}
 
         /// <summary>
         /// 直接初始化
@@ -168,14 +170,14 @@ namespace GameFrameWork.UGUI
                 Debug.LogEditorInfor("HideWindow Exception !!! Is Not Complete ShowWindow Process " + gameObject.name);
             }
         }
-        /// <summary>
-        /// 子类重写这个方法实现 协程关闭界面
-        /// </summary>
-        /// <returns></returns>
-        protected virtual IEnumerator OnHideWindow(UIParameterArgs parameter)
-        {
-            yield return null;
-        }
+        ///// <summary>
+        ///// 子类重写这个方法实现 协程关闭界面
+        ///// </summary>
+        ///// <returns></returns>
+        //protected virtual IEnumerator OnHideWindow(UIParameterArgs parameter)
+        //{
+        //    yield return null;
+        //}
         /// <summary>
         /// 完成刷新窗口 (必须在 HideWindow中调用这个接口 否则无法关闭界面  )
         /// </summary>

@@ -78,7 +78,8 @@ namespace GameFrameWork.EditorExpand
                         allTexture2DAssets.RemoveAt(dex);
                         continue;
                     }//不是png 图片则不导入 否则强制导入图片
-                    TextureImporterHelper.OnPresProcessUITextureSetting(asstImpoter, allTexture2DAssets[dex]);
+                    Texture2D texture = AssetDatabase.LoadAssetAtPath<Texture2D>(allTexture2DAssets[dex]);
+                    TextureImporterHelper.OnPresProcessUITextureSetting(texture, asstImpoter, allTexture2DAssets[dex]);
                 }
                 #endregion
 

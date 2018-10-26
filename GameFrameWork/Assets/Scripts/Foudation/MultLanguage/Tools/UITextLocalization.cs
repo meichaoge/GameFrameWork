@@ -96,34 +96,33 @@ namespace GameFrameWork
                 }
 
                 string staticConfigfilePath = string.Format(Define_Config.StaticTextConfigPath, languageName, fileName);
-                ResourcesMgr.Instance.LoadFile(staticConfigfilePath, LoadAssetModel.Sync, (dataStr) => {
-                    JsonData jsonData = JsonMapper.ToObject(dataStr);
+                string dataStr = ResourcesMgr.Instance.LoadFileSync(staticConfigfilePath);
+                JsonData jsonData = JsonMapper.ToObject(dataStr);
 
-                    if (!jsonData.ContainsKey(key))
-                        return;
-                    removed = true;
+                if (!jsonData.ContainsKey(key))
+                    return;
+                removed = true;
 
-                    if (jsonData.Keys.Count(x => x != key) == 0)
-                    {
-                        File.Delete(filePath);
-                        return;
-                    }
+                if (jsonData.Keys.Count(x => x != key) == 0)
+                {
+                    File.Delete(filePath);
+                    return;
+                }
 
-                    StringBuilder sb = new StringBuilder();
-                    sb.Append("{\n");
-                    foreach (string tmpKey in jsonData.Keys)
-                    {
-                        if (tmpKey == key)
-                            continue;
-                        sb.Append(string.Format("\"{0}\":\"{1}\",\n", tmpKey, jsonData[tmpKey]));
-                    }
-                    sb.Append("}");
+                StringBuilder sb = new StringBuilder();
+                sb.Append("{\n");
+                foreach (string tmpKey in jsonData.Keys)
+                {
+                    if (tmpKey == key)
+                        continue;
+                    sb.Append(string.Format("\"{0}\":\"{1}\",\n", tmpKey, jsonData[tmpKey]));
+                }
+                sb.Append("}");
 
-                    StreamWriter sw = new StreamWriter(filePath, false, Encoding.UTF8);
-                    sw.Write(sb.ToString());
-                    sw.Close();
+                StreamWriter sw = new StreamWriter(filePath, false, Encoding.UTF8);
+                sw.Write(sb.ToString());
+                sw.Close();
 
-                });
             }
 
             if (removed)
@@ -234,7 +233,7 @@ namespace GameFrameWork
             currentLanguageType = languageType;
 
             TMPro.TextMeshProUGUI text = GetComponent<TMPro.TextMeshProUGUI>();
-        //    text.text = Localization.instance.GetStaticTextString(fileName, key, languageType);
+            //    text.text = Localization.instance.GetStaticTextString(fileName, key, languageType);
         }
         #endregion
     }

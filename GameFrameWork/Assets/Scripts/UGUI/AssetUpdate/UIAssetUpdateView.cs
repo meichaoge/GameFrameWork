@@ -95,9 +95,8 @@ namespace GameFrameWork.UGUI
         }
 
 
-        protected override IEnumerator OnEnumerateShowWindow()
+        private  IEnumerator OnEnumerateShowWindow()
         {
-            // return base.OnEnumerateShowWindow();
             InitialedView();
             m_txtUpdateStateText.text = m_StrCheckingLocalAssetState;
             yield return new WaitForSeconds(0.3f);

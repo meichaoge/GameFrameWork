@@ -40,15 +40,13 @@ namespace GameFrameWork
                 return;
             }
 
-            ResourcesMgr.Instance.LoadFile(Define_Config.ButtonAudioConfigPath, LoadAssetModel.Sync, (dataStr) =>
+            string dataStr = ResourcesMgr.Instance.LoadFileSync(Define_Config.ButtonAudioConfigPath);
+            if (string.IsNullOrEmpty(dataStr))
             {
-                if (string.IsNullOrEmpty(dataStr))
-                {
-                    IsEnable = false;
-                    return;
-                }
-                AnalysisConfig(dataStr);
-            });
+                IsEnable = false;
+                return;
+            }
+            AnalysisConfig(dataStr);
         }
 
         private void AnalysisConfig(string data)

@@ -236,7 +236,7 @@ namespace GameFrameWork.HotUpdate
         protected void GetLocalAseetConfigureRecordText(string localAsssetConfigPath, string localAssetConfigFileName)
         {
             Debug.Log("GetLocalAseetConfigureRecordText>>> " + localAsssetConfigPath + localAssetConfigFileName);
-            ResourcesMgr.Instance.LoadFile(localAsssetConfigPath + localAssetConfigFileName, LoadAssetModel.Async, OnLocalConfigureRecorded);
+            ResourcesMgr.Instance.LoadFileAsync(localAsssetConfigPath + localAssetConfigFileName,  OnLocalConfigureRecorded);
         }
 
         /// <summary>

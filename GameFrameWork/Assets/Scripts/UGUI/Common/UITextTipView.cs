@@ -52,7 +52,7 @@ namespace GameFrameWork.UGUI
         }
 
 
-        protected override IEnumerator OnEnumerateShowWindow()
+        private  IEnumerator OnEnumerateShowWindow()
         {
             m_txtTipText.text = m_ShowTipsContent;
             yield return null;

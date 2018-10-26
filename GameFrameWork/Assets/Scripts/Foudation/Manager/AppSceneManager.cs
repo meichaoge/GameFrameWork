@@ -129,13 +129,14 @@ namespace GameFrameWork
 
 
         #region  加载场景资源
+       
         /// <summary>
         /// 加载场景资源 (优先加载AssetBundle 资源) （不要直接使用字符串场景名）
         /// </summary>
         /// <param name="sceneNameEnum"></param>
         /// <param name="isSingleLoad">加载场景模式 (true 标识加载完成删除其他的场景资源  否则 保留其他的场景资源 )</param>
-        /// <param name="callback"></param>
-        public void LoadScene(SceneNameEnum sceneNameEnum, LoadSceneModeEnum loadMode,  System.Action<bool> callback,
+        /// <param name="callback">=true 标识场景加载成功 否则失败</param>
+        public void LoadScene(SceneNameEnum sceneNameEnum, LoadSceneModeEnum loadMode,  System.Action<bool> callback, 
             List<SceneNameEnum> ignoreUnLoadScene,System.Action onCompleteUnLoadSceneAct=null)
         {
             if(IsUnLoadingScene)
@@ -185,6 +186,9 @@ namespace GameFrameWork
 
          
         }
+
+
+
 
 
         /// <summary>

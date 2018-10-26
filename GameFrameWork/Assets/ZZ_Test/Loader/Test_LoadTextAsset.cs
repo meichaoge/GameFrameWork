@@ -27,7 +27,10 @@ public class Test_LoadTextAsset : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.B))
         {
-            ResourcesMgr.Instance.LoadFile(m_Url, m_LoadAssetModel,(result) => { m_ShowText.text = result; });
+            if (m_LoadAssetModel == LoadAssetModel.Async)
+                ResourcesMgr.Instance.LoadFileAsync(m_Url, (result) => { m_ShowText.text = result; });
+            else
+                m_ShowText.text = ResourcesMgr.Instance.LoadFileSync(m_Url);
         }
     }
 

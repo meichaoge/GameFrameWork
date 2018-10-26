@@ -5,13 +5,14 @@ using UnityEngine;
 
 public class Test_LoadScene : MonoBehaviour
 {
+#if UNITY_EDITOR
     public SceneNameEnum m_WillLoad = SceneNameEnum.None;
     public LoadSceneModeEnum m_LoadSceneEnum = LoadSceneModeEnum.ReleaseSelf;
     public KeyCode m_Key = KeyCode.F;
     // Use this for initialization
     void Start()
     {
-
+        Debug.LogEditorInfor("测试场景加载模块 不需要时候记得移除");
     }
 
     // Update is called once per frame
@@ -33,4 +34,6 @@ public class Test_LoadScene : MonoBehaviour
            );
         }
     }
+
+#endif
 }

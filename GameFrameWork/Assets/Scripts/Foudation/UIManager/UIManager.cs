@@ -32,22 +32,22 @@ namespace GameFrameWork
                 Debug.LogError("CreateUI Fail, View Path Is Not Avaliable");
                 return;
             }
-            ResourcesMgr.Instance.Instantiate(viewPath, parentTrans, LoadAssetModel.Async, (obj) =>
-            {
-                if (obj != null && string.IsNullOrEmpty(viewName) == false)
-                    obj.name = viewName;
+            ResourcesMgr.Instance.InstantiateAsync(viewPath, parentTrans, (obj) =>
+           {
+               if (obj != null && string.IsNullOrEmpty(viewName) == false)
+                   obj.name = viewName;
 
-                T viewScript = obj.GetAddComponent<T>();
+               T viewScript = obj.GetAddComponent<T>();
                 //Debug.LogEditorInfor("CreateUI  " + viewScript.gameObject.activeSelf+ "           viewPath="+ viewPath+ "            isActivate="+ isActivate);
                 obj.SetActive(isActivate);
 
-                if (callback != null)
-                    callback.Invoke(viewScript);
-            }, true, isResetTransProperty);
+               if (callback != null)
+                   callback.Invoke(viewScript);
+           }, true, isResetTransProperty);
         }
 
         /// <summary>
-        /// 创建UI 异步加载方式
+        /// 创建UI 同步加载方式
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="viewPath"></param>
@@ -59,21 +59,21 @@ namespace GameFrameWork
         {
             if (string.IsNullOrEmpty(viewPath))
             {
-                Debug.LogError("CreateUI Fail, View Path Is Not Avaliable   viewPath="+ viewPath);
+                Debug.LogError("CreateUI Fail, View Path Is Not Avaliable   viewPath=" + viewPath);
                 return null;
             }
             T result = null;
 
-            ResourcesMgr.Instance.Instantiate(viewPath, parentTrans, LoadAssetModel.Sync, (obj) =>
-            {
-                if (obj != null && string.IsNullOrEmpty(viewName) == false)
-                    obj.name = viewName;
+            GameObject obj = ResourcesMgr.Instance.InstantiateSync(viewPath, parentTrans, true, isResetTransProperty);
+            if (obj == null)
+                return result;
+            if (string.IsNullOrEmpty(viewName) == false)
+                obj.name = viewName;
 
-                T viewScript = obj.GetAddComponent<T>();
-                //Debug.LogEditorInfor("CreateUI  " + viewScript.gameObject.activeSelf+ "           viewPath="+ viewPath+ "            isActivate="+ isActivate);
-                obj.SetActive(isActivate);
-                result = viewScript;
-            }, true, isResetTransProperty);
+            T viewScript = obj.GetAddComponent<T>();
+            //Debug.LogEditorInfor("CreateUI  " + viewScript.gameObject.activeSelf+ "           viewPath="+ viewPath+ "            isActivate="+ isActivate);
+            obj.SetActive(isActivate);
+            result = viewScript;
 
             return result;
         }

@@ -26,7 +26,10 @@ public class Test_LoadSprite : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.B))
         {
-            ResourcesMgr.Instance.LoadSprite(m_Url, m_Image, m_LoadAssetModel, null);
+            if (m_LoadAssetModel == LoadAssetModel.Async)
+                ResourcesMgr.Instance.LoadSpriteAsync(m_Url, m_Image, (result) => { m_Image.sprite = result; });
+            else
+                ResourcesMgr.Instance.LoadSpriteSync(m_Url, m_Image);
         }
     }
 

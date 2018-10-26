@@ -96,10 +96,8 @@ namespace GameFrameWork
                     return;
                 }
                 m_volume = audio.Volume;
-                ResourcesMgr.Instance.LoadAudio(audio.AudioPath, transform, LoadAssetModel.Sync, (audioClip) =>
-                {
-                    m_AudioSource.clip = audioClip;
-                });
+                m_AudioSource.clip = ResourcesMgr.Instance.LoadAudioSync(audio.AudioPath, transform);
+            
             }
 
             if (m_AudioSource.clip == null) return;

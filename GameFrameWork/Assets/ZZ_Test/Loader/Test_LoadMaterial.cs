@@ -26,7 +26,7 @@ public class Test_LoadMaterial : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.A))
         {
             Debug.LogInfor("Time=" + Time.realtimeSinceStartup + "Frame=" + EventCenter.Instance.CurFrameCount);
-            ResourcesMgr.Instance.LoadMaterial(m_URL, m_Go.transform, m_LoadAssetModel, OnComplete);
+    //        ResourcesMgr.Instance.LoadMaterial(m_URL, m_Go.transform, m_LoadAssetModel, OnComplete);
         }
     }
 

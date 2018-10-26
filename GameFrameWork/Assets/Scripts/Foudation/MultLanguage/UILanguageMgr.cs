@@ -82,7 +82,7 @@ namespace GameFrameWork
             else
                 filePath = string.Format("{0}/{1}/{2}/{3}", ConstDefine.S_MultLanguageConfigPathName, LanguageMgr.Instance.GetLanguageStr(language), ConstDefine.S_UIStaticConfigPathName, fileName);
 
-            string result = "";
+            string result = string.Empty;
             JsonData data;
             if (m_AllUIConfigFileInfor.TryGetValue(filePath, out data))
             {
@@ -97,20 +97,18 @@ namespace GameFrameWork
             } //已经加载过的配置文件
             else
             {
-                ResourcesMgr.Instance.LoadFile(filePath, LoadAssetModel.Sync, (configure) =>
+                string configure = ResourcesMgr.Instance.LoadFileSync(filePath);
+                if (string.IsNullOrEmpty(configure)) return result;
+                try
                 {
-                    if (string.IsNullOrEmpty(configure)) return;
-                    try
-                    {
-                        data = JsonMapper.ToObject(configure);
-                        result = data[key].ToString();
-                        m_AllUIConfigFileInfor.Add(filePath, data);  //保存数据
-                    }
-                    catch (System.Exception ex)
-                    {
-                        Debug.LogError("GetUIConfigStr  Fail2 ,Not Exit!! Error= " + ex);
-                    }
-                });
+                    data = JsonMapper.ToObject(configure);
+                    result = data[key].ToString();
+                    m_AllUIConfigFileInfor.Add(filePath, data);  //保存数据
+                }
+                catch (System.Exception ex)
+                {
+                    Debug.LogError("GetUIConfigStr  Fail2 ,Not Exit!! Error= " + ex);
+                }
             }//第一次加载配置i文件则同步加载 缓存下来
             return result;
         }

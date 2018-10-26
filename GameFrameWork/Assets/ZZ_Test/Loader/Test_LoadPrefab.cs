@@ -23,9 +23,18 @@ public class Test_LoadPrefab : MonoBehaviour {
 
         if (Input.GetKeyDown(KeyCode.B))
         {
-            ResourcesMgr.Instance.Instantiate(m_Url, transform, m_LoadAssetModel,(obj) => {
-                Debug.Log("生成成功");
-            }, true);
+
+            if(m_LoadAssetModel== LoadAssetModel.Async)
+            {
+                ResourcesMgr.Instance.InstantiateAsync(m_Url, transform, (obj) =>
+                {
+                    Debug.Log("生成成功");
+                }, true);
+            }
+            else
+            {
+                GameObject go = ResourcesMgr.Instance.InstantiateSync(m_Url, transform);
+            }
         }
     }
 
