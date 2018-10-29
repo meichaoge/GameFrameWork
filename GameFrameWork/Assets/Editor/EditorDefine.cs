@@ -13,13 +13,24 @@ namespace GameFrameWork.EditorExpand
 #if UNITY_EDITOR
 
         /// <summary>
-        /// 编辑器 View 模板文件
+        /// 编辑器 View 模板文件 (基本继承子UIViewBase)
         /// </summary>
         public static string S_UIEdirorViewTempPath
         {
             get
             {
                 return Application.dataPath + "/" + "Editor/Template/UIView.tpl.txt";
+            }
+        }
+
+        /// <summary>
+        /// 编辑器 View 模板文件 (MonoBehaviour)
+        /// </summary>
+        public static string S_UIEdirorNormalViewTempPath
+        {
+            get
+            {
+                return Application.dataPath + "/" + "Editor/Template/UINormalView.tpl.txt";
             }
         }
 
@@ -52,6 +63,40 @@ namespace GameFrameWork.EditorExpand
         public static string S_ModelTopRelativePath
         {
             get { return "Art/Model/"; }
+        }
+
+
+        /// <summary>
+        /// 打包多语言资源配置
+        /// </summary>
+        public static string S_BuildAppMultLanguageAssetPath {
+            get
+            {
+                return "Assets/Editor/BuildApplication/multiLanguageRecource.asset";
+            }
+        }
+
+        /// <summary>
+        /// 打包多语言资源配置
+        /// </summary>
+        public static string S_MoveOutMultLanguageAssetPath
+        {
+            get
+            {
+                return "Assets/Editor/BuildApplication/moveOutAssetRecord.asset";
+            }
+        }
+
+        /// <summary>
+        /// 打包多语言资源配置 (打包前非当前语言资源临时存储路径)
+        /// </summary>
+        public static string S_BuildAppMultLanguageTempStorePath
+        {
+            get
+            {
+                string assetPath = System.IO.Path.GetDirectoryName(Application.dataPath); //获取Assets 同级目录
+                return  string.Format("{0}/MultLanguageTempStore", assetPath);
+            }
         }
 
 

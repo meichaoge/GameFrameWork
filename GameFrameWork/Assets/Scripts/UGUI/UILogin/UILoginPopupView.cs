@@ -263,7 +263,7 @@ namespace GameFrameWork.UGUI
 
             UIViewReference.Instance.UiCanvasMaskView.OpenWidget(UIManagerHelper.Instance.WidgetParentTrans, 0, true, UIParameterArgs.Create());
 
-            AppSceneManager.Instance.LoadScene(SceneNameEnum.StartUp, LoadSceneModeEnum.KeepPrevious, (isComplete) =>
+            AppSceneManager.Instance.LoadSceneAsync(SceneNameEnum.StartUp, LoadSceneModeEnum.KeepPrevious, (isComplete) =>
             {
                 UIViewReference.Instance.UiCanvasMaskView.CloseWidget(false, UIParameterArgs.Create(false, true));
                 if (isComplete)

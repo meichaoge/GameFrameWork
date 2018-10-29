@@ -1,0 +1,46 @@
+{
+  
+"Day1": "一",
+  
+"Day2": "二",
+  
+"Day3": "三",
+ 
+ "Day4": "四",
+ 
+ "Day5": "五",
+  
+"Day6": "六",
+  
+"Day7": "日",
+  
+
+"TimeDay01": "{0}天前",
+
+  "TimeHour01": "{0}小时前",
+ 
+ "TimeMinute01": "{0}分钟前",
+  
+"TimeSecend01": "{0}秒前",
+  
+"TimeJustNow": "刚刚",
+  
+"TimeDay02": "{0}天后",
+  
+"TimeHour02": "{0}小时后",
+ 
+ "TimeMinute02": "{0}分钟后",
+ 
+ "TimeSecend02": "{0}秒后",
+ 
+ "TimeDay": "{0}天",
+  
+"TimeHour": "{0}小时",
+  
+"TimeMinute": "{0}分钟",
+
+  "TimeSecend": "{0}秒"
+
+
+
+}

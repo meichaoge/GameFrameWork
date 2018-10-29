@@ -33,6 +33,7 @@ namespace GameFrameWork
             Debug.Log(" Application.persistentDataPath=" + Application.persistentDataPath);
             Debug.Log(" Application.temporaryCachePath=" + Application.temporaryCachePath);
             Debug.Log(" Application.streamingAssetsPath=" + Application.streamingAssetsPath);
+
             GameObject goDebug = new GameObject("Editor_ShowLoaderInfor");
             goDebug.GetAddComponent<DebugShowLoaderInfor>();
 

@@ -1,0 +1,27 @@
+﻿using System.Collections.Generic;
+using System.Collections;
+using UnityEngine;
+using UnityEngine.UI;
+
+namespace GameFrameWork.UGUI
+{
+   public class #CLASSNAME# : MonoBehaviour
+    {
+       #region UI
+      #UIPARAMETER#
+      #endregion
+
+     #region Frame
+    private void Awake()
+    {
+         this.InitView();
+    }
+
+    private void  InitView() {
+      #INITVIEW#
+      //**
+      #INITVIEWTOPARAMETER#
+    }
+    #endregion
+  }
+}

@@ -16,10 +16,11 @@ namespace GameFrameWork.EditorExpand
         /// 创建Unity 序列化资源Asset
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        public static void CreateUnityAsset<T>() where T : ScriptableObject
+        public static void CreateUnityAsset<T>(string title, string directoryPath, string fileName) where T : ScriptableObject
         {
             T asset = ScriptableObject.CreateInstance<T>();
-             string assetPathAndName = EditorDialogUtility.SaveFileDialog("保存Asset资源", "", "", "asset");
+            string assetPathAndName = EditorDialogUtility.SaveFileDialog(title, directoryPath, fileName, "asset");
+            if (string.IsNullOrEmpty(assetPathAndName)) return;
             Debug.Log("assetPathAndName= " + assetPathAndName);
             assetPathAndName = assetPathAndName.Substring(assetPathAndName.IndexOf("Assets"));
 

@@ -51,6 +51,58 @@ namespace GameFrameWork
         }
 
         /// <summary>
+        /// 将一个目录文件移动到另一个目录
+        /// </summary>
+        /// <param name="sourcesDirc"></param>
+        /// <param name="destionationDirc"></param>
+        public void ForceMoveDirectoryFile(string sourcesDirc, string destionationDirc,bool isTopDirectory=true)
+        {
+            #region 源目录和目的目录检测
+
+            if (Directory.Exists(sourcesDirc) == false)
+            {
+                Debug.LogError("ForceMoveDirectoryFile Fail Not Exit " + sourcesDirc);
+                return;
+            }
+
+            if (!Directory.Exists(destionationDirc))
+            {
+                Directory.CreateDirectory(destionationDirc);
+            }
+            else
+            {
+                if(isTopDirectory)
+                {
+                    Directory.Delete(destionationDirc,true);
+                    Directory.CreateDirectory(destionationDirc);
+                }
+            }
+            #endregion
+
+            DirectoryInfo directoryInfo = new DirectoryInfo(sourcesDirc);
+            FileInfo[] files = directoryInfo.GetFiles();
+            //移动所有文件  
+            foreach (FileInfo file in files)
+            {
+                //Debug.Log("file " + file.DirectoryName);
+                file.MoveTo(Path.Combine(destionationDirc, file.Name));
+            }
+            //最后移动目录  
+            DirectoryInfo[] directoryInfoArray = directoryInfo.GetDirectories();
+            foreach (DirectoryInfo dir in directoryInfoArray)
+            {
+                ForceMoveDirectoryFile(Path.Combine(sourcesDirc, dir.Name), Path.Combine(destionationDirc, dir.Name),false);
+            }
+
+            if (isTopDirectory)
+            {
+                Debug.LogEditorInfor("删除空的目录 " + sourcesDirc);
+                Directory.Delete(sourcesDirc, true);  //删除无用的空目录
+            }
+        }
+
+
+        /// <summary>
         /// 将制定的信息保存到本地的外部存储目录， 如果不存在则创建这个文件夹(总目录是)
         /// </summary>
         /// <param name="filePath">相对于Resources 路径</param>
@@ -103,6 +155,27 @@ namespace GameFrameWork
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// 获取参数路径的父级目录
+        /// </summary>
+        /// <param name="directoryPath"></param>
+        /// <param name="splitStr"></param>
+        /// <returns></returns>
+        public string GetDirectoryParentDcirectory(string directoryPath, char splitStr = '/')
+        {
+           if(System.IO.Directory.Exists(directoryPath)==false)
+            {
+                Debug.LogError("GetDirectoryParentDcirectory Fail Dirctory  Not Exit " + directoryPath);
+                return string.Empty;
+            }
+
+            string[] fileDirectorys = directoryPath.Split(splitStr);
+            if (fileDirectorys.Length > 0)
+                return fileDirectorys[fileDirectorys.Length - 1];
+
+            return string.Empty;
         }
 
 #if UNITY_EDITOR

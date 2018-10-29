@@ -28,6 +28,8 @@ namespace GameFrameWork.EditorExpand
 
                 isBeforeBuildFlag = true;
 
+                EditorUtility.DisplayDialog("XX", "aa", "确定");
+
                 if (OnBeforeBuildPlayerEvent != null)
                     OnBeforeBuildPlayerEvent();
             }
@@ -47,6 +49,16 @@ namespace GameFrameWork.EditorExpand
 
             UnityEngine.Debug.Log(string.Format("Success build ({0}) : {1}", target, pathToBuiltProject));
         }
+
+        /// <summary>
+        /// 编译完成回调
+        /// </summary>
+        [UnityEditor.Callbacks.DidReloadScripts]
+        private static void OnScriptsReloaded()
+        {
+            Debug.LogEditorInfor("编译代码回调");
+        }
+
 
         #endregion
 

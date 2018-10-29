@@ -39,15 +39,29 @@ namespace GameFrameWork.EditorExpand
                 return;
             }
 
-            string savePrefabPath = EditorDialogUtility.SaveFileDialog("保存生成的预制体", Application.dataPath + "/Resources", "只需要选择合适的目录，不需要填写文件名", "prefab");
+            string savePrefabPath = EditorDialogUtility.SaveFileDialog("保存生成的预制体", Application.dataPath + "/Resources/Sprite", "选择一个目录时候不需要输入文件名,按照选择的目录自动创建目录", "");
+            savePrefabPath = System.IO.Path.GetDirectoryName(savePrefabPath);
+
             if (string.IsNullOrEmpty(savePrefabPath))
             {
-                Debug.LogInfor("取消 创建SpriteRender");
+                Debug.LogEditorInfor("取消 创建SpriteRender");
                 return;
             }
 
-            //Debug.Log(Application.dataPath);
             //Debug.Log("dirctoryPath=" + dirctoryPath);
+            string parentDirectoryPath = IoUtility.Instance.GetDirectoryParentDcirectory(dirctoryPath); //获取选择的目录的目录名
+            if (string.IsNullOrEmpty(parentDirectoryPath))
+            {
+                Debug.LogError("无法处理的目录 " + parentDirectoryPath);
+                return;
+            }
+            savePrefabPath = string.Format("{0}/{1}", savePrefabPath, parentDirectoryPath);
+            if (System.IO.Directory.Exists(savePrefabPath) == false)
+            {
+                System.IO.Directory.CreateDirectory(savePrefabPath);
+            }
+
+
             var assets = AssetDatabase.FindAssets("t:texture2D", new string[] { dirctoryPath }); //获取当前目录下所有的图片资源GUID
             List<string> allTexture2DAssets = new List<string>();  //所有的图片资源相对资源路径
             foreach (var item in assets)
@@ -82,17 +96,15 @@ namespace GameFrameWork.EditorExpand
                     TextureImporterHelper.OnPresProcessUITextureSetting(texture, asstImpoter, allTexture2DAssets[dex]);
                 }
                 #endregion
-
             }
 
             if (IsNeedReflushAsset)
                 AssetDatabase.Refresh();
 
-
-
             foreach (var sprite2d in allTexture2DAssets)
             {
-                CreateOrUpdateSpritePrefab(sprite2d, System.IO.Path.GetDirectoryName(savePrefabPath));
+                //CreateOrUpdateSpritePrefab(sprite2d, System.IO.Path.GetDirectoryName(savePrefabPath));
+                CreateOrUpdateSpritePrefab(sprite2d,savePrefabPath);
             }
             AssetDatabase.Refresh();
         }

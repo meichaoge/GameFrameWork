@@ -19,10 +19,12 @@ namespace GameFrameWork.UGUI
         #endregion
 
         #region  Data 
-        private  List<MainMenuEnum> m_DefaultBottomMenuEnums= new List<MainMenuEnum>();
-        private  List<MainMenuEnum> m_DefaultTopMenuEnums = new List<MainMenuEnum>();
+        //默认的菜单
+        private List<MainMenuEnum> m_DefaultBottomMenuEnums = new List<MainMenuEnum>();
+        private List<MainMenuEnum> m_DefaultTopMenuEnums = new List<MainMenuEnum>();
         private List<MainMenuEnum> m_DefaultLeftMenuEnums = new List<MainMenuEnum>();
 
+        //**实际显示的菜单
         private List<MainMenuEnum> m_BottomMenuEnums = new List<MainMenuEnum>();
         private List<MainMenuEnum> m_TopMenuEnums = new List<MainMenuEnum>();
         private List<MainMenuEnum> m_LeftMenuEnums = new List<MainMenuEnum>();
@@ -58,7 +60,11 @@ namespace GameFrameWork.UGUI
         public override void ShowWindow(UIParameterArgs parameter)
         {
             base.ShowWindow(parameter);
-            GetWillShowConfig(parameter);
+
+            GetWiilShowConfig(parameter, 0, m_DefaultBottomMenuEnums, ref m_BottomMenuEnums);
+            GetWiilShowConfig(parameter, 1, m_DefaultTopMenuEnums, ref m_TopMenuEnums);
+            GetWiilShowConfig(parameter, 2, m_DefaultLeftMenuEnums, ref m_LeftMenuEnums);
+
 
             CreateBottomMenuItems();
             CreateTopMenuItems();
@@ -111,40 +117,63 @@ namespace GameFrameWork.UGUI
         #endregion
 
         #region 创建视图
-        private void GetWillShowConfig(UIParameterArgs parameter)
+        //private void GetWillShowConfig(UIParameterArgs parameter)
+        //{
+        //    object infor = null;
+        //    if (parameter.ParemeterCount >= 1)
+        //    {
+        //        m_BottomMenuEnums.Clear();
+        //        infor = parameter.GetParameterByIndex(0);
+        //        if (infor == null)
+        //            m_BottomMenuEnums.AddRange(m_DefaultBottomMenuEnums);
+        //        else
+        //            m_BottomMenuEnums.AddRange(infor as List<MainMenuEnum>);
+        //    }
+
+        //    if (parameter.ParemeterCount >= 2)
+        //    {
+        //        m_TopMenuEnums.Clear();
+        //        infor = parameter.GetParameterByIndex(1);
+        //        if (infor == null)
+        //            m_TopMenuEnums.AddRange(m_DefaultTopMenuEnums);
+        //        else
+        //            m_TopMenuEnums.AddRange(infor as List<MainMenuEnum>);
+        //    }
+
+
+        //    if (parameter.ParemeterCount >= 3)
+        //    {
+        //        m_LeftMenuEnums.Clear();
+        //        infor = parameter.GetParameterByIndex(2);
+        //        if (infor == null)
+        //            m_LeftMenuEnums.AddRange(m_DefaultLeftMenuEnums);
+        //        else
+        //            m_LeftMenuEnums.AddRange(infor as List<MainMenuEnum>);
+        //    }
+        //}
+
+        /// <summary>
+        /// 解析参数个数填充默认的菜单
+        /// </summary>
+        /// <param name="parameter"></param>
+        /// <param name="dex"></param>
+        /// <param name="defaultMenu"></param>
+        /// <param name="willShowMenu"></param>
+        private void GetWiilShowConfig(UIParameterArgs parameter, int dex, List<MainMenuEnum> defaultMenu, ref List<MainMenuEnum> willShowMenu)
         {
-            object infor = null;
-            if (parameter.ParemeterCount >= 1)
+            willShowMenu.Clear();
+            if (parameter.ParemeterCount < dex + 1)
             {
-                m_BottomMenuEnums.Clear();
-                infor = parameter.GetParameterByIndex(0);
-                if (infor == null)
-                    m_BottomMenuEnums.AddRange(m_DefaultBottomMenuEnums);
-                else
-                    m_BottomMenuEnums.AddRange(infor as List<MainMenuEnum>);
-            }
-
-            if (parameter.ParemeterCount >= 2)
-            {
-                m_TopMenuEnums.Clear();
-                infor = parameter.GetParameterByIndex(1);
-                if (infor == null)
-                    m_TopMenuEnums.AddRange(m_DefaultTopMenuEnums);
-                else
-                    m_TopMenuEnums.AddRange(infor as List<MainMenuEnum>);
-            }
-
-
-            if (parameter.ParemeterCount >= 3)
-            {
-                m_LeftMenuEnums.Clear();
-                infor = parameter.GetParameterByIndex(2);
-                if (infor == null)
-                    m_LeftMenuEnums.AddRange(m_DefaultLeftMenuEnums);
-                else
-                    m_LeftMenuEnums.AddRange(infor as List<MainMenuEnum>);
-            }
+                willShowMenu.AddRange(defaultMenu);
+                return;
+            } //参数不足
+            object infor = parameter.GetParameterByIndex(dex);
+            if (infor == null)
+                willShowMenu.AddRange(defaultMenu);
+            else
+                willShowMenu.AddRange(infor as List<MainMenuEnum>);
         }
+
 
         /// <summary>
         /// 创建底部菜单

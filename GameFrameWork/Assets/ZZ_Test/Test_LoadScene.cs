@@ -20,7 +20,7 @@ public class Test_LoadScene : MonoBehaviour
     {
         if (Input.GetKeyDown(m_Key) && AppSceneManager.Instance.IsUnLoadingScene == false)
         {
-            AppSceneManager.Instance.LoadScene(m_WillLoad, m_LoadSceneEnum, (isComplete) =>
+            AppSceneManager.Instance.LoadSceneAsync(m_WillLoad, m_LoadSceneEnum, (isComplete) =>
             {
                 if (isComplete)
                 {

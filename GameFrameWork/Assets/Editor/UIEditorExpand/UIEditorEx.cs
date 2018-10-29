@@ -68,8 +68,6 @@ namespace GameFrameWork.EditorExpand
             {"UI.RawImage", new TagInfor(EmObjType.Component, "RawImage", "raw")},
             {"UI.Button", new TagInfor(EmObjType.Component, "Button", "btn")},
             {"UI.Toggle", new TagInfor(EmObjType.Component, "Toggle", "tgl")},
-            //{"UI.Slider", new TagInfor(EmObjType.Component, "Slider", "sld")},
-            //{"UI.Scrollbar", new TagInfor(EmObjType.Component, "Scrollbar", "scb")},
             {"UI.Dropdown", new TagInfor(EmObjType.Component, "Dropdown", "drop")},
             {"UI.InputField", new TagInfor(EmObjType.Component, "InputField", "input")},
             {"UI.Canvas", new TagInfor(EmObjType.Component, "Canvas", "cav")},
@@ -79,7 +77,6 @@ namespace GameFrameWork.EditorExpand
             {"UnityEngine.RectTransform", new TagInfor(EmObjType.RectTransform, "RectTransform", "rtf")},
             {"UnityEngine.ParticleSystem", new TagInfor(EmObjType.Component, "ParticleSystem", "pts")},
             {"TMPro.TextMeshProUGUI", new TagInfor(EmObjType.Component, "TMPro.TextMeshProUGUI", "txt")},
-        //    {"UICacheItemMark", new TagInfor(EmObjType.Component, "UICacheItemMark", "")},
              {"AudioSource", new TagInfor(EmObjType.Component, "AudioSource", "Aud")},
               {"TMPro.TMP_InputField", new TagInfor(EmObjType.Component, "TMPro.TMP_InputField", "InputFieldPro")},
                {"TMPro.TMP_Dropdown", new TagInfor(EmObjType.Component, "TMPro.TMP_Dropdown", "DropdownPro")},
@@ -97,14 +94,12 @@ namespace GameFrameWork.EditorExpand
         [MenuItem("Assets/UIEdirorEx/选中目录创建精灵 SpriteRender 预制体")]
         public static void CreateSpriteRender_Directory()
         {
-          
-               EditorCreateSpriteRender.CreateMultiSpriteRenders_Dirctory();
+            EditorCreateSpriteRender.CreateMultiSpriteRenders_Dirctory();
         }
 
 
 
-        [MenuItem("Assets/UIEdirorEx/选中节点，生成View代码")]
-        // [MenuItem("CONTEXT/UICacheView/生成View代码")]
+        [MenuItem("Assets/UIEdirorEx/选中节点，生成继承UIBaseView 的View代码")]
         public static void GenUIViewCode()
         {
             GameObject goSelected = Selection.activeGameObject;
@@ -119,6 +114,34 @@ namespace GameFrameWork.EditorExpand
                 Debug.LogError("模板文件不存在！" + EditorDefine.S_UIEdirorViewTempPath);
                 return;
             }
+            CreateCodeFileFromTemplate(goSelected, EditorDefine.S_UIEdirorViewTempPath);
+        }
+
+        [MenuItem("Assets/UIEdirorEx/选中节点，生成继承MonoBehaviour 的View代码")]
+        public static void GenNormalViewCode()
+        {
+            GameObject goSelected = Selection.activeGameObject;
+            if (goSelected == null)
+            {
+                Debug.LogError("没有选中Prefab！");
+                return;
+            }
+
+            if (!File.Exists(EditorDefine.S_UIEdirorNormalViewTempPath))
+            {
+                Debug.LogError("模板文件不存在！" + EditorDefine.S_UIEdirorNormalViewTempPath);
+                return;
+            }
+            CreateCodeFileFromTemplate(goSelected, EditorDefine.S_UIEdirorNormalViewTempPath);
+        }
+
+        /// <summary>
+        /// 对于选择 的预制体文件 根据模板文件创建脚本
+        /// </summary>
+        /// <param name="goSelected"></param>
+        /// <param name="templateFilePath"></param>
+        private static void  CreateCodeFileFromTemplate(GameObject goSelected,string templateFilePath)
+        {
             string className = goSelected.name;
 
             if (System.IO.Directory.Exists(EditorDefine.S_UGUISpritePath) == false)
@@ -126,9 +149,7 @@ namespace GameFrameWork.EditorExpand
 
             string filePath = EditorUtility.SaveFilePanel("Generate Code", EditorDefine.S_UGUISpritePath, className + ".cs", "cs");
             if (string.IsNullOrEmpty(filePath))
-            {
                 return;
-            }
             className = Path.GetFileNameWithoutExtension(filePath);
 
             List<GameObject> goChilds = goSelected.GetChildCollectionRecursive();
@@ -155,7 +176,7 @@ namespace GameFrameWork.EditorExpand
             }
 
             string strInitView = sbInitView.ToString();
-            StreamReader sr = new StreamReader(EditorDefine.S_UIEdirorViewTempPath, Encoding.UTF8);
+            StreamReader sr = new StreamReader(templateFilePath, Encoding.UTF8);
             string strTpl = sr.ReadToEnd();
             sr.Close();
 
@@ -182,8 +203,8 @@ namespace GameFrameWork.EditorExpand
             Debug.Log("生成View代码完成！");
         }
 
+
         [MenuItem("Assets/UIEdirorEx/选中节点，拷贝View代码到剪贴板")]
-        //     [MenuItem("CONTEXT/UICacheView/拷贝View代码")]
         public static void CopyViewCodeToClipbord()
         {
             GameObject goSelected = Selection.activeGameObject;
@@ -235,5 +256,9 @@ namespace GameFrameWork.EditorExpand
 
             Debug.Log("拷贝View代码到剪贴板完成！");
         }
+
+
+
+
     }
 }
