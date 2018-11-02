@@ -39,6 +39,7 @@ namespace GameFrameWork
         protected override void InitialSingleton()
         {
             base.InitialSingleton();
+           // if (Application.isPlaying == false) return;
             InitialSetting();
         }
 

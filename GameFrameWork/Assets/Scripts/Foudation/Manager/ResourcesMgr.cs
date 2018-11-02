@@ -11,6 +11,109 @@ namespace GameFrameWork
     /// </summary>
     public class ResourcesMgr : Singleton_Static<ResourcesMgr>
     {
+        private HashSet<GameObject> m_AllNotDestroyOnLoadObj = new HashSet<GameObject>(); // 所有不会在场景加载时候销毁的对象
+
+        #region  实例化对象
+        /// <summary>
+        /// 实例化一个对象
+        /// </summary>
+        /// <param name="prefab"></param>
+        /// <returns></returns>
+        public GameObject Instantiate(string goName) 
+        {
+            return new GameObject(goName);
+        }
+
+        /// <summary>
+        /// 实例化一个对象
+        /// </summary>
+        /// <param name="prefab"></param>
+        /// <returns></returns>
+        public T Instantiate<T>(T original) where T : Object
+        {
+            return GameObject.Instantiate<T>(original, Vector3.zero, Quaternion.identity);
+        }
+
+        /// <summary>
+        /// 实例化一个对象
+        /// </summary>
+        /// <param name="prefab"></param>
+        /// <returns></returns>
+        public T Instantiate<T>(T original, Transform parent) where T : Object
+        {
+            return Instantiate<T>(original, parent, true);
+        }
+
+        /// <summary>
+        /// 实例化一个对象
+        /// </summary>
+        /// <param name="prefab"></param>
+        /// <returns></returns>
+        public T Instantiate<T>(T original, Vector3 position, Quaternion rotation) where T : Object
+        {
+            return Instantiate<T>(original, position, rotation, null);
+        }
+
+        /// <summary>
+        /// 实例化一个对象
+        /// </summary>
+        /// <param name="prefab"></param>
+        /// <returns></returns>
+        public T Instantiate<T>(T original, Vector3 position, Quaternion rotation, Transform parent) where T : Object
+        {
+            if (original == null)
+            {
+                Debug.LogError("Instantiate Fail,参数预制体为null");
+                return null;
+            }
+
+            ResourcesLoadTraceMgr.Instance.RecordTraceInstantiate(original.name);
+            return GameObject.Instantiate<T>(original, position, rotation, parent);
+        }
+
+        /// <summary>
+        /// 实例化一个对象
+        /// </summary>
+        /// <param name="prefab"></param>
+        /// <returns></returns>
+        public T Instantiate<T>(T original, Transform parent, bool worldPositionStays) where T : Object
+        {
+            if (original == null)
+            {
+                Debug.LogError("Instantiate Fail,参数预制体为null");
+                return null;
+            }
+
+            ResourcesLoadTraceMgr.Instance.RecordTraceInstantiate(original.name);
+            return GameObject.Instantiate<T>(original, parent, worldPositionStays);
+        }
+        #endregion
+
+        #region  记录不会销毁的对象
+        /// <summary>
+        /// 记录不会被销毁的对象
+        /// </summary>
+        /// <param name="go"></param>
+        /// <returns></returns>
+        public bool MarkNotDestroyOnLoad(GameObject go)
+        {
+            if(go==null)
+            {
+                Debug.LogError("MarkNotDestroyOnLoad Fail, Parameter is Null");
+                return false;
+            }
+
+            if(m_AllNotDestroyOnLoadObj.Contains(go))
+            {
+                Debug.LogError("MarkNotDestroyOnLoad Fail,Alrady Record " + go.name);
+                return false;
+            }
+            m_AllNotDestroyOnLoadObj.Add(go);
+            GameObject.DontDestroyOnLoad(go);
+            return true;
+        }
+        #endregion
+
         #region 加载不同资源的接口 (内部使用加载器加载资源)
 
         #region 加载并生成GameObject
@@ -214,6 +317,14 @@ namespace GameFrameWork
              });
         }
 
+        #endregion
+
+        #region  加载有多个语言版本的Sprite资源
+        public Sprite LoadSpecialSpriteSync(string url, UnityEngine.UI.Image targetImag)
+        {
+            //** StringUtility 写到一半
+            return null;
+        }
         #endregion
 
         #region  加载File 配置文件(text)
@@ -471,79 +582,6 @@ namespace GameFrameWork
              });
         }
 
-        #endregion
-
-        #region  加载场景
-        ///// <summary>
-        ///// 根据场景资源路径加载场景(可能是AssetBundle 中的场景)
-        ///// </summary>
-        ///// <param name="url"></param>
-        ///// <param name="callback"></param>
-        //public void LoadSceneSync(string url, LoadSceneMode loadModel, System.Action callback)
-        //{
-        //    if (string.IsNullOrEmpty(url))
-        //    {
-        //        Debug.LogError("LoadSceneSync Fail url IsNullOrEmpty");
-        //        return;
-        //    }
-        //    LoadScene(url, loadModel, LoadAssetModel.Sync, null);
-        //}
-
-        ///// <summary>
-        ///// 根据场景资源路径加载场景(可能是AssetBundle 中的场景)
-        ///// </summary>
-        ///// <param name="url"></param>
-        ///// <param name="callback"></param>
-        //public void LoadSceneAsync(string url, LoadSceneMode loadModel, System.Action callback)
-        //{
-        //    if (string.IsNullOrEmpty(url))
-        //    {
-        //        Debug.LogError("LoadSceneAsync Fail url IsNullOrEmpty");
-        //        if (callback != null)
-        //            callback();
-        //        return;
-        //    }
-        //    LoadScene(url, loadModel, LoadAssetModel.Async, callback);
-        //}
-        ///// <summary>
-        ///// 根据场景资源路径加载场景(可能是AssetBundle 中的场景)
-        ///// </summary>
-        ///// <param name="url"></param>
-        ///// <param name="loadModel">加载模式</param>
-        ///// <param name="callback"></param>
-        //private void LoadScene(string url, LoadSceneMode loadModel, LoadAssetModel loadassetModel, System.Action callback)
-        //{
-        //    SceneLoader.LoadScene(url, loadassetModel, (loader) =>
-        //    {
-        //        // ResourcesLoadTraceMgr.Instance.RecordTraceResourceInfor(loader);
-        //        #region  加载成功后的处理逻辑
-        //        if (loader == null || (loader.IsCompleted && loader.IsError))
-        //        {
-        //            Debug.LogError("LoadMaterial   Fail,Not Exit At Path= " + url);
-        //            if (callback != null)
-        //                callback.Invoke();
-        //            return;
-        //        } //加载资源出错
-        //        string sceneName = System.IO.Path.GetFileNameWithoutExtension(url);
-        //        if (loadassetModel == LoadAssetModel.Async)
-        //        {
-        //            EventCenter.Instance.StartCoroutine(LoadSceneAsyncOperate(sceneName, loadModel, callback));
-        //        } //异步加载场景
-        //        else
-        //        {
-        //            SceneManager.LoadScene(sceneName, loadModel);
-        //        }
-        //        #endregion
-        //    });
-        //}
-        //private IEnumerator LoadSceneAsyncOperate(string sceneName, LoadSceneMode loadModel, System.Action callback)
-        //{
-        //    AsyncOperation loadAsync = SceneManager.LoadSceneAsync(sceneName, loadModel);
-        //    while (loadAsync != null && loadAsync.isDone == false)
-        //        yield return null;
-        //    if (callback != null)
-        //        callback.Invoke();
-        //}
         #endregion
 
 

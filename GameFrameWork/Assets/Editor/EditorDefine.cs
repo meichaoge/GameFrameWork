@@ -52,10 +52,10 @@ namespace GameFrameWork.EditorExpand
         {
             get { return "Art/UI/"; }
         }
-        /// <summary>
-        /// 对于存在多个版本的资源 设置Sprite Tage时候需要过滤掉这个，目录名
-        /// </summary>
-        public static string S_UILocalizationPathFileName = "LocalizationUI/";
+        ///// <summary>
+        ///// 对于存在多个版本的资源 设置Sprite Tage时候需要过滤掉这个，目录名
+        ///// </summary>
+        //public static string S_UILocalizationPathFileName = "LocalizationUI/";
 
         /// <summary>
         ///场景模型资源相对于Asset 的目录(所有的美术模型 放在这个目录下)
@@ -65,14 +65,14 @@ namespace GameFrameWork.EditorExpand
             get { return "Art/Model/"; }
         }
 
-
+     
         /// <summary>
         /// 打包多语言资源配置
         /// </summary>
         public static string S_BuildAppMultLanguageAssetPath {
             get
             {
-                return "Assets/Editor/BuildApplication/multiLanguageRecource.asset";
+                return "Assets/Editor/BuildApplication/MutiLanguageResourcesInfor.asset";
             }
         }
 
@@ -83,7 +83,7 @@ namespace GameFrameWork.EditorExpand
         {
             get
             {
-                return "Assets/Editor/BuildApplication/moveOutAssetRecord.asset";
+                return "Assets/Editor/BuildApplication/MoveOutResourceaRecord.asset";
             }
         }
 

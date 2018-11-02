@@ -1,2 +1,0 @@
-1 解压TexturePacker-4.6.1-x64 并安装
-2 在Unity中点击打开SpriteSheet即可

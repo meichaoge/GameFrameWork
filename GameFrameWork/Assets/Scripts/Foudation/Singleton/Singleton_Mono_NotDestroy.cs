@@ -14,7 +14,7 @@ namespace GameFrameWork
         protected override void Awake()
         {
             base.Awake();
-            GameObject.DontDestroyOnLoad(gameObject);
+            ResourcesMgr.Instance.MarkNotDestroyOnLoad(gameObject);
         }
 
     }

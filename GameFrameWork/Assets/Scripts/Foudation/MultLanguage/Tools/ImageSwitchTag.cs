@@ -31,6 +31,8 @@ namespace GameFrameWork
         }
 
         private RectTransform m_Rectransform { get { return transform as RectTransform; } }
+
+      
         #endregion
 
         #region 编辑器下切换语言的工具
@@ -42,7 +44,11 @@ namespace GameFrameWork
 #endif
         #endregion
 
-        #region Data
+        #region Data 
+        [CustomerHeader("相对于Resources/Sprite 不带语言的路径 文件路径")]
+        [SerializeField]
+        private string SpriteRelativePath = string.Empty;  //关联的图片相对于Resources/Sprite 不带语言的路径
+
         public TotalImageConfige m_TotalImageConfigure = new TotalImageConfige();
 #if UNITY_EDITOR
         private List<ImageConfige> m_TotalImageLanguageConfigure = new List<ImageConfige>();  //为了防止修改list 导致重复的定义而使用的
@@ -59,18 +65,20 @@ namespace GameFrameWork
         [ContextMenu("保存当前图片的属性更改到配置m_ImageLanguageConfige中")]
         public void ApplyEditorProperty()
         {
-            ImageConfige config = GetTargetImageProperty(m_CurrentEditorLanguage);
+            ImageConfige config = GetTargetImagePropertyOfLanguage(m_CurrentEditorLanguage);
+            bool isExitConfigure = false;
             for (int dex = 0; dex < m_TotalImageConfigure.m_ImageLanguageConfige.Count; ++dex)
             {
                 if (m_TotalImageConfigure.m_ImageLanguageConfige[dex].m_Language == config.m_Language)
                 {
-                    //   m_ImageLanguageConfige[dex] = config;
-                    m_TotalImageConfigure.m_ImageLanguageConfige[dex] = CloneImageConfigureValue(m_TotalImageConfigure.m_ImageLanguageConfige[dex], ref config);
-                    OnEditorConfigure();
-                    return;
+                    isExitConfigure = true;
+                    m_TotalImageConfigure.m_ImageLanguageConfige[dex].m_ImageProperty = config.m_ImageProperty;
+                    break;
                 }
             }
-            m_TotalImageConfigure.m_ImageLanguageConfige.Add(config);
+
+            if (isExitConfigure == false)
+                m_TotalImageConfigure.m_ImageLanguageConfige.Add(config);
             OnEditorConfigure();
         }
 
@@ -102,7 +110,7 @@ namespace GameFrameWork
         private void OnEditorConfigure()
         {
             if (m_TotalImageLanguageConfigure.Count == 0)
-                GetLanguageConfigureOnLanguageType(ref m_TotalImageLanguageConfigure);
+                GetLanguageConfigureOnLanguageType(ref m_TotalImageLanguageConfigure);  //避免删除了原始的配置信息
 
             Language repeatLanguage = Language.Chinese;
             if (IsLanguageConfigureEnable(m_TotalImageConfigure.m_ImageLanguageConfige, ref repeatLanguage))
@@ -134,7 +142,7 @@ namespace GameFrameWork
                 Language languageType = (Language)System.Enum.Parse(typeof(Language), language.ToString());
                 if (languageConfigContainer.Count == 0)
                 {
-                    config = GetTargetImageProperty(languageType);
+                    config = GetTargetImagePropertyOfLanguage(languageType);
                     //     GetSpritePathByLanguage(ref sptitePath,config.m_SourceImage, GameSettings.GetLanguageName(config.m_Language));
                     firstConfigure = config;
                 }
@@ -147,110 +155,26 @@ namespace GameFrameWork
             }
         }
 
+
         /// <summary>
-        ///自动移动图片 (TODO  )
+        /// 获取参数语言对应的配置 取当前脚本挂载对象上的属性
         /// </summary>
-        /// <param name="path"></param>
-        /// <param name="source"></param>
-        /// <param name="languageName"></param>
-        private void GetSpritePathByLanguage(ref string path, Sprite source, string languageName)
-        {
-            //if (source == null) return;
-            //string assetPath = AssetDatabase.GetAssetPath(source);
-            //string directionPath = System.IO.Path.GetDirectoryName(assetPath);
-            //Debug.LogInfor("directionPath =" + directionPath);
-            //if(directionPath=="Resources")
-            //{
-            //    Debug.LogInfor("使用Unity 内置的资源"+ source.name);
-            //    return;
-            //}
-            //string[] paths = directionPath.Split('/');
-            //int index = -1;
-            //bool isNeedCreateDirectory = false;
-            //for (int dex=0;dex<paths.Length;++dex)
-            //{
-            //    if(paths[dex]=="Main_New")
-            //    {
-            //        index = dex;
-            //        isNeedCreateDirectory = true;
-            //        break;
-            //    }
-
-            //    if (paths[dex] == "Main")
-            //    {
-            //        index = dex;
-            //        isNeedCreateDirectory = true;
-            //        break;
-            //    }
-
-            //    if (paths[dex] == languageName)
-            //    {
-            //        isNeedCreateDirectory = false;
-            //        index = dex;
-            //        break;
-            //    }
-            //}
-
-            //if(index==-1)
-            //{
-            //    Debug.LogError("当前图片不在管理的目录 请手动处理");
-            //    return;
-            //}
-
-            //if(isNeedCreateDirectory)
-            //{
-            //    string relativePath = "";
-            //    for (int dex= index+1;dex< paths.Length;++dex)
-            //    {
-            //        relativePath += paths[dex];
-            //        if (dex != paths.Length - 1)
-            //            relativePath += "/";
-            //    }
-            //    Debug.Log("relativePath=" + relativePath);
-            //    string NewPath = Application.dataPath + "/Art/UI/Localization_NEW/";
-            //    Debug.Log("NewPath=" + NewPath);
-            //    var allLanguage = System.Enum.GetValues(typeof(Language));
-            //    foreach (var item    in allLanguage)
-            //    {
-            //        Language language = (Language)System.Enum.Parse(typeof(Language), item.ToString());
-            //        NewPath += GameSettings.GetLanguageName(language) + "/";
-            //        string pathRelative = relativePath + "/" + System.IO.Path.GetFileName(assetPath);
-            //        Debug.LogInfor("language=" + language + "   ::" + NewPath + "   :::" + pathRelative);
-            //        string directoryPath = System.IO.Path.GetDirectoryName(NewPath + pathRelative);
-            //        Debug.Log("directoryPath==" + directoryPath);
-            //        if (GameSettings.GetLanguageName(language)== languageName)
-            //        {
-            //            Debug.Log("From:" + assetPath + " \n+TO:" + (NewPath + pathRelative));
-            //            System.IO.Directory.CreateDirectory(directoryPath);
-            //            System.IO.File.Move(assetPath, NewPath+ pathRelative);
-            //            System.IO.File.Move(assetPath, NewPath + pathRelative + ".meta");
-
-            //        }
-            //        //else
-            //        //{
-            //        //    System.IO.Directory.CreateDirectory(directoryPath);
-            //        //    Debug.Log("From:" + AssetDatabase.GetAssetPath(source) + " \n+TO:" + (NewPath + pathRelative));
-            //        //    System.IO.File.Copy(AssetDatabase.GetAssetPath(source), NewPath + pathRelative);
-            //        //}
-            //    }
-            //}
-        }
-
-
-        //获取第一个语言对应的配置 取当前脚本挂载对象上的属性
-        private ImageConfige GetTargetImageProperty(Language firstLanguage)
+        /// <param name="firstLanguage"></param>
+        /// <returns></returns>
+        private ImageConfige GetTargetImagePropertyOfLanguage(Language firstLanguage)
         {
             ImageConfige _configure = new ImageConfige();
             _configure.m_Language = firstLanguage;
-            _configure.m_SourceImage = m_TargetImage.sprite;
-            InitialedImageProperty(ref _configure.m_ImageProperty);
+            ReadTargetImageProperty(ref _configure.m_ImageProperty);
             return _configure;
         }
 
 
-
-        //初始化图片的基本属性
-        private void InitialedImageProperty(ref ImageProperty imageProperty)
+        /// <summary>
+        /// 读取图片的基本属性 并记录
+        /// </summary>
+        /// <param name="imageProperty"></param>
+        private void ReadTargetImageProperty(ref ImageProperty imageProperty)
         {
             if (m_TargetImage == null) return;
             if (imageProperty == null)
@@ -285,16 +209,11 @@ namespace GameFrameWork
         #endregion
 
 
-#endif
-        #endregion
-
-        private void Awake()
-        {
-            ShowImageViewBaseOnLanguage(ApplicationConfig.Instance.CurLanguageType);
-        }
-
-
-        //根据语言类型获取对应的配置
+        /// <summary>
+        /// 根据语言类型获取对应的配置
+        /// </summary>
+        /// <param name="language"></param>
+        /// <returns></returns>
         private ImageConfige GetLanguageConfigure(Language language)
         {
             for (int dex = 0; dex < m_TotalImageConfigure.m_ImageLanguageConfige.Count; ++dex)
@@ -305,7 +224,12 @@ namespace GameFrameWork
             Debug.LogError("没有对应的语言配置" + language);
             return null;
         }
-        //检测当前语言是否已经配置过
+        /// <summary>
+        /// 检测当前语言是否已经配置过
+        /// </summary>
+        /// <param name="language"></param>
+        /// <param name="dataSource"></param>
+        /// <returns></returns>
         private bool IsExitLanguageConfigure(Language language, List<ImageConfige> dataSource)
         {
             for (int dex = 0; dex < dataSource.Count; ++dex)
@@ -324,7 +248,6 @@ namespace GameFrameWork
         private bool IsLanguageConfigureEnable(List<ImageConfige> data, ref Language repeatLanguage)
         {
             List<ImageConfige> readyCompareList = new List<ImageConfige>();  //已经匹配的不重复项
-
             for (int dex = 0; dex < data.Count; ++dex)
             {
                 if (IsExitLanguageConfigure(data[dex].m_Language, readyCompareList))
@@ -360,8 +283,8 @@ namespace GameFrameWork
         /// <param name="config"></param>
         private void InitialedImageProperty(ImageConfige config)
         {
-            m_TargetImage.sprite = config.m_SourceImage;
-            if (config.m_SourceImage == null)
+           m_TargetImage.sprite = ResourcesMgr.Instance.LoadSpriteSync(Define_SpritePath.GetSpriteInfor(SpriteRelativePath,true), m_TargetImage);
+            if (m_TargetImage.sprite == null)
                 Debug.LogInfor("当前语言" + config.m_Language + "  Name=" + gameObject.name + "  图片没有找到");
             m_TargetImage.type = config.m_ImageProperty.m_ImageType;
             m_TargetImage.color = config.m_ImageProperty.m_ImageColor;
@@ -420,12 +343,18 @@ namespace GameFrameWork
 
         #endregion
 
-        //将sources 数据赋值到target中
-        private ImageConfige CloneImageConfigureValue(ImageConfige target, ref ImageConfige sources)
+        
+
+#endif
+        #endregion
+
+        private void Awake()
         {
-            target.m_ImageProperty = sources.m_ImageProperty;
-            return target;
+            //     ShowImageViewBaseOnLanguage(AppConfigSetting.Instance.LanguageType);
         }
+
+
+
 
     }
 }

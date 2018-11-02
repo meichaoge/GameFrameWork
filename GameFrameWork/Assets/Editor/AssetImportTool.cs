@@ -7,6 +7,9 @@ namespace GameFrameWork.EditorExpand
 {
     public class AssetImportTool
     {
+        /// <summary>
+        ///标识是否在导入图片的时候
+        /// </summary>
         public static bool S_IsEnableImportTeture=true;
       //  private bool isEnable = true;
 

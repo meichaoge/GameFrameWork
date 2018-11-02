@@ -145,6 +145,16 @@ namespace GameFrameWork
 
 
         /// <summary>
+        /// 多语言图片资源在Assets顶层目录
+        /// </summary>
+        public static string S_MultLanguageSpriteTopPath = "Assets/Art/UI/LocalizationUI/";
+      
+        /// <summary>
+        /// 对于存在多个版本的资源 设置Sprite Tage时候需要过滤掉这个，目录名
+        /// 获取多语言资源时候也需要
+        /// </summary>
+        public static string S_UILocalizationPathFileName = "LocalizationUI/";
+        /// <summary>
         /// UI多语言配置信息
         /// </summary>
         public static string S_MultLanguageConfigPathName { get { return "Configure/Localization"; } }

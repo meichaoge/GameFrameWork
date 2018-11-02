@@ -13,7 +13,6 @@ namespace GameFrameWork.EditorExpand
     public class BuildToolWindow : EditorWindow
     {
         private static BuildToolWindow m_BuildToolWindow = null;
-        private static Language S_SelectedLanguage = Language.Chinese; //选择需要打包的资源的支持语言
 
         [MenuItem("Tools/Build Application/打包项目资源设置", false, 1)]
         private static void ShowBuildApplicationWin()
@@ -23,7 +22,6 @@ namespace GameFrameWork.EditorExpand
             m_BuildToolWindow.minSize = new Vector2(400, 400);
             m_BuildToolWindow.maxSize = new Vector2(800, 600);
             m_BuildToolWindow.Show();
-
         }
 
         [PostProcessBuildAttribute(1)]
@@ -38,7 +36,7 @@ namespace GameFrameWork.EditorExpand
         private void OnGUI()
         {
             GUILayout.Space(10);
-            S_SelectedLanguage = (Language)EditorGUILayout.EnumPopup(new GUIContent("选择打包语言:"), S_SelectedLanguage, GUILayout.Width(300));
+            GUILayout.Label(new GUIContent(string.Format("当前选择的语言: {0}", LanguageMgr.Instance.GetCurLanguageStr())), GUILayout.Width(300));
             GUILayout.Space(10);
 
             GUILayout.BeginVertical("Box");
@@ -54,16 +52,16 @@ namespace GameFrameWork.EditorExpand
             GUILayout.FlexibleSpace(); //使用空白填充
             if (GUILayout.Button(new GUIContent("移除多语言资源"), GUILayout.Width(180), GUILayout.Height(40)))
             {
-                if(alreadyRecordCount>0)
+                if (alreadyRecordCount > 0)
                 {
                     if (EditorUtility.DisplayDialog("提示", "已经记录了部分需要导入的资源，确定需要添加记录吗？", "确定", "取消") == false)
                         return;
                 }
 
                 if (willRemoveCount > 0)
-                    BuildTool.MoveOutUnUseResources(S_SelectedLanguage);
-                Debug.LogEditorInfor("移除其他多语言资源 选择" + S_SelectedLanguage);
-                EditorUtility.DisplayDialog("打包前移除资源", string.Format("打包前移除非{0}语言的资源到目录{1}", S_SelectedLanguage,
+                    BuildTool.MoveOutUnUseResources(AppConfigSetting.Instance.LanguageType);
+                Debug.LogEditorInfor("移除其他多语言资源 选择" + AppConfigSetting.Instance.LanguageType);
+                EditorUtility.DisplayDialog("打包前移除资源", string.Format("打包前移除非{0}语言的资源到目录{1}", AppConfigSetting.Instance.LanguageType,
                    EditorDefine.S_BuildAppMultLanguageTempStorePath), "已知晓");
             }
             GUILayout.FlexibleSpace();

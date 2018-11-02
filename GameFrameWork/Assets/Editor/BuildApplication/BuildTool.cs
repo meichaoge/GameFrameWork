@@ -26,8 +26,8 @@ namespace GameFrameWork.EditorExpand
         {
             get
             {
-                if(_MutiLanguageResourcesInfor==null)
-                    _MutiLanguageResourcesInfor= AssetDatabase.LoadAssetAtPath<MutiLanguageResourcesInfor>(EditorDefine.S_BuildAppMultLanguageAssetPath);
+                if (_MutiLanguageResourcesInfor == null)
+                    _MutiLanguageResourcesInfor = AssetDatabase.LoadAssetAtPath<MutiLanguageResourcesInfor>(EditorDefine.S_BuildAppMultLanguageAssetPath);
                 return _MutiLanguageResourcesInfor;
             }
         }
@@ -40,8 +40,8 @@ namespace GameFrameWork.EditorExpand
         {
             get
             {
-                if(_MoveOutResourceaRecord==null)
-                    _MoveOutResourceaRecord= AssetDatabase.LoadAssetAtPath<MoveOutResourceaRecord>(EditorDefine.S_MoveOutMultLanguageAssetPath);
+                if (_MoveOutResourceaRecord == null)
+                    _MoveOutResourceaRecord = AssetDatabase.LoadAssetAtPath<MoveOutResourceaRecord>(EditorDefine.S_MoveOutMultLanguageAssetPath);
                 return _MoveOutResourceaRecord;
             }
         }
@@ -49,6 +49,7 @@ namespace GameFrameWork.EditorExpand
 
 
 
+        #region  打包前 移动不是当前语言的资源到Assets同级目录
 
         /// <summary>
         /// 将所有的非参数语言的多语言资源移除到其他目录不打包进去
@@ -100,7 +101,7 @@ namespace GameFrameWork.EditorExpand
             if (item.IsIgnoreLanguage)
             {
                 realPath = string.Format("{0}/{1}", Application.dataPath, item.AssetRelativePath);
-                if (TryMoveDirectory(realPath, item.AssetRelativePath,string.Empty))
+                if (TryMoveDirectory(realPath, item.AssetRelativePath, string.Empty))
                     AssetDatabase.Refresh();
                 return;
             } //移动不需要考虑不同语言版本的资源
@@ -126,7 +127,7 @@ namespace GameFrameWork.EditorExpand
         /// <param name="relativePath"></param>
         /// <param name="languageDirectory">当不需要增加多语言目录时候为null 即可</param>
         /// <returns></returns>
-        private static bool TryMoveDirectory(string realPath, string relativePath,string languageDirectory)
+        private static bool TryMoveDirectory(string realPath, string relativePath, string languageDirectory)
         {
             if (string.IsNullOrEmpty(languageDirectory) == false)
                 relativePath = string.Format("{0}/{1}", relativePath, languageDirectory); //增加一个语言目录
@@ -137,7 +138,7 @@ namespace GameFrameWork.EditorExpand
                 return false;
             }
 
-        //    string parentDirectory = IoUtility.Instance.GetDirectoryParentDcirectory(realPath);  //获取参数路径的父级目录
+            //    string parentDirectory = IoUtility.Instance.GetDirectoryParentDcirectory(realPath);  //获取参数路径的父级目录
             string storePath = string.Format("{0}/{1}", EditorDefine.S_BuildAppMultLanguageTempStorePath, relativePath);
 
             MoveOutResourcesInfor infor = new MoveOutResourcesInfor(realPath, storePath);
@@ -146,8 +147,9 @@ namespace GameFrameWork.EditorExpand
             return true;
         }
 
+        #endregion
 
-
+        #region 打包后 将移出去的资源重新导入
 
         /// <summary>
         /// 将移除出去的资源重新导入进来
@@ -176,8 +178,22 @@ namespace GameFrameWork.EditorExpand
             {
                 Debug.LogError("MoveInAllMoveOutResources " + ex.ToString());
             }
-           
+
         }
+
+        #endregion
+
+
+        #region 批量修改Prefab 关联的静态图片资源
+        /// <summary>
+        /// 打包前关联图片资源的Sprite 
+        /// </summary>
+        public static void ConectPrefabsImage()
+        {
+            Debug.LogEditorInfor("ConectPrefabsImage TODO");
+        }
+        #endregion
+
 
 
     }

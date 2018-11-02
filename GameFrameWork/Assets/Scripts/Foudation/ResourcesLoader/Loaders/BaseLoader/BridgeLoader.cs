@@ -24,6 +24,13 @@ namespace GameFrameWork.ResourcesLoader
                 case LoadAssetModel.Sync:
                     return LoadAssetSync(url, onCompleteAct, isloadSceneAsset);
                 case LoadAssetModel.Async:
+#if UNITY_EDITOR
+                    if (Application.isPlaying == false)
+                    {
+                        Debug.LogError("编辑器下非运行模式不要使用异步模式");
+                        return null;
+                    }
+#endif
                     return LoadAssetAsync(url, onCompleteAct, isloadSceneAsset);
                 default:
                     Debug.LogError("没有定义的加载类型 " + loadModel);
@@ -200,6 +207,15 @@ namespace GameFrameWork.ResourcesLoader
                 bridgeLoader.ForceBreakLoaderProcess();
             }
             bridgeLoader.LoadassetModel = LoadAssetModel.Sync;
+#if UNITY_EDITOR
+            if(Application.isPlaying==false)
+            {
+                bridgeLoader.LoadAssetByPriority_Editor(url, bridgeLoader, isloadSceneAsset);
+                bridgeLoader.LoadAssetSync(url, bridgeLoader);
+                return bridgeLoader;
+            }//编辑器下非运行状态特殊处理
+#endif
+
             bridgeLoader.LoadAssetByPrioritySync(url, bridgeLoader, isloadSceneAsset);
             bridgeLoader.LoadAssetSync(url, bridgeLoader);
             return bridgeLoader;
@@ -300,6 +316,36 @@ namespace GameFrameWork.ResourcesLoader
 
 
         #endregion
+
+
+
+#if UNITY_EDITOR
+        /// <summary>
+        ///只在编辑器下可用
+        /// </summary>
+        /// <param name="bridgeLoader"></param>
+        /// <param name="url"></param>
+        /// <param name="isloadScene"> 如果加载的是场景 则这里必须填true ,否则false</param>
+        /// <returns></returns>
+        private void LoadAssetByPriority_Editor(string url, BridgeLoader bridgeLoader, bool isloadSceneAsset)
+        {
+            LoadAssetPathEnum curLoadAssetPathEnum = ApplicationConfig.GetDefaultEditorLoadAssetPath();
+            string fileName = System.IO.Path.GetFileNameWithoutExtension(url);
+            if (curLoadAssetPathEnum == LoadAssetPathEnum.ResourcesPath)
+            {
+                bridgeLoader.m_ConnectLoader = ResourcesLoader.LoadResourcesAsset(url, LoadAssetModel.Sync, null, isloadSceneAsset);
+                if (bridgeLoader.m_ConnectLoader.ResultObj != null)
+                    return;
+                else
+                {
+                    Debug.LogError("加载资源失败  url" + url);
+                }
+            }
+
+            Debug.LogError("LoadAssetByPriority_Editor  Fail,  无法识别的模式 " + curLoadAssetPathEnum);
+        }
+
+#endif
 
         #endregion
 

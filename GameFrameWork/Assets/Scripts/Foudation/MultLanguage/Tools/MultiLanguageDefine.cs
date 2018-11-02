@@ -201,27 +201,35 @@ namespace GameFrameWork
     [System.Serializable]
     public class ImageConfige
     {
+#if UNITY_EDITOR
         public string m_LanguageName;  //显示用的
+#endif
         public Language m_Language;
-        public Sprite m_SourceImage = null;
+      
         public ImageProperty m_ImageProperty;
         public ImageConfige()
         {
+#if UNITY_EDITOR
             m_LanguageName = m_Language.ToString();
+#endif
             m_ImageProperty = new ImageProperty();
         }
 
         public ImageConfige(Language language)
         {
             m_Language = language;
+#if UNITY_EDITOR
             m_LanguageName = m_Language.ToString();
+#endif
             m_ImageProperty = new ImageProperty();
         }
 
         public ImageConfige(Language language, ImageProperty imageProperty)
         {
             m_Language = language;
+#if UNITY_EDITOR
             m_LanguageName = m_Language.ToString();
+#endif
             m_ImageProperty = new ImageProperty(imageProperty);
         }
     } //每一种语言类型对应的配置属性

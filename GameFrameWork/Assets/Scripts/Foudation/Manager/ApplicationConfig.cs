@@ -21,13 +21,13 @@ namespace GameFrameWork
             public int m_Priority = 1;  //优先级
         }
 
-        [CustomerHeaderAttribute("应用当前的语言版本", "#00E7E7FF")]
-        [SerializeField]
-        private Language m_CurLanguageType = Language.Chinese;
-        public Language CurLanguageType
-        {
-            get { return m_CurLanguageType; }
-        }
+        //[CustomerHeaderAttribute("应用当前的语言版本", "#00E7E7FF")]
+        //[SerializeField]
+        //private Language m_CurLanguageType = Language.Chinese;
+        //public Language CurLanguageType
+        //{
+        //    get { return m_CurLanguageType; }
+        //}
 
         [CustomerHeaderAttribute("标识是否是开发模式(true 则优先加载Resources文件)", "#FF0000FF")]
         [Space(20)]
@@ -134,6 +134,10 @@ namespace GameFrameWork
             }
         }
 
+        public static LoadAssetPathEnum GetDefaultEditorLoadAssetPath()
+        {
+            return LoadAssetPathEnum.ResourcesPath;
+        }
 #endif
 
         protected override void Awake()

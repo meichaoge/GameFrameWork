@@ -69,6 +69,10 @@ namespace GameFrameWork.ResourcesLoader
         #region 引用计数维护
         protected override void AddReference(Transform requestTarget, string url)
         {
+#if UNITY_EDITOR
+            if (Application.isPlaying == false) return;  //编辑器非运行情况不考虑
+#endif
+
             if (TryAddRecord(requestTarget, url))
                 base.AddReference(requestTarget, url);  //如果没有被记录过则添加引用计数
         }
@@ -76,6 +80,9 @@ namespace GameFrameWork.ResourcesLoader
 
         public override void ReduceReference(BaseAbstracResourceLoader loader, bool isForcesDelete)
         {
+#if UNITY_EDITOR
+            if (Application.isPlaying == false) return;  //编辑器非运行情况不考虑
+#endif
             if (TryDeleteRecord(m_RequesterTarget))
                 base.ReduceReference(loader, isForcesDelete); //如果没有被记录过则添加引用计数
         }

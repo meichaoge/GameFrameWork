@@ -24,6 +24,10 @@ namespace GameFrameWork
 
         public void RecordTraceResourceInfor(BaseAbstracResourceLoader loader)
         {
+#if UNITY_EDITOR
+            if (Application.isPlaying == false) return;
+#endif
+
             if (ApplicationConfig.Instance.m_IsEnableResourcesLoadTrace == false) return;
 
             #region  记录加载为Null 的资源信息
@@ -66,6 +70,17 @@ namespace GameFrameWork
             }
 
             ///m_SortRecordInfor.Sort();
+        }
+
+
+        public void RecordTraceInstantiate(string url)
+        {
+#if UNITY_EDITOR
+            if (Application.isPlaying == false) return;
+#endif
+
+            if (ApplicationConfig.Instance.m_IsEnableResourcesLoadTrace == false) return;
+            Debug.LogEditorInfor("TODO " + url);
         }
 
     }

@@ -31,13 +31,13 @@ namespace GameFrameWork.EditorExpand
             string relativePath = texturePath.Substring(index + EditorDefine.S_UITextureTopRelativePath.Length);
             relativePath = System.IO.Path.GetDirectoryName(relativePath); //去除文件名
 
-            if (relativePath.StartsWith(EditorDefine.S_UILocalizationPathFileName))
+            if (relativePath.StartsWith(ConstDefine.S_UILocalizationPathFileName))
             {
                 var languages = System.Enum.GetValues(typeof(Language));
                 string localizationLanguagePath = "";
                 foreach (var item in languages)
                 {
-                    localizationLanguagePath = string.Format("{0}{1}/", EditorDefine.S_UILocalizationPathFileName, item.ToString());
+                    localizationLanguagePath = string.Format("{0}{1}/", ConstDefine.S_UILocalizationPathFileName, item.ToString());
                     if (relativePath.StartsWith(localizationLanguagePath))
                     {
                         relativePath = relativePath.Replace(localizationLanguagePath, "");

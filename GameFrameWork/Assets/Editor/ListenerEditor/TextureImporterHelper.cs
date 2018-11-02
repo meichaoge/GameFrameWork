@@ -37,7 +37,7 @@ namespace GameFrameWork.EditorExpand
             settings.overridden = true;
             settings.compressionQuality = 100;   //图片压缩比例
                                                  //settings.maxTextureSize = textureImporter.maxTextureSize;    //textureImporter.maxTextureSize=2048
-            settings.maxTextureSize =CommonUtility.Instance.GetNearnestPowerNumber(Mathf.Max(texture.width, texture.height),10);
+            settings.maxTextureSize = MathUtility.Instance.GetNearnestPowerNumber(Mathf.Max(texture.width, texture.height),10);
             //   Debug.Log("OnPresProcessUITextureSetting " + settings.maxTextureSize+" Width="+ texture.width+" Height="+texture.height);
             textureImporter.SetPlatformTextureSettings(settings);
         }

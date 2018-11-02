@@ -85,7 +85,7 @@ namespace GameFrameWork
         #region 视图操作
         private void Awake()
         {
-            InitView(ApplicationConfig.Instance.CurLanguageType);
+            InitView(AppConfigSetting.Instance.LanguageType);
         }
 
         /// <summary>
