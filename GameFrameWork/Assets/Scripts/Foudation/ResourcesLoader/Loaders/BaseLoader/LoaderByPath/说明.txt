@@ -1,2 +1,0 @@
-1 根据不同的路径选择合适的加载器1 2 ResourcesLoader 加载Resources 下面的资源
-3  AssetBundleLoader 加载外部  Application.Persition路径下的资源 下面的资源(AssetBundle 或者普通资源)
